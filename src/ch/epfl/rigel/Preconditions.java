@@ -30,7 +30,7 @@ public final class Preconditions {
      */
 
     public static double checkInInterval(Interval interval, double value){
-        if(value <= interval.high() || value >= interval.low()){
+        if(value <= interval.high() && value >= interval.low()){
             return value;
         }
         else{

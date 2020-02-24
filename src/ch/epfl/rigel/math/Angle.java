@@ -17,7 +17,7 @@ public final class Angle {
      * @return the corresponding angle in radians in range [0,Tau[
      */
     public static double normalizePositive(double rad){
-        if(rad > TAU){
+        if(rad >= TAU){
             rad = rad % TAU;
         }
         if(rad < 0){
@@ -46,13 +46,12 @@ public final class Angle {
      * @return converts deg,arcmin,arcsec to degree
      */
     public static double ofDMS(int deg, int min, double sec){
-        double floatpoint;
-        if(!minSecInterval.contains(deg) || !minSecInterval.contains(min)){
+        double result;
+        if(!minSecInterval.contains(sec) || !minSecInterval.contains(min)){
             throw new IllegalArgumentException();
         }
         else{
-           floatpoint = (sec/3600) + (min/60);
-           return deg += floatpoint;
+           return ofDeg( deg + min/60.0 + sec/3600.0);
         }
     }
 
@@ -81,7 +80,7 @@ public final class Angle {
      * @return converts hours to radians
      */
     public static double ofHr(double hr){
-        return ofDeg(hr/60);
+        return ofDeg(hr*15);
     }
 
     /**
@@ -90,10 +89,9 @@ public final class Angle {
      * @return converts radians to hours
      */
     public static double toHr(double rad){
-        return(toDeg(rad)*60);
+        return(toDeg(rad)/15);
     }
 
-    //hi
 
 
 }

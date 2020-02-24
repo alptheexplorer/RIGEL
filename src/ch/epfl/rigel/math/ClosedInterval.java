@@ -14,7 +14,7 @@ public final class ClosedInterval extends Interval {
      * @return true if in interval else no
      */
     public boolean contains(double v) {
-        return (v>= this.low() && v<= this.low());
+        return (v>= this.low() && v<= this.high());
     }
 
 
@@ -76,4 +76,9 @@ public final class ClosedInterval extends Interval {
                 this.high());
 
     }
+
+
+
+
+
 }

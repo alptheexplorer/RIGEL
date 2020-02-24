@@ -1,11 +1,11 @@
 package ch.epfl.rigel.math;
 
-import java.util.Locale;
-
 public final class Polynomial {
+
+// polynomial is represented with exponents in decreasing order
     private final double[] polynomials;
     private Polynomial(double coefficientN, double... coefficients){
-        this.polynomials = new double[coefficients.length];
+        this.polynomials = new double[coefficients.length + 1];
         this.polynomials[polynomials.length-1] = coefficientN;
         for(double coefficient: coefficients){
             for(int i = 0; i<=polynomials.length - 2; i++){
@@ -15,7 +15,6 @@ public final class Polynomial {
 
     }
 
-
     /**
      *
      * @param coefficientN
@@ -23,7 +22,12 @@ public final class Polynomial {
      * @return a new polynomial with exponents in increasing order
      */
     public static Polynomial of(double coefficientN, double... coefficients){
-        return new Polynomial(coefficientN, coefficients);
+        if(coefficientN == 0){
+            throw new IllegalArgumentException();
+        }
+        else {
+            return new Polynomial(coefficientN, coefficients);
+        }
     }
 
     /**
@@ -32,44 +36,89 @@ public final class Polynomial {
      * @return evaluate polynomial for given value
      */
     public double at(double x){
-        double result = 0;
-        for (int i = polynomials.length - 1; i >= 0; i--) {
-            result = polynomials[i] + (x * result);
+        int n = polynomials.length - 1;
+        double y = polynomials[n];
+        for (int i = n - 1; i >= 0; i--) {
+            y = polynomials[i] + (x * y);
         }
-        return result;
+        return y;
+    }
+
+    public String toString(){
+
     }
 
     /**
      *
      * @return string representation of polynomial ignoring any 0 coefficients
      */
+
+/**
+    public String toString(){
+        if(polynomials.length > 1){
+            String out = polynomials[polynomials.length - 1] + "x^" + (polynomials.length - 1);
+            for(int i = polynomials.length - 2; i>=2; i--){
+                if(polynomials[i] != 0){
+                    if(polynomials[i] > 0){
+                        out = "+" + out + polynomials[i] + "x^" + (i-1);
+                    }
+                    else{
+                        out = "-" + out + polynomials[i] + "x^" + (i-1);
+                    }
+                }
+            }
+            if(polynomials[1] > 0){
+                out = "+" + out + polynomials[1] + "x";
+            }
+            else{
+                out = "-" + out + polynomials[1] + "x";
+            }
+            if(polynomials[0] > 0){
+                out = "+" + out + polynomials[0] ;
+            }
+            else{
+                out = "-" + out + polynomials[0];
+            }
+            return out;
+
+        }
+        else{
+            String out = Double.toString(polynomials[0]);
+            return out;
+        }
+
+    }
+**/
+    /**
     public String toString(){
         // returns String rep ignoring any 0 coefficients
-        String output = "";
-        for(int i =0; i< polynomials.length; i++){
-            if(polynomials[i] != 0){
-                output = output + " " + polynomials[i] + "x^" + i + " ";
+        if(polynomials.length > 1){
+            String output = polynomials[0] + "x^" + (polynomials.length-1) ;
+            for(int i = polynomials.length - 2; i>1; i--){
+                if(polynomials[i] != 0){
+                    output = "+" + output + polynomials[i] + "x^" + (i-1) + "+";
+                }
             }
+            output = output + " " + polynomials[polynomials.length -1];
+            return output;
         }
-        return output;
-    }
+        else{
+            return Double.toString(polynomials[0]);
+        }
 
-    /**
-     *
-     * @throws UnsupportedOperationException
-     */
+    }
+     **/
+
+    @Override
     public int hashCode(){
         throw new UnsupportedOperationException();
     }
 
-
-    /**
-     *
-     * @throws UnsupportedOperationException
-     */
-    public boolean equals(){
+    @Override
+    public boolean equals(Object obj) {
         throw new UnsupportedOperationException();
     }
+
 
 
 }
