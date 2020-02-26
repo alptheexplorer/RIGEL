@@ -61,7 +61,7 @@ public final class Angle {
      * @return converts degrees to radians
      */
     public static double ofDeg(double deg){
-        return deg* TO_RAD;
+        return deg*TO_RAD;
     }
 
     /**
@@ -70,7 +70,7 @@ public final class Angle {
      * @return converts radians to degrees
      */
     public static double toDeg(double rad){
-        return rad* TO_DEG;
+        return rad*TO_DEG;
     }
 
 

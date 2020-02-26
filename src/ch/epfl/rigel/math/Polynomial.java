@@ -44,9 +44,11 @@ public final class Polynomial {
         return y;
     }
 
+    /**
     public String toString(){
-
+        return
     }
+
 
     /**
      *
