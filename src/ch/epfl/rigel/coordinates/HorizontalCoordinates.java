@@ -1,5 +1,4 @@
-package ch.epfl.rigel.coordinates;
-
+package ch.epfl.rigel.
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.RightOpenInterval;
@@ -7,7 +6,7 @@ import ch.epfl.rigel.math.RightOpenInterval;
 import java.util.Locale;
 
 
-public final class HorizontalCoordinates extends SphericalCoordinates {
+public final class HorizontalCoordinates extends ch.epfl.rigel.coordinates.SphericalCoordinates {
 
     private static RightOpenInterval AZIMUT = RightOpenInterval.of(0,360);
     private static ClosedInterval HEIGHT = ClosedInterval.of(-90,90);

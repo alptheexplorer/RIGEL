@@ -2,7 +2,7 @@ package ch.epfl.rigel.coordinates;
 
 import java.util.Locale;
 
-public class EclipticCoordinates extends SphericalCoordinates {
+public class EclipticCoordinates extends ch.epfl.rigel.coordinates.SphericalCoordinates {
     private EclipticCoordinates(double l, double la) {
         super(l, la);
     }
