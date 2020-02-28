@@ -35,7 +35,7 @@ public abstract class Interval {
         return higherExtrema - lowerExtrema;
     }
 
-    abstract boolean contains(double v);
+    abstract public  boolean contains(double v);
 
     @Override
     public int hashCode(){

@@ -1,4 +1,4 @@
-package ch.epfl.rigel.
+package ch.epfl.rigel.coordinates;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.RightOpenInterval;
