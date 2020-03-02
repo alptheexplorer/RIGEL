@@ -34,9 +34,17 @@ public final class Angle {
      * @return converts arcsec to radians
      */
     public static double ofArcsec(double sec){
-        return ofDeg(sec/3600);
+        return ofDeg(sec/3600.0);
     }
 
+    /**
+            *
+            * @param sec
+     * @return converts seconds to radians
+     */
+    public static double ofSec(double sec){
+        return ofDeg(sec/60.0);
+    }
 
     /**
      *
@@ -80,7 +88,7 @@ public final class Angle {
      * @return converts hours to radians
      */
     public static double ofHr(double hr){
-        return ofDeg(hr*15);
+        return ofDeg(hr*15.0);
     }
 
     /**
@@ -89,7 +97,7 @@ public final class Angle {
      * @return converts radians to hours
      */
     public static double toHr(double rad){
-        return(toDeg(rad)/15);
+        return(toDeg(rad)/15.0);
     }
 
 

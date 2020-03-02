@@ -8,29 +8,10 @@ import java.time.temporal.ChronoUnit;
  */
 public enum Epoch {
 
-    /**
-    J2000(2000, Month.JANUARY,1,12,0),
-    J2010(2010, Month.JANUARY, 1, 1,0,0);
-
-     */
-
-
-    /**
-    private Epoch(Integer year, Month month, Integer Day, Integer subtractDay, Integer Hour, Integer Minute){
-        ZonedDateTime.of(LocalDate.of(year, month, Day).minusDays(subtractDay), LocalTime.of(Hour, Minute), ZoneOffset.UTC);
-    }
-
-    private Epoch(Integer year, Month month, Integer Day, Integer Hour, Integer Minute){
-        ZonedDateTime.of(LocalDate.of(year, month, Day), LocalTime.of(Hour, Minute), ZoneOffset.UTC);
-    }
-
-     **/
-
-
     J2000(ZonedDateTime.of(LocalDate.of(2000, Month.JANUARY, 0),
             LocalTime.of(12, 0),
             ZoneOffset.UTC)),
-    J2010(ZonedDateTime.of((LocalDate.of(2010, Month.JANUARY, 1).minusDays(1),
+    J2010(ZonedDateTime.of((LocalDate.of(2010, Month.JANUARY, 1).minusDays(1)),
             LocalTime.of(0, 0),
             ZoneOffset.UTC));
 
