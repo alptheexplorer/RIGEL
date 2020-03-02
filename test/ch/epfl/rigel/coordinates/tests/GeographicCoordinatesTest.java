@@ -15,7 +15,7 @@ class GeographicCoordinatesTest {
     @Test
     void toStringWorks(){
         GeographicCoordinates test = GeographicCoordinates.ofDeg(45,50);
-        assertEquals("(lon=45°, lat=50°)", test.toString());
+        assertEquals("(lon=45.0000°, lat=50.0000°)", test.toString());
     }
 
 }
