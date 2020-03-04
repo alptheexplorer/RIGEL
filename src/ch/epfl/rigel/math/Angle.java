@@ -7,9 +7,9 @@ public final class Angle {
     private Angle(){}
     private static ch.epfl.rigel.math.RightOpenInterval minSecInterval = ch.epfl.rigel.math.RightOpenInterval.of(0,60);
 
-    public final static double TAU = 2*Math.PI;
-    private final static double TO_RAD = Math.PI/180;
-    private final static double TO_DEG = 180/Math.PI;
+    public final static double TAU = 2.0*Math.PI;
+    private final static double TO_RAD = Math.PI/180.0;
+    private final static double TO_DEG = 180.0/Math.PI;
 
     /**
      *
