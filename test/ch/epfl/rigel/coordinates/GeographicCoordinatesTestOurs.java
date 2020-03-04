@@ -1,11 +1,11 @@
-package ch.epfl.rigel.coordinates.tests;
+package ch.epfl.rigel.coordinates;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class GeographicCoordinatesTest {
+class GeographicCoordinatesTestOurs {
 
     @Test
     void validLonDegWorks(){

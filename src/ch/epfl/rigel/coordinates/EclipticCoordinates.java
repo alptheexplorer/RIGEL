@@ -11,7 +11,7 @@ public class EclipticCoordinates extends SphericalCoordinates {
      *
      * @param lon
      * @param lat
-     * @return immutable eclipticCoordinates object
+     * @return immutable eclipticCoordinates object, note that arguments are in RADIANS!
      */
     public static EclipticCoordinates of(double lon, double lat){
         return new EclipticCoordinates(lon, lat);

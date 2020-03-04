@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
  */
 public enum Epoch {
 
-    J2000(ZonedDateTime.of(LocalDate.of(2000, Month.JANUARY, 0),
+    J2000(ZonedDateTime.of(LocalDate.of(2000, Month.JANUARY, 1),
             LocalTime.of(12, 0),
             ZoneOffset.UTC)),
     J2010(ZonedDateTime.of((LocalDate.of(2010, Month.JANUARY, 1).minusDays(1)),

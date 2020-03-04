@@ -1,4 +1,4 @@
-package ch.epfl.rigel.coordinates.tests;
+package ch.epfl.rigel.coordinates;
 
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.math.Angle;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class HorizontalCoordinatesTest {
+public class HorizontalCoordinatesTestOurs {
     @Test
     void ofWorksOnInvalidAzimut(){
         assertThrows(IllegalArgumentException.class, () -> {
