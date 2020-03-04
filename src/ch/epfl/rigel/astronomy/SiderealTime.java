@@ -2,7 +2,6 @@ package ch.epfl.rigel.astronomy;
 
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -23,7 +22,7 @@ public final class SiderealTime {
      * @param when
      * @return
      */
-    public static double greenwhich(ZonedDateTime when){
+    public static double greenwich(ZonedDateTime when){
         double bigT;
         double smallT;
         double S_0;
@@ -31,8 +30,8 @@ public final class SiderealTime {
         double result;
         ZonedDateTime convertedToGW = when.withZoneSameInstant(ZoneId.of("UTC+00:00"));
         bigT = J2000.julianCenturiesUntil(convertedToGW.truncatedTo(ChronoUnit.DAYS));
-        smallT = when.getHour() +((double)when.getMinute()/60) +(double)when.getSecond()/3600
-                + (double)when.getNano()/(1e9 * 3600);
+        smallT = when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
+                + (double)when.getNano()/(1e9 * 3600.0);
 
         S_0 = 0.000025862*bigT*bigT + 2400.051336*bigT + 6.697374558;
         S_1 = 1.002737909*smallT;
@@ -44,7 +43,7 @@ public final class SiderealTime {
     }
 
     public static double local(ZonedDateTime when, GeographicCoordinates where){
-        return (greenwhich(when) + where.lon());
+        return (greenwich(when) + where.lon());
     }
 
 
