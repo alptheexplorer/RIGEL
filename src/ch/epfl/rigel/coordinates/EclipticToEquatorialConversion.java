@@ -11,17 +11,17 @@ import static ch.epfl.rigel.astronomy.Epoch.J2000;
 
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates>  {
 
-    private Polynomial E = Polynomial.of(Angle.ofArcsec(0.00181), -Angle.ofArcsec(0.0006), -Angle.ofArcsec(46.815), (Angle.ofDeg(23)+ Angle.ofSec(26) + Angle.ofArcsec(21.45)));
+    private Polynomial E = Polynomial.of(Angle.arcsSecToDeg(0.00181), -Angle.arcsSecToDeg(0.0006), -Angle.arcsSecToDeg(46.815), (23+ Angle.minToDeg(26) + Angle.arcsSecToDeg(21.45)));
     private double obliqueEcliptique;
     private double cosObliqueEcliptique;
     private double sinObliqueEcliptique;
 
     /**
-     *
+     * purpose of constructor is to immediately construct non-dependent values for faster usage in apply method
      * @param when
      */
     public EclipticToEquatorialConversion(ZonedDateTime when){
-        this.obliqueEcliptique = E.at(J2000.julianCenturiesUntil(when));
+        this.obliqueEcliptique = Angle.ofDeg(E.at(J2000.julianCenturiesUntil(when)));
         this.cosObliqueEcliptique = Math.cos(obliqueEcliptique);
         this.sinObliqueEcliptique = Math.sin(obliqueEcliptique);
     }
@@ -33,8 +33,8 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
      */
     @Override
     public EquatorialCoordinates apply(EclipticCoordinates eclipticCoordinates) {
-        double ascension = Math.atan2((Math.sin(eclipticCoordinates.lon()*cosObliqueEcliptique - Math.tan(eclipticCoordinates.lat()*sinObliqueEcliptique))), Math.cos(eclipticCoordinates.lon()));
-        double declination = Math.asin(Math.sin(eclipticCoordinates.lat()*cosObliqueEcliptique) + Math.cos(eclipticCoordinates.lat())*sinObliqueEcliptique*Math.sin(eclipticCoordinates.lon()));
+        double ascension = Math.atan2((Math.sin(eclipticCoordinates.lon())*cosObliqueEcliptique - Math.tan(eclipticCoordinates.lat())*sinObliqueEcliptique), Math.cos(eclipticCoordinates.lon()));
+        double declination = Math.asin((Math.sin(eclipticCoordinates.lat())*cosObliqueEcliptique) + Math.cos(eclipticCoordinates.lat())*sinObliqueEcliptique*Math.sin(eclipticCoordinates.lon()));
         return EquatorialCoordinates.of(ascension, declination);
     }
 

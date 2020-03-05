@@ -10,9 +10,9 @@ import java.util.function.Function;
  */
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
+    //declaration of all constants later initialized by constructor excluding h
     private double H;
     private double phi;
-    private double delta;
     private double h;
 
     /**
@@ -21,7 +21,8 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
      * @param where
      */
     public EquatorialToHorizontalConversion(ZonedDateTime when, GeographicCoordinates where){
-        this.H = Angle.ofHr(when.getHour()) + Angle.ofSec(when.getMinute());
+        this.H = Angle.ofHr(when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
+                + (double)when.getNano()/(1e9 * 3600.0));
         this.phi = where.lat();
     }
 
@@ -33,9 +34,9 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
      */
     @Override
     public HorizontalCoordinates apply(EquatorialCoordinates equatorialCoordinates) {
-        this.h = Math.asin(Math.sin(equatorialCoordinates.lat()*Math.sin(phi) + Math.cos(equatorialCoordinates.lat())*Math.cos(phi)*Math.cos(H)));
-        double A = Math.atan2(-Math.cos(equatorialCoordinates.lat())*Math.cos(phi)*Math.sin(H),(Math.sin(equatorialCoordinates.lat() - Math.sin(phi)*Math.sin(h))));
-        return HorizontalCoordinates.of(A,h);
+        this.h = Math.asin(Math.sin(equatorialCoordinates.lat())*Math.sin(phi) + Math.cos(equatorialCoordinates.lat())*Math.cos(phi)*Math.cos(H));
+        double A = Math.atan2(-Math.cos(equatorialCoordinates.lat())*Math.cos(phi)*Math.sin(H),(Math.sin(equatorialCoordinates.lat()) - Math.sin(phi)*Math.sin(h)));
+        return HorizontalCoordinates.of(Angle.normalizePositive(A), Angle.normalizePositive(h));
     }
 
     @Override

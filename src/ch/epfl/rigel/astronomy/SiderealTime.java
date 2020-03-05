@@ -13,14 +13,15 @@ import static ch.epfl.rigel.astronomy.Epoch.J2000;
  * @author Alp-Ozen
  */
 public final class SiderealTime {
-    private SiderealTime(){ }
+    private SiderealTime(){
+
+    }
 
     /**
      *
      * @param when
      * @return
      */
-
     public static double greenwich(ZonedDateTime when){
         double bigT;
         double smallT;
@@ -36,6 +37,7 @@ public final class SiderealTime {
         S_1 = 1.002737909*smallT;
         result = S_0 + S_1;
         //double resNormHr = RightOpenInterval.of(0,24).reduce(result);
+
 
         return Angle.normalizePositive(Angle.ofHr(result));
     }

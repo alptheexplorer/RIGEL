@@ -37,6 +37,14 @@ public final class Angle {
         return ofDeg(sec/3600.0);
     }
 
+    public static double arcsSecToDeg(double arcsec){
+        return (arcsec/3600.0);
+    }
+
+    public static double minToDeg(double min){
+        return (min/60.0);
+    }
+
     /**
             *
             * @param sec

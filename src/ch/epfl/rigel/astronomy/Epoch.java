@@ -17,8 +17,8 @@ public enum Epoch {
 
 
     private final ZonedDateTime timeObject;
-    private final double MIL_TO_DAY = 1000*60*60*24;
-    private final double MIL_TO_JULCENTURY = 36525;
+    private final double MIL_TO_DAY = 1000.0*60.0*60.0*24.0;
+    private final double MIL_TO_JULCENTURY = 36525.0;
     private Epoch(ZonedDateTime d){
         this.timeObject = d;
     }
