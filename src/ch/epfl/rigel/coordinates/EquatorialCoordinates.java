@@ -1,5 +1,7 @@
 package ch.epfl.rigel.coordinates;
 
+import ch.epfl.rigel.math.Angle;
+
 import java.util.Locale;
 
 public final class EquatorialCoordinates extends SphericalCoordinates{
@@ -11,6 +13,8 @@ public final class EquatorialCoordinates extends SphericalCoordinates{
     public static EquatorialCoordinates of(double ra, double dec){
         return new EquatorialCoordinates(ra, dec);
     }
+
+    public static EquatorialCoordinates ofDeg(double raDeg, double decDeg) { return new EquatorialCoordinates(Angle.ofDeg(raDeg), Angle.ofDeg(decDeg)); }
 
     public double ra(){
         return super.lon();
