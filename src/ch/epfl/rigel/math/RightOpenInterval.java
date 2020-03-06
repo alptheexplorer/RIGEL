@@ -60,9 +60,11 @@ public final class RightOpenInterval extends Interval {
      *
      */
     public double reduce(double v){
-        double low = this.low();
+        /**double low = this.low();
         double high = this.high();
-        return v + ((v - low) - (high - low)*Math.floor((v - low)/(high-low)));
+        return v + ((v - low) - (high - low)*Math.floor((v - low)/(high-low)));**/
+        return this.low() + florMod(v-this.low(), this.high() - this.low());
+
     }
 
     /**TODO fix reduce
@@ -79,6 +81,10 @@ public final class RightOpenInterval extends Interval {
                 "[%f,%f[",
                 this.low(),
                 this.high());
+    }
+
+    private double florMod(double x, double y){
+        return x- y*Math.floor(x/y);
     }
 
 

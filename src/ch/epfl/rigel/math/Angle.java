@@ -17,7 +17,7 @@ public final class Angle {
      * @return the corresponding angle in radians in range [0,Tau[
      */
     public static double normalizePositive(double rad){
-        if(rad >= TAU){
+       /** if(rad >= TAU){
             rad = rad % TAU;
         }
         if(rad < 0){
@@ -25,7 +25,10 @@ public final class Angle {
                 rad+= TAU;
             }while(rad < 0);
         }
-        return rad;
+        return rad;**/
+       RightOpenInterval interval = RightOpenInterval.of(0,TAU);
+       return interval.reduce(rad);
+
     }
 
     /**
