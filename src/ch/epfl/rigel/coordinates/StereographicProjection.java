@@ -12,13 +12,13 @@ import java.util.function.Function;
  * the meridians will be projected into circles too, but in this
  * project we will not draw those, so we won't compute them
  */
-public class StereographicProjection implements Function<HorizontalCoordinates, CartesianCoordinates>{
+public final class StereographicProjection implements Function<HorizontalCoordinates, CartesianCoordinates>{
 
     // attribute names based on formula in 2.1- Projection stéréographique
     //they are all in function of the center
-    private double sinPhiCenter, sinLambdaCenter, cosPhiCenter, cosLambdaCenter, lambdaCenter, phiCenter;
+    final private double sinPhiCenter, sinLambdaCenter, cosPhiCenter, cosLambdaCenter, lambdaCenter, phiCenter;
 
-    private HorizontalCoordinates centerHor;
+    final private HorizontalCoordinates centerHor;
 
     /**
      *

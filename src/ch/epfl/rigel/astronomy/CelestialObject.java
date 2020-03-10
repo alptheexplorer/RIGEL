@@ -8,10 +8,10 @@ import java.util.Objects;
  */
 public abstract class CelestialObject {
 
-    String name;
-    EquatorialCoordinates equatorialpos;
-    float angularSize;
-    float magnitude;
+    private final String name;
+    private final EquatorialCoordinates equatorialpos;
+    private final float angularSize;
+    private final float magnitude;
     /**
      * package private ( by default )
      * The only constructor
@@ -80,7 +80,7 @@ public abstract class CelestialObject {
      * @return a brief info text on the object, destined to the user
      * by default it will return name as name()
      */
-    String info(){
+    public String info(){
         return this.name;
     }
 
