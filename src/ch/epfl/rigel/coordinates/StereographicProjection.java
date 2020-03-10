@@ -8,14 +8,17 @@ import java.util.function.Function;
  *
  * lambda = longitude = az() = lon()
  * phi = latitude = lat() = lat()
+ * the parallels will be projected as circles on the plane
+ * the meridians will be projected into circles too, but in this
+ * project we will not draw those, so we won't compute them
  */
 public class StereographicProjection implements Function<HorizontalCoordinates, CartesianCoordinates>{
 
     // attribute names based on formula in 2.1- Projection stéréographique
     //they are all in function of the center
-   // private double absX, ordY, lambda, phi,  lambdaDelta, d, rho;
     private double sinPhiCenter, sinLambdaCenter, cosPhiCenter, cosLambdaCenter, lambdaCenter, phiCenter;
 
+    private HorizontalCoordinates centerHor;
 
     /**
      *
@@ -27,29 +30,18 @@ public class StereographicProjection implements Function<HorizontalCoordinates, 
 
         // how to define lambda and phi now? WE CANNOT, but we can define the
         // attributes that depend only on the center
-        // this is just a projection so it only serves to calculate
-        // where to actually project stuff
-        /**lambdaDelta = lambda - center.lon();
-        d = 1/(
-                1+ Math.sin(phi)*Math.sin(center.lat()) +
-                        Math.cos(phi)*Math.sin(center.lat())*Math.cos(lambdaDelta)
-                );
-        absX = d*Math.cos(phi)*Math.sin(lambdaDelta);
-        ordY = d*(
-                Math.sin(phi)*Math.cos(center.lat()) -
-                        Math.cos(phi)*Math.sin(center.lat())*Math.cos(lambdaDelta)
-                );
-        rho=**/
 
+        // these seems the only formulas we can calculate in the constructor
+        //i.e. they depend only on the center of the projection
         lambdaCenter = center.lon();
         phiCenter = center.lat();
         sinLambdaCenter = Math.sin(lambdaCenter);
         sinPhiCenter = Math.sin(phiCenter);
         cosLambdaCenter = Math.cos(lambdaCenter);
         cosPhiCenter = Math.cos(phiCenter);
+        centerHor = center;
 
-
-
+        //TODO: ask/check if there are more
     }
 
     /**
@@ -59,30 +51,53 @@ public class StereographicProjection implements Function<HorizontalCoordinates, 
      * of the parallel passing though @hor
      * the ordY of the center could be infinite, that means that the "cercle"
      * is in fact a simple line ( equator)
+     * note also that the projections of the paralallels will not be concentric as
+     * we move from the north or south poles
      */
     public CartesianCoordinates circleCenterForParallel(HorizontalCoordinates hor){
+        //Only need the latitude=phi of @hor to project it
+        double circleCenterX = 0.0;
+        double phi = hor.lat();
 
-
-    }
-
-    /**TODO
-     *
-     * @param parallel
-     * @return radius of cercle correspondant to the projection of the parallel
-     * passing throw the point of coord hor (? error here in cours)(@parallel)
-     * could be infinite (equator)
-     */
-    public double circleRadiusForParallel(HorizontalCoordinates parallel){
+        double circleCenterY = cosPhiCenter/(
+                Math.sin(phi) + sinPhiCenter );
+        return CartesianCoordinates.of(circleCenterX,circleCenterY);
 
     }
 
     /**
-     *TODO
+     *
+     * @param parallel
+     * @return radius=rho(in formula) of cercle correspondant to the projection of the parallel
+     * passing throw the point of coord hor (? error here in cours)(@parallel)
+     * could be infinite (equator)
+     */
+    public double circleRadiusForParallel(HorizontalCoordinates parallel){
+        //we only need the phi=latitude of the parallel to project it
+
+        double phi= parallel.lat();
+        double cosPhi = Math.cos(phi);
+        double sinPhi = Math.sin(phi);
+
+        double radius = cosPhi/(
+                sinPhi +sinPhiCenter);
+        return radius;
+    }
+
+    /**
+     *
      * @param rad
      * @return projected diameter of a sphere of angular size @rad centered
      * at the center of the projection, admitting that the latter is on the horizon
+     *
+     * in particular we will draw the Moon and the Sun etc.. with a diameter always
+     * as if they were exactly in the center of our projection, for simplicity
+     * therefore they will not change size when we move the projection
+     *
      */
     public double applyToAngle(double rad){
+        double diameter = 2*Math.tan(rad/4.0);
+        return diameter;
 
     }
 
@@ -94,8 +109,6 @@ public class StereographicProjection implements Function<HorizontalCoordinates, 
      * giving the corresponding Cartesian Coordinates
      */
     public CartesianCoordinates apply(HorizontalCoordinates azAlt){
-
-
 
         double phi = azAlt.lat();
         double lambda = azAlt.lon();
@@ -157,10 +170,10 @@ public class StereographicProjection implements Function<HorizontalCoordinates, 
      * and coordinates of the projection's center
      */
     public String toString(){
-        //TODO
         return String.format(Locale.ROOT,
-                "(%f,%f)",
-                absX,
-                ordY);
+                "  StereographicProjection (center): (%f,%f) --> (%f,%f)",
+                phiCenter,
+                lambdaCenter, apply(centerHor).x() , apply(centerHor).y())
+        ;
     }
 }
