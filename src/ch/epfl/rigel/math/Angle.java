@@ -17,7 +17,7 @@ public final class Angle {
      * @return the corresponding angle in radians in range [0,Tau[
      */
     public static double normalizePositive(double rad){
-       /** if(rad >= TAU){
+        if(rad >= TAU){
             rad = rad % TAU;
         }
         if(rad < 0){
@@ -25,10 +25,7 @@ public final class Angle {
                 rad+= TAU;
             }while(rad < 0);
         }
-        return rad;**/
-       RightOpenInterval interval = RightOpenInterval.of(0,TAU);
-       return interval.reduce(rad);
-
+        return rad;
     }
 
     /**
@@ -40,9 +37,17 @@ public final class Angle {
         return ofDeg(sec/3600.0);
     }
 
+    public static double arcsSecToDeg(double arcsec){
+        return (arcsec/3600.0);
+    }
+
+    public static double minToDeg(double min){
+        return (min/60.0);
+    }
+
     /**
-            *
-            * @param sec
+     *
+     * @param sec
      * @return converts seconds to radians
      */
     public static double ofSec(double sec){
@@ -62,7 +67,7 @@ public final class Angle {
             throw new IllegalArgumentException();
         }
         else{
-           return ofDeg( deg + min/60.0 + sec/3600.0);
+            return ofDeg( deg + min/60.0 + sec/3600.0);
         }
     }
 
