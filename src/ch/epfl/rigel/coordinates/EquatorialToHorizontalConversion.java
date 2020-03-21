@@ -12,7 +12,6 @@ import java.util.function.Function;
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
     private double phi;
-    private double delta;
     private double h;
     private double sidTime;
 
@@ -52,10 +51,9 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
                 Math.sin(equatorialCoordinates.dec()) - Math.sin(phi)*Math.sin(h)
         );
         //need to normalize before putting into Horizontal!
-        //A and h are in deg? radians?
-        double Anorm = Angle.normalizePositive(A);
-        //double hnorm = Angle.normalizePositive(h);
-        return HorizontalCoordinates.of(Anorm,h);
+        double A_NORM = Angle.normalizePositive(A);
+        double h_NORM = Angle.normalizePositive(h);
+        return HorizontalCoordinates.of(A_NORM,h_NORM);
     }
 
     @Override

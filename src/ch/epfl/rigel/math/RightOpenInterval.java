@@ -1,7 +1,5 @@
 package ch.epfl.rigel.math;
 
-import ch.epfl.rigel.math.Interval;
-
 import java.util.Locale;
 
 /**
@@ -59,6 +57,7 @@ public final class RightOpenInterval extends Interval {
      *
      * @param v
      * @return reduced form
+     *
      */
     public double reduce(double v){
         /**double low = this.low();
@@ -67,6 +66,10 @@ public final class RightOpenInterval extends Interval {
         return this.low() + florMod(v-this.low(), this.high() - this.low());
 
     }
+
+    /**TODO fix reduce
+     *
+     */
 
 
     /**

@@ -4,12 +4,12 @@ import java.util.Locale;
 
 public final class CartesianCoordinates {
 
-    private static double absX;
-    private static double ordY;
+    private final double ordY;
+    private final double absX;
 
     private CartesianCoordinates(double x,double y) {
-        absX = x;
-        ordY = y;
+        this.absX = x;
+        this.ordY = y;
     }
 
     /**
@@ -25,11 +25,11 @@ public final class CartesianCoordinates {
     }
 
     public double x(){
-        return absX;
+        return this.absX;
     }
 
     public double y(){
-        return ordY;
+        return this.ordY;
     }
 
     @Override

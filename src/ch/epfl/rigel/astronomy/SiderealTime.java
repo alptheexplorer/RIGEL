@@ -22,7 +22,7 @@ public final class SiderealTime {
     /**
      *
      * @param when
-     * @return
+     * @return greenwich converted time in radians in normalized range
      */
     public static double greenwich(ZonedDateTime when){
         double bigT;
@@ -44,6 +44,12 @@ public final class SiderealTime {
         return Angle.normalizePositive(Angle.ofHr(day.reduce(result)));
     }
 
+    /**
+     *
+     * @param when
+     * @param where
+     * @return sidereal local time in radians
+     */
     public static double local(ZonedDateTime when, GeographicCoordinates where){
         //System.out.println(where.lon());
         return Angle.normalizePositive(greenwich(when) + where.lon());

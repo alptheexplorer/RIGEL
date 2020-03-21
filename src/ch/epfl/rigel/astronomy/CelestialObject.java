@@ -31,11 +31,15 @@ public abstract class CelestialObject {
         }
          */
 
-        if ( angularSize<0) throw new IllegalArgumentException();
-        else this.angularSize = angularSize;
+        if ( angularSize<0) {
+            throw new IllegalArgumentException();
+        }
+        else {
+            this.angularSize = angularSize;
+        }
 
-        this.name = Objects.requireNonNull(name);
-        this.equatorialpos = Objects.requireNonNull(equatorialPos);
+        this.name = Objects.requireNonNull(name, "Non-Null object");
+        this.equatorialpos = Objects.requireNonNull(equatorialPos, "Non-Null object");
 
         this.magnitude = magnitude;
         Objects.requireNonNull(name);

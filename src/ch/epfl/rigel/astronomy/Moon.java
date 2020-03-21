@@ -2,6 +2,8 @@ package ch.epfl.rigel.astronomy;
 
 import ch.epfl.rigel.coordinates.*;
 
+import java.util.Locale;
+
 /**
  * represents the Moon at a given instant
  */
@@ -12,18 +14,22 @@ public final class Moon extends CelestialObject {
     /**
      *
      * name is "Lune"
-     *
+     * @throws IllegalArgumentException if not in specified phase
      * @param equatorialPos
      * @param angularSize
      * @param magnitude
      * @param phase must be in [0,1]
      */
-    Moon(EquatorialCoordinates equatorialPos, float angularSize, float magnitude, float phase){
+    public Moon(EquatorialCoordinates equatorialPos, float angularSize, float magnitude, float phase){
         super("Lune",equatorialPos,angularSize,magnitude);
-        if(phase>=0 && phase<=1) this.phase=phase;
-        else throw new IllegalArgumentException();
+        if(phase>=0 && phase<=1) {
+            this.phase=phase;}
+        else
+        {
+            throw new IllegalArgumentException();
+        }
+        }
 
-    }
 
     //TODO: check this one: if phase = 0.3752, print " Lune (37.5%) "
     //TODO: ask if we need to simply cut it or to approximate it:
@@ -34,6 +40,6 @@ public final class Moon extends CelestialObject {
      */
     public  String info(){
         double percentage = phase*100;
-        return String.format("Lune (%.2f", percentage) + "%)";
+        return String.format(Locale.ROOT,"Lune (%.1f", percentage) + "%)";
     }
 }
