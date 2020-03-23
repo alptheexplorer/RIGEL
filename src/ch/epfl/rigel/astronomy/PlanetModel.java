@@ -6,6 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Theory:
+ * The position of a planet is more complicated to calculate: a planet doesn't orbit
+ * in an ecliptic's plane, but has his own. Furthermore we want to determine the
+ * planet's position in geocentric ecliptic coordinates so we need to know at
+ * the same time the planet position as well as the Earth position.
+ *
+ * We'll proceed in 4 steps:
+ */
 public enum PlanetModel implements CelestialObjectModel<Planet> {
     MERCURY("Mercure", 0.24085, 75.5671, 77.612, 0.205627,
             0.387098, 7.0051, 48.449, 6.74, -0.42),

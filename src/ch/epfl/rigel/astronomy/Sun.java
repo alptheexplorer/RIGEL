@@ -17,7 +17,7 @@ public final class Sun extends CelestialObject{
      * @param eclipticPos celestial didn't have this
      * @param equatorialPos
      * @param angularSize
-     * @param meanAnomaly  explained later
+     * @param meanAnomaly  explained later ( see sunModel )
      */
     public Sun(EclipticCoordinates eclipticPos, EquatorialCoordinates equatorialPos,
                float angularSize, float meanAnomaly){
