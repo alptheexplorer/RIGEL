@@ -1,6 +1,7 @@
 package ch.epfl.rigel.astronomy;
 
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
+import ch.epfl.rigel.math.Angle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +15,14 @@ import java.util.List;
  * the same time the planet position as well as the Earth position.
  *
  * We'll proceed in 4 steps:
+ * 1-planet's position on his own orbit ( similar to Sun )
+ * 2-projecting 1) on an ecliptic plane, express it in heliocentric ecliptic coord. ( Sun as origin)
+ * 3-Earth Position in same coordinate system as 2)
+ * 4-combine 2) and 3) and obtain planet's position in geocentric ecliptic coordinates
+ *
+ * As with SunModel, be careful with the units/Angles: they are given in degrees
+ * but need to be stocked in rad
+ * AU = Astronomical Unit = Average distance between Sun and Earth
  */
 public enum PlanetModel implements CelestialObjectModel<Planet> {
     MERCURY("Mercure", 0.24085, 75.5671, 77.612, 0.205627,
@@ -34,26 +43,82 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
             30.1985, 1.7673, 131.879, 62.20, -6.87);
 
     private final String frenchName;
-    private final double T_P, EPSILON, GAMMA, E, A, I, OMEGA, ANGULAR_SIZE, MAGNITUDE;
+
+    //revolution period [tropical year]; Longitude at J2010[deg or rad]; Longitude at perigee [deg or rad]
+    private final double T_P, EPSILON_RAD, OMEGA_RAD;
+    //Orbit's Eccentricity; Half Orbit's major-axe [UA]; Orbit's inclination at ecliptic [deg or rad]
+    private final double E, A, I;
+    //Longitude of ascendant node [Deg or rad] (see wiki: usually it's not exactly an omega but we use that here )
+    private final double BIG_OMEGA_RAD;
+    // given in constructor are the angular size and magnitude of the planet at a distance of 1UA
+    private final double ANG_SIZE_UA, MAGNITUDE_UA;
+
+    //the angular size and magnitude are a function of the distance from the point of observation
+    private double angularSize, magnitude;
+
     public static List<PlanetModel> ALL = new ArrayList<>(Arrays.asList(MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE));
 
+    //Days since J2010 [Day]; Planet's Mean Anomaly [Rad]; True (Vraie) Anomaly [Rad]
+    private double d,m,v;
+    //radius7distance from Sun [UA]; heliocentric longitude [rad]
+    private double r,l;
+    //radius projection on the ecliptic [UA]; heliocentric ecliptic longitude and latitude [rad]
+    private double rPrime, lPrime, psi;
+    //Geocentric ecliptic longitude and latitude [rad]
+    private double lambda, beta;
+
+    //stuff we can calculate here to lighten at()
+    private final double MEAN_ANG_VEL= Angle.TAU/365.242191;
 
 
-    PlanetModel(String frenchName, double t_P, double EPSILON, double GAMMA, double e, double a, double i, double OMEGA, double ANGULAR_SIZE, double MAGNITUDE) {
+
+    PlanetModel(String frenchName, double revolutionPeriod, double lonJ2010, double lonPerigee,
+                double eccentricity, double halfOrbitMajorAxe, double inclination, double lonAscendNode, double angularSizeUA, double magnitudeUA) {
         this.frenchName = frenchName;
-        T_P = t_P;
-        this.EPSILON = EPSILON;
-        this.GAMMA = GAMMA;
-        E = e;
-        A = a;
-        I = i;
-        this.OMEGA = OMEGA;
-        this.ANGULAR_SIZE = ANGULAR_SIZE;
-        this.MAGNITUDE = MAGNITUDE;
+        T_P = revolutionPeriod;
+        EPSILON_RAD = Angle.ofDeg(lonJ2010);
+        OMEGA_RAD = Angle.ofDeg(lonPerigee);
+        E = eccentricity;
+        A = halfOrbitMajorAxe;
+        I = inclination;
+        BIG_OMEGA_RAD = Angle.ofDeg(lonAscendNode);
+        this.ANG_SIZE_UA = angularSizeUA;
+        this.MAGNITUDE_UA = magnitudeUA;
+
     }
 
+
+    /**
+     *
+     * @param daysSinceJ2010
+     * @param eclipticToEquatorialConversion
+     * @return Planet at epoch J2010 + @daysSinceJ2010, using @eclipticToEquatorialConversion
+     * to obtain equatorial coordinates from ecliptic one
+     * Formula in the text, see book for better references
+     */
     @Override
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
+        double oneMinusE = 1 - (E*E);
+
+        d = daysSinceJ2010;
+        m = MEAN_ANG_VEL*d/T_P + EPSILON_RAD - OMEGA_RAD;
+        v= m + 2*E*Math.sin(m);
+
+        r = (A*oneMinusE)/(1+ E*Math.cos(v));
+        l = v+OMEGA_RAD;
+        double sinLBigOmega = Math.sin(l-BIG_OMEGA_RAD);
+        double cosLBigOmega = Math.cos(l-BIG_OMEGA_RAD);
+        psi = Angle.normalizePositive(sinLBigOmega*Math.sin(I));
+
+        rPrime = r*Math.cos(psi);
+        //TODO
+        lPrime = Angle.normalizePositive(
+                Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
+                ) + BIG_OMEGA_RAD);
+
+        //TODO: distinction inner and outer planets to complete the method
+
+
         return null;
     }
 }
