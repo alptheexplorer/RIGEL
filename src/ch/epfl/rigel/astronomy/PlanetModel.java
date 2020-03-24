@@ -1,6 +1,8 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
+import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.Angle;
 
 import java.util.ArrayList;
@@ -23,6 +25,10 @@ import java.util.List;
  * As with SunModel, be careful with the units/Angles: they are given in degrees
  * but need to be stocked in rad
  * AU = Astronomical Unit = Average distance between Sun and Earth
+ *
+ * Theory- Outer and Inner Planets:
+ * Inner: closer to the Sun than Earth: Mercure et Venus
+ * Outer: further away from the Sun than Earth: Mars, Jupiter, Saturne, Uranus et Neptune
  */
 public enum PlanetModel implements CelestialObjectModel<Planet> {
     MERCURY("Mercure", 0.24085, 75.5671, 77.612, 0.205627,
@@ -51,7 +57,7 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
     //Longitude of ascendant node [Deg or rad] (see wiki: usually it's not exactly an omega but we use that here )
     private final double BIG_OMEGA_RAD;
     // given in constructor are the angular size and magnitude of the planet at a distance of 1UA
-    private final double ANG_SIZE_UA, MAGNITUDE_UA;
+    private final double ANG_SIZE_UA, MAGNITUDE_UA; //Ang size given in arcsec! then transformed in [rad]
 
     //the angular size and magnitude are a function of the distance from the point of observation
     private double angularSize, magnitude;
@@ -82,7 +88,7 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         A = halfOrbitMajorAxe;
         I = inclination;
         BIG_OMEGA_RAD = Angle.ofDeg(lonAscendNode);
-        this.ANG_SIZE_UA = angularSizeUA;
+        this.ANG_SIZE_UA = Angle.ofArcsec(angularSizeUA);
         this.MAGNITUDE_UA = magnitudeUA;
 
     }
@@ -111,14 +117,50 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         psi = Angle.normalizePositive(sinLBigOmega*Math.sin(I));
 
         rPrime = r*Math.cos(psi);
-        //TODO
+        //TODO check fuss about atan2. Was it only about normalizing the angle at the end?
         lPrime = Angle.normalizePositive(
                 Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
                 ) + BIG_OMEGA_RAD);
 
-        //TODO: distinction inner and outer planets to complete the method
+        //distinction inner and outer Planets
+        //bigL and bigR are l and r but for Earth TODO is it correct? at this point it should calculate it lke inside at() right?
+        double bigL = EARTH.l;
+        double bigR = EARTH.r;
+        double bigLMinusLPrime= bigL - lPrime;
+        //Inner Planets first TODO ask if it's ok like this or if we should make it work w/ see slack
+        if(this.frenchName.equals("Mercure") || this.frenchName.equals("Vénus")) {
+            lambda = Angle.normalizePositive(Math.PI + bigL + Math.atan2(
+                    rPrime*Math.sin(bigLMinusLPrime),
+                    bigR - rPrime*Math.cos(bigLMinusLPrime))
+            );
 
+        }
+        else{
+            lambda = Angle.normalizePositive(lPrime + Math.atan2(
+                    bigR*Math.sin(-bigLMinusLPrime),
+                    rPrime - bigR*Math.cos(-bigLMinusLPrime)
+            ));
 
-        return null;
+        }
+
+        beta =Angle.normalizePositive(Math.atan2(
+                rPrime*Math.tan(psi)*Math.sin(lambda-lPrime),
+                bigR*Math.sin(-bigLMinusLPrime)
+        ));
+
+        //distance from Earth
+        double rho =Math.cbrt(bigR*bigR + r*r - 2*bigR*r*Math.cos(l-bigL)*Math.cos(psi));
+        angularSize = Angle.normalizePositive(ANG_SIZE_UA/rho);
+
+        //phase= illuminated portion of the Planet's disk as seen from Earth
+        double bigF = (1+ Math.cos(lambda - l))/2.0;
+        magnitude = MAGNITUDE_UA + 5*Math.log10(r*rho/Math.sqrt(bigF));
+
+        EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,beta);
+        EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
+        Planet planet = new Planet (frenchName,equatorialCoordinates,(float)angularSize,(float)magnitude);
+
+        return planet;
+
     }
 }
