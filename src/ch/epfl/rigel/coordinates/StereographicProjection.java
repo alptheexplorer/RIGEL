@@ -1,5 +1,7 @@
 package ch.epfl.rigel.coordinates;
 
+import ch.epfl.rigel.math.Angle;
+
 import java.util.Locale;
 import java.util.function.Function;
 
@@ -140,12 +142,12 @@ public final class StereographicProjection implements Function<HorizontalCoordin
                 rhoPwr + 1 );
 
         double atanNum = xy.x()*sinC;
-        double atanDen = rho*COS_PHI_CENTER *cosC - xy.y()* SIN_PHI_CENTER *sinC;
-        double lambda = Math.atan2(xy.x()*sinC,
-                rho*COS_PHI_CENTER*cosC -1*xy.y()*SIN_PHI_CENTER*sinC) + LAMBDA_CENTER;
+        double atanDen = rho*COS_PHI_CENTER *cosC - xy.y()* SIN_PHI_CENTER *sinC;//TODO error is probably here
+        double lambda = Angle.normalizePositive(Math.atan2(xy.x()*sinC,
+                rho*COS_PHI_CENTER*cosC -1*xy.y()*SIN_PHI_CENTER*sinC) + LAMBDA_CENTER);
 
-        double phi= Math.asin(cosC* SIN_PHI_CENTER +
-                (xy.y()*sinC* COS_PHI_CENTER)/rho );
+        double phi= Angle.normalizePositive(Math.asin(cosC* SIN_PHI_CENTER +
+                (xy.y()*sinC* COS_PHI_CENTER)/rho ));
 
         return HorizontalCoordinates.of(lambda, phi);
     }
