@@ -131,10 +131,6 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
         rPrime = r*Math.cos(psi);
 
-        lPrime = Angle.normalizePositive(
-                Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
-                ) + BIG_OMEGA_RAD);
-
         double bigL = EARTH.l;
         double bigR = EARTH.r;
         double bigLMinusLPrime= bigL - lPrime;
