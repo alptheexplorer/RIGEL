@@ -76,16 +76,16 @@ public enum SunModel implements CelestialObjectModel<Sun> {
     @Override
     public Sun at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
 
-        d= daysSinceJ2010; //TODO in the text it says "Calculate" but actually it's given, check
+        d= daysSinceJ2010;
         m= MEAN_ANG_VEL*d + EPSILON_RAD - OMEGA_RAD;
         v = m + 2*E*Math.sin(m);
         lambda = v + OMEGA_RAD;
         phi = 0;
-        double tmp= (1+Math.cos(v))/(1- E*E);
-        theta = THETA_0_RAD*tmp; // TODO the result should be in rad,check/ask
+        double tmp= (1+E*Math.cos(v))/(1- E*E);
+        theta = THETA_0_RAD*tmp;
         //if we want distance r = R_0/tmp
 
-        // TODO check if I used the conversion correctly
+
         EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,phi);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
         Sun sun = new Sun(eclipticCoordinates,equatorialCoordinates,(float)theta,(float)v);
