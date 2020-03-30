@@ -170,7 +170,7 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
 
-        return new Planet (frenchName,equatorialCoordinates,(float)angularSize,(float)magnitude);
+        return new Planet(frenchName,equatorialCoordinates,(float)angularSize,(float)magnitude);
 
     }
 }
