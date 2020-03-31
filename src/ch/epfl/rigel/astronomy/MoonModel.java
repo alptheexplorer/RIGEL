@@ -56,11 +56,11 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
 
         //calculating orbital Longitude
         l = (Angle.ofDeg(13.1763966)*DAYS_SINCE) + l_null;
-        m = (l - Angle.ofDeg(0.1114041))*(DAYS_SINCE - P_null);
+        m = l - Angle.ofDeg(0.1114041)*DAYS_SINCE - P_null;
         E = Angle.ofDeg(1.2739)*Math.sin(2*(l-LAMBDA_SUN) - m);
         A = Angle.ofDeg(0.1858)*Math.sin(M_SUN);
         A3 = Angle.ofDeg(0.37)*Math.sin(M_SUN);
-        mP = m + E - A  - A3;
+        mP = m + E - A - A3;
         eC = Angle.ofDeg(6.2886)*Math.sin(mP);
         A4 = Angle.ofDeg(0.214)*Math.sin(2*mP);
         lP = l + e + eC - A + A4;
@@ -70,18 +70,25 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
         //calculating ecliptic position
         n = N_null - (Angle.ofDeg(0.0529539)*DAYS_SINCE);
         nP = n - Angle.ofDeg(0.16)*Math.sin(M_SUN);
-        lambda = Angle.normalizePositive(Math.atan2(Math.sin(lPP-nP)*Math.cos(i),Math.cos(lPP-nP)))+nP;
-        beta = Math.asin(Math.sin(lPP-nP)*Math.sin(i));
+        lambda = Angle.normalizePositive(
+                Math.atan2(
+                        Math.sin(lPP - nP) * Math.cos(i),
+                        Math.cos(lPP - nP) )
+                        + nP );
+        beta = Angle.normalizePositive(
+                Math.asin(
+                        Math.sin(lPP - nP) * Math.sin(i)
+                ));
 
         //calculating phase
-        double phase = (1-Math.cos(lPP-LAMBDA_SUN)/2);
+        double phase = (1 - Math.cos(lPP-LAMBDA_SUN) )/ 2;
 
         //calculating angular size:
-        double row = (1-(e*e))/(1+e*Math.cos(mP+eC));
-        double angularSize = Angle.ofDeg(0.5181)/row;
+        double rho = (1 - (e*e) )/( 1 + e*Math.cos(mP + eC) );
+        double angularSize = Angle.normalizePositive(Angle.ofDeg(0.5181)/rho );
 
         //final steps
-        EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,beta);
+        EclipticCoordinates eclipticCoordinates = EclipticCoordinates.of(lambda,beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
         return new Moon(equatorialCoordinates, (float)angularSize, 0, (float)phase);
     }
