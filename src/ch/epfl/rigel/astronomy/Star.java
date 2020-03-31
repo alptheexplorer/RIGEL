@@ -1,10 +1,7 @@
 package ch.epfl.rigel.astronomy;
 
-import ch.epfl.rigel.Preconditions;
-import ch.epfl.rigel.coordinates.*;
+import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.ClosedInterval;
-
-import java.util.TreeMap;
 
 /**
  * Represents a star, final, immutable and public,
@@ -38,22 +35,18 @@ public final class Star extends CelestialObject {
      * Hipparcos number is negative, or if the colorIndex is not in [-0.5,5.5]
      *
      * Gives 0 in angular size of Celestial Object: stars are modelled as points
-     * due to their distance from Hearth
+     * due to their distance from earth
      */
     public Star(int hipparcosId, String name, EquatorialCoordinates equatorialPos,
                 float magnitude, float colorIndex){
 
         super(name,equatorialPos,0,magnitude);
 
-        if(hipparcosId <0) throw new IllegalArgumentException();
-        else this.hipparcosId = hipparcosId;
+        if(hipparcosId <0) {throw new IllegalArgumentException();}
+        else{ this.hipparcosId = hipparcosId;}
 
-        /**if(intervalColorIndex.contains(colorIndex)) this.colorIndex = colorIndex;
-        else throw new IllegalArgumentException();**/
-        this.colorIndex = (float) Preconditions.checkInInterval(intervalColorIndex,colorIndex);
-
-
-
+        if(intervalColorIndex.contains(colorIndex)) {this.colorIndex = colorIndex;}
+        else {throw new IllegalArgumentException();}
     }
 
 
@@ -63,7 +56,6 @@ public final class Star extends CelestialObject {
      */
     public int hipparcosId(){
         return hipparcosId;
-
     }
 
     /**
@@ -75,10 +67,10 @@ public final class Star extends CelestialObject {
      */
     public int colorTemperature(){
 
-        double c = colorIndex;
+        double c = this.colorIndex;
 
         double T = 4600*(
-                1/(0.92*c + 1.7) + 1/(0.92*c + 0.62)
+                (1/(0.92*c + 1.7)) + (1/(0.92*c + 0.62))
                 );
 
         int TRounded = (int) Math.floor(T);

@@ -62,9 +62,10 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
     //the angular size and magnitude are a function of the distance from the point of observation
     private double angularSize, magnitude;
 
+    //store all ENUM objects
     public static List<PlanetModel> ALL = new ArrayList<>(Arrays.asList(MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE));
 
-    //Days since J2010 [Day]; Planet's Mean Anomaly [Rad]; True (Vraie) Anomaly [Rad]
+    //Days since J2010 [Day]; Planet's Mean Anomaly [Rad]; True (Vrai) Anomaly [Rad]
     private double d,m,v;
     //radius7distance from Sun [UA]; heliocentric longitude [rad]
     private double r,l;
@@ -72,6 +73,8 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
     private double rPrime, lPrime, psi;
     //Geocentric ecliptic longitude and latitude [rad]
     private double lambda, beta;
+
+    private double sinLBigOmega,cosLBigOmega;
 
     //stuff we can calculate here to lighten at()
     private final double MEAN_ANG_VEL= Angle.TAU/365.242191;
@@ -91,6 +94,24 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         this.ANG_SIZE_UA = Angle.ofArcsec(angularSizeUA);
         this.MAGNITUDE_UA = magnitudeUA;
 
+        //calculation of constants for speedy runtime
+        double oneMinusE = 1 - (E*E);
+
+        m = MEAN_ANG_VEL*d/T_P + EPSILON_RAD - OMEGA_RAD;
+        v= m + 2*E*Math.sin(m);
+
+        r = (A*oneMinusE)/(1+ E*Math.cos(v));
+        l = v+OMEGA_RAD;
+        sinLBigOmega = Math.sin(l-BIG_OMEGA_RAD);
+        cosLBigOmega = Math.cos(l-BIG_OMEGA_RAD);
+        psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
+
+        rPrime = r*Math.cos(psi);
+
+        lPrime = Angle.normalizePositive(
+                Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
+                ) + BIG_OMEGA_RAD);
+
     }
 
 
@@ -107,27 +128,13 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         double oneMinusE = 1 - (E*E);
 
         d = daysSinceJ2010;
-        m = MEAN_ANG_VEL*d/T_P + EPSILON_RAD - OMEGA_RAD;
-        v= m + 2*E*Math.sin(m);
-
-        r = (A*oneMinusE)/(1+ E*Math.cos(v));
-        l = v+OMEGA_RAD;
-        double sinLBigOmega = Math.sin(l-BIG_OMEGA_RAD);
-        double cosLBigOmega = Math.cos(l-BIG_OMEGA_RAD);
-        psi = Angle.normalizePositive(sinLBigOmega*Math.sin(I));
-
+        psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
         rPrime = r*Math.cos(psi);
-        //TODO check fuss about atan2. Was it only about normalizing the angle at the end?
-        lPrime = Angle.normalizePositive(
-                Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
-                ) + BIG_OMEGA_RAD);
 
-        //distinction inner and outer Planets
-        //bigL and bigR are l and r but for Earth TODO is it correct? at this point it should calculate it lke inside at() right?
         double bigL = EARTH.l;
         double bigR = EARTH.r;
         double bigLMinusLPrime= bigL - lPrime;
-        //Inner Planets first TODO ask if it's ok like this or if we should make it work w/ see slack
+
         if(this.frenchName.equals("Mercure") || this.frenchName.equals("Vénus")) {
             lambda = Angle.normalizePositive(Math.PI + bigL + Math.atan2(
                     rPrime*Math.sin(bigLMinusLPrime),
@@ -149,7 +156,7 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         ));
 
         //distance from Earth
-        double rho =Math.cbrt(bigR*bigR + r*r - 2*bigR*r*Math.cos(l-bigL)*Math.cos(psi));
+        double rho =Math.sqrt(bigR*bigR + r*r - 2*bigR*r*Math.cos(l-bigL)*Math.cos(psi));
         angularSize = Angle.normalizePositive(ANG_SIZE_UA/rho);
 
         //phase= illuminated portion of the Planet's disk as seen from Earth
@@ -158,9 +165,8 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
 
         EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
-        Planet planet = new Planet (frenchName,equatorialCoordinates,(float)angularSize,(float)magnitude);
 
-        return planet;
+        return new Planet(frenchName,equatorialCoordinates,(float)angularSize,(float)magnitude);
 
     }
 }

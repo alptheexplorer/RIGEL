@@ -27,7 +27,7 @@ public final class Asterism {
 
         Objects.requireNonNull(stars);
         Preconditions.checkArgument(!stars.isEmpty());
-        asterism = List.copyOf(stars);
+        this.asterism = List.copyOf(stars);
 
     }
 

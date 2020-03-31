@@ -8,12 +8,13 @@ import org.junit.jupiter.api.Test;
 import java.time.*;
 
 import static ch.epfl.rigel.astronomy.Epoch.J2010;
-import static ch.epfl.rigel.astronomy.PlanetModel.SATURN;
+import static ch.epfl.rigel.astronomy.SunModel.SUN;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class PlanetModelTest {
+class SunModelTestOurs {
 
     @Test
-    void constCheck(){
+    void atWorks(){
         EclipticCoordinates expectedCoord = EclipticCoordinates.of(3,0);
         ZonedDateTime timeObj = ZonedDateTime.of(
                 LocalDate.of(2010, Month.JULY, 27),
@@ -21,6 +22,7 @@ class PlanetModelTest {
                 ZoneOffset.UTC);
         EclipticToEquatorialConversion convObj = new EclipticToEquatorialConversion(timeObj);
         EquatorialCoordinates expectedEqCoord = convObj.apply(expectedCoord);
-        SATURN.at(J2010.daysUntil(timeObj), convObj);
+        assertEquals(new Sun(expectedCoord,expectedEqCoord,(float)0.524930842,(float)-2.784355831).eclipticPos().lon(), SUN.at(J2010.daysUntil(timeObj), convObj).eclipticPos().lon());
+
     }
 }
