@@ -11,7 +11,7 @@ import java.util.Set;
 public final class StarCatalogue {
 
     //Catalogue object
-    private final HashMap<Asterism,List<Integer>> Catalogue = new HashMap();
+    final HashMap<Asterism,List<Integer>> Catalogue = new HashMap();
     // List to store StarList passed to constructor
     private final List<Star> starList;
 
@@ -67,6 +67,15 @@ public final class StarCatalogue {
      */
     public List<Integer> asterismIndices(Asterism asterism){
         return Catalogue.get(asterism);
+    }
+
+    public final static class Builder{
+        Builder(){
+
+        }
+        public Builder addStar(Star star){
+
+        }
     }
 
 
