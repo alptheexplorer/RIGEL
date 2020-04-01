@@ -1,5 +1,6 @@
 package ch.epfl.rigel.coordinates;
 
+import ch.epfl.rigel.astronomy.SiderealTime;
 import ch.epfl.rigel.math.Angle;
 
 import java.time.ZonedDateTime;
@@ -10,10 +11,9 @@ import java.util.function.Function;
  */
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
-    //declaration of all constants later initialized by constructor excluding h
-    private double H;
     private double phi;
     private double h;
+    private double sidTime;
 
     /**
      *
@@ -21,9 +21,14 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
      * @param where
      */
     public EquatorialToHorizontalConversion(ZonedDateTime when, GeographicCoordinates where){
-        this.H = Angle.ofHr(when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
-                + (double)when.getNano()/(1e9 * 3600.0));
+        //probably like in Sidereal we need to be more specific here(?)/convert min into decimal hours
+       // this.H = Angle.ofHr(when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
+               // + (double)when.getNano()/(1e9 * 3600.0));
+        this.sidTime = SiderealTime.local(when, where);
+        //System.out.println(sidTime);
         this.phi = where.lat();
+        //System.out.println(Angle.toDeg(this.phi));
+        //System.out.println(phi);
     }
 
 
@@ -34,9 +39,21 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
      */
     @Override
     public HorizontalCoordinates apply(EquatorialCoordinates equatorialCoordinates) {
-        this.h = Math.asin(Math.sin(equatorialCoordinates.lat())*Math.sin(phi) + Math.cos(equatorialCoordinates.lat())*Math.cos(phi)*Math.cos(H));
-        double A = Math.atan2(-Math.cos(equatorialCoordinates.lat())*Math.cos(phi)*Math.sin(H),(Math.sin(equatorialCoordinates.lat()) - Math.sin(phi)*Math.sin(h)));
-        return HorizontalCoordinates.of(Angle.normalizePositive(A), Angle.normalizePositive(h));
+        // H is in Hours--> converted to rad
+        double H = Angle.ofHr(sidTime -equatorialCoordinates.ra());
+        //System.out.println(equatorialCoordinates.ra());
+        //System.out.println(Angle.toDeg(H));
+        this.h = Math.asin(
+                Math.sin(equatorialCoordinates.dec()) * Math.sin(phi) + Math.cos(equatorialCoordinates.dec()) * Math.cos(phi)*Math.cos(H)
+        );
+        double A = Math.atan2(
+                -Math.cos(equatorialCoordinates.dec())*Math.cos(phi)*Math.sin(H),
+                Math.sin(equatorialCoordinates.dec()) - Math.sin(phi)*Math.sin(h)
+        );
+        //need to normalize before putting into Horizontal!
+        double A_NORM = Angle.normalizePositive(A);
+        double h_NORM = Angle.normalizePositive(h);
+        return HorizontalCoordinates.of(A_NORM,h_NORM);
     }
 
     @Override

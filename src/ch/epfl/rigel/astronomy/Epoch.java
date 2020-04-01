@@ -17,9 +17,9 @@ public enum Epoch {
 
 
     private final ZonedDateTime timeObject;
-    private final double MIL_TO_DAY = 1000.0*60.0*60.0*24.0;
-    private final double MIL_TO_JULCENTURY = 36525.0;
-    private Epoch(ZonedDateTime d){
+    private final double MIL_TO_DAY = 1000*60*60*24;
+    private final double MIL_TO_JULCENTURY = 36525;
+    Epoch(ZonedDateTime d){
         this.timeObject = d;
     }
 
@@ -37,7 +37,7 @@ public enum Epoch {
      * @return daysUntil between the astronomical unit and argument ZonedDateTime object
      */
     public double daysUntil(ZonedDateTime when){
-        return (this.getTimeObject().until(when, ChronoUnit.MILLIS)/MIL_TO_DAY);
+        return timeObject.until(when, ChronoUnit.MILLIS)/MIL_TO_DAY;
     }
 
     /**

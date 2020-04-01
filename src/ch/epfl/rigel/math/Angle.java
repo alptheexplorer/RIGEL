@@ -46,8 +46,8 @@ public final class Angle {
     }
 
     /**
-            *
-            * @param sec
+     *
+     * @param sec
      * @return converts seconds to radians
      */
     public static double ofSec(double sec){
@@ -67,7 +67,7 @@ public final class Angle {
             throw new IllegalArgumentException();
         }
         else{
-           return ofDeg( deg + min/60.0 + sec/3600.0);
+            return ofDeg( deg + min/60.0 + sec/3600.0);
         }
     }
 
