@@ -50,7 +50,7 @@ public final class StarCatalogue {
      *
      * @return copy of starlist
      */
-    public List<Star> Star(){
+    public List<Star> stars(){
         // returns a copy of original starList
         return List.copyOf(starList);
     }
