@@ -17,6 +17,10 @@ public final class StarCatalogue {
     // List to store StarList passed to constructor
     private final List<Star> starList;
 
+    public HashMap<Asterism,List<Integer>> getCatalogue(){
+        return catalogue;
+    }
+
 
 
     /**
@@ -69,7 +73,7 @@ public final class StarCatalogue {
      * @throws IllegalArgumentException
      * @return List containing index of each asterism as occuring in starList
      */
-    public List<Integer> asterismIndices(Asterism asterism){
+    public List<Integer> asterismIndices(Asterism asterism) throws IllegalArgumentException{
         if(this.asterisms().contains(asterism)){
             return catalogue.get(asterism);
         }

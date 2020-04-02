@@ -12,6 +12,9 @@ class HygDatabaseLoaderTest {
     private static final String HYG_CATALOGUE_NAME =
             "/hygdata_v3.csv";
 
+    private static final String ASTERISM_CATALOGUE_NAME =
+            "/asterisms.txt";
+
     @Test
     void hygDatabaseIsCorrectlyInstalled() throws IOException {
         try (InputStream hygStream = getClass()
