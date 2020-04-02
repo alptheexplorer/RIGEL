@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public enum HygDataBaseLoader implements StarCatalogue.Loader {
+public enum HygDatabaseLoader implements StarCatalogue.Loader {
     INSTANCE;
 
     @Override
@@ -37,8 +37,9 @@ public enum HygDataBaseLoader implements StarCatalogue.Loader {
             while((line = buffer.readLine())!=null){
                 String[] starVal = line.split(",");
 
+
                 // assigning hipparcosId found in position 1 of line
-                if(!starVal[1].equals(null)){
+                if(!starVal[1].isEmpty()){
                     hipparcosId = Integer.parseInt(starVal[1]);
                 }
                 else{
@@ -46,12 +47,12 @@ public enum HygDataBaseLoader implements StarCatalogue.Loader {
                 }
 
                 // assigning name found in position 6 of line
-                if(!starVal[6].equals(null)){
+                if(!starVal[6].isEmpty()){
                     name = starVal[6];
                 }
                 else{
                     String bayer = starVal[27];
-                    if(!bayer.equals(null)){
+                    if(!bayer.isEmpty()){
                         name = bayer + " " + starVal[29];
                     }
                     else{
@@ -63,16 +64,17 @@ public enum HygDataBaseLoader implements StarCatalogue.Loader {
                 equatorialPos = EquatorialCoordinates.of(Double.parseDouble(starVal[23]), Double.parseDouble(starVal[24]));
 
                 // assigning magnitude found in position 13 of line
-                if(!starVal[13].equals(null)){
-                    magnitude = Float.parseFloat(starVal[13]);
+                if(!starVal[13].isEmpty()){
+
+                     magnitude = (float) Double.parseDouble(starVal[13]);
                 }
                 else{
                     magnitude = 0;
                 }
 
                 // assigning colorIndex found in position 16 of line
-                if(!starVal[16].equals(null)){
-                    colorIndex = Float.parseFloat(starVal[16]);
+                if(!starVal[16].isEmpty()){
+                    colorIndex = (float)Double.parseDouble(starVal[16]);
                 }
                 else{
                     colorIndex = 0;
@@ -83,6 +85,7 @@ public enum HygDataBaseLoader implements StarCatalogue.Loader {
                 builder.addStar(currentStar);
 
             }
+
 
 
 
