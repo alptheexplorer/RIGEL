@@ -3,18 +3,15 @@ package ch.epfl.rigel.astronomy;
 import javax.xml.catalog.Catalog;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Alp Ozen
  */
 public final class StarCatalogue {
 
-    //Catalogue object: key is Asterism, each of which has a list of integer ( the value )
-    // representing the hipparcus number of the star. So each key(asterism) has a value(list). HashMap.
+    //Catalogue object: key is Asterism, each of which has a list of integers (the value)
+    // representing the indices ( corresponding to the position of the star in starList) of the stars in asterism.
     private final HashMap<Asterism,List<Integer>> catalogue = new HashMap();
     // List to store StarList passed to constructor
     private final List<Star> starList;
@@ -22,36 +19,36 @@ public final class StarCatalogue {
 
 
     /**
-    Our goal here is to return a StarCatalogue based on data from resources folder. We take the given asterism put it as a key and its value is the set of stars
+    Our goal here is to return a StarCatalogue based on data from resources folder. We take the given asterism put it as a key and its value is the set of indeces
+    of the corresponding stars in the starList
     If an Asterism contains a star not in the star list, the constructor will throw an exception
      @Throws IllegalArgumentException
-     //TODO we never put the throws like this before
+     //TODO  check other classes to see if we need to add the throws, When should we write like this?
      **/
     public StarCatalogue(List<Star> stars, List<Asterism> asterisms) throws IllegalArgumentException{
         this.starList = stars;
+        List indeces = new ArrayList();
         // in this loop, we traverse through all asterisms and add a stars index to it if asterism contains star
         for(Asterism a: asterisms){
-            List asterismValue = new ArrayList();
             for(Star s:stars){
                 //temporary list object to work with
-                List tempList = a.stars();
-                if(tempList.contains(s) && !starList.contains(s)){
+                List asterismStars = a.stars();
+                if(asterismStars.contains(s) && !starList.contains(s)){ //TODO check
                     // we throw an IAexception if the asterism has a star not in the actual star list
                     throw new IllegalArgumentException();
                 }
-                else if(tempList.contains(s)){
+                else if(asterismStars.contains(s)){
                     // we add the index of the star to the List which is the value of the asterism
-                    asterismValue.add(starList.indexOf(s));
+                    indeces.add(starList.indexOf(s));
                 }
             }
             //finally we add the asterism-list pair to the catalogue
-            this.catalogue.put(a,asterismValue);
+            this.catalogue.put(a,indeces);
         }
     }
 
     /**
-     *
-     * @return copy of starlist
+     * @return the whole star list ( immutable )
      */
     public List<Star> Star(){
         // returns a copy of original starList
@@ -60,43 +57,31 @@ public final class StarCatalogue {
 
     /**
      *
-     * @return set of asterisms in catalogue
-     * TODO should we return a copy here too?
+     * @return set of asterisms in catalogue (immutable)
      */
     public Set<Asterism> asterisms(){
 
-        return catalogue.keySet();
+        return Set.copyOf(catalogue.keySet());
     }
 
     /**
-     *
      * @param asterism
      * @throws IllegalArgumentException
-     * @return List of indeces of the stars of the given @asterism as occuring in starList
-     * TODO wrong, we want the indeces of the list of the asterism. The indeces in starList.
-     * We need to:
-     * check if asterism is in catalog
-     * take the list of stars in asterism
-     * find the indeces of those stars in the list starList
-     * give back a list with those indeces, in the same order as they appeared in asterism
-     *
-     * Big difference: in asterism there's a list of hypparcus number. In starList we got stars,
-     * stored in a certain position ( index) of this list. We want this index, not the hypparcus number.
+     * @return List of indices of the stars of the given @asterism as occurring in starList
      */
     public List<Integer> asterismIndices(Asterism asterism){
         if(asterisms().contains(asterism)){
-            List indeces = new List<Integer>;
-            List<Integer> starsHypNumber = catalogue.get(asterism);
-            for (Integer i : starsHypNumber){
-                indeces = starList
-            }
-
+            return List.copyOf(catalogue.get(asterism));
         }
         else{
             throw new IllegalArgumentException();
         }
     }
 
+
+    /**
+     * Builder of star catalog
+     */
     public final static class Builder{
         // Builder has same attributes as StarCatalogue
         private List<Star> star_builder;
@@ -112,7 +97,7 @@ public final class StarCatalogue {
         /**
          *
          * @param star
-         * @return global builder object
+         * @return adds star to the catalog in construction and returns Builder
          */
         public Builder addStar(Star star){
             this.star_builder.add(star);
@@ -122,7 +107,7 @@ public final class StarCatalogue {
         /**
          *
          * @param asterism
-         * @return global builder object
+         * @return adds asterism to the catalog in construction and returns Builder
          */
         public Builder addAsterism(Asterism asterism){
             this.asterism_builder.add(asterism);
@@ -130,9 +115,7 @@ public final class StarCatalogue {
         }
 
         /**
-         *
-         * @return currently built catalogue
-         *
+         * @return currently built catalog
          */
         public StarCatalogue build(){
             return new StarCatalogue(star_builder,asterism_builder);
@@ -140,27 +123,41 @@ public final class StarCatalogue {
 
         /**
          *
-         * @return a mutable view of starlist
+         * @return a possibly mutable but not modifiable view of the star list
          */
         public List<Star> stars(){
-            return this.star_builder;
+            List<Star> view = Collections.unmodifiableList(star_builder);
+            return view;
         }
 
         /**
          *
-         * @return a mutable view of asterism
+         * @return a possibly mutable but not modifiable view of the asterism list
          */
         public List<Asterism> asterisms(){
-            return this.asterism_builder;
+            List<Asterism> view = Collections.unmodifiableList(asterism_builder);
+            return view;
         }
 
+        //TODO to do
         public Builder loadFrom(InputStream inputStream, Loader loader) throws IOException{
             
         }
     }
 
+    //TODO to do
     public interface Loader{
-        public abstract void load(InputStream inputStream, Builder builder) throws IOException;
+
+        /**
+         *
+         * @param inputStream
+         * @param builder
+         * @throws IOException
+         *
+         */
+        public abstract void load(InputStream inputStream, Builder builder) throws IOException{
+
+        }
 
 
     }
