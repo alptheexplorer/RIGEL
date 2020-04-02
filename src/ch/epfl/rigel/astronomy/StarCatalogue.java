@@ -1,6 +1,5 @@
 package ch.epfl.rigel.astronomy;
 
-import javax.xml.catalog.Catalog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -137,7 +136,8 @@ public final class StarCatalogue {
         }
 
         public Builder loadFrom(InputStream inputStream, Loader loader) throws IOException{
-            
+            loader.load(inputStream,this);
+            return this;
         }
     }
 
