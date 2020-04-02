@@ -12,8 +12,7 @@ import java.util.Objects;
  * the sky
  *
  * Public, final and immutable class, represents an Asterism, which in this
- * project is just a list of stars, so this class is very basic and just has
- * a constructor
+ * project is just a list of stars, so this class is very basic
  */
 public final class Asterism {
 
@@ -33,7 +32,7 @@ public final class Asterism {
 
     /**
      *
-     * @return list of stars of the asterism
+     * @return list of stars of the asterism //TODO should we give a copy here?
      */
     public List<Star> stars(){
 

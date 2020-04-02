@@ -13,7 +13,8 @@ import java.util.Set;
  */
 public final class StarCatalogue {
 
-    //Catalogue object
+    //Catalogue object: key is Asterism, each of which has a list of integer ( the value )
+    // representing the hipparcus number of the star. So each key(asterism) has a value(list). HashMap.
     private final HashMap<Asterism,List<Integer>> catalogue = new HashMap();
     // List to store StarList passed to constructor
     private final List<Star> starList;
@@ -23,7 +24,8 @@ public final class StarCatalogue {
     /**
     Our goal here is to return a StarCatalogue based on data from resources folder. We take the given asterism put it as a key and its value is the set of stars
     If an Asterism contains a star not in the star list, the constructor will throw an exception
-     @Throws IllegealArgumentException
+     @Throws IllegalArgumentException
+     //TODO we never put the throws like this before
      **/
     public StarCatalogue(List<Star> stars, List<Asterism> asterisms) throws IllegalArgumentException{
         this.starList = stars;
@@ -59,8 +61,10 @@ public final class StarCatalogue {
     /**
      *
      * @return set of asterisms in catalogue
+     * TODO should we return a copy here too?
      */
     public Set<Asterism> asterisms(){
+
         return catalogue.keySet();
     }
 
@@ -68,11 +72,25 @@ public final class StarCatalogue {
      *
      * @param asterism
      * @throws IllegalArgumentException
-     * @return List containing index of each asterism as occuring in starList
+     * @return List of indeces of the stars of the given @asterism as occuring in starList
+     * TODO wrong, we want the indeces of the list of the asterism. The indeces in starList.
+     * We need to:
+     * check if asterism is in catalog
+     * take the list of stars in asterism
+     * find the indeces of those stars in the list starList
+     * give back a list with those indeces, in the same order as they appeared in asterism
+     *
+     * Big difference: in asterism there's a list of hypparcus number. In starList we got stars,
+     * stored in a certain position ( index) of this list. We want this index, not the hypparcus number.
      */
     public List<Integer> asterismIndices(Asterism asterism){
-        if(this.asterisms().contains(asterism)){
-            return catalogue.get(asterism);
+        if(asterisms().contains(asterism)){
+            List indeces = new List<Integer>;
+            List<Integer> starsHypNumber = catalogue.get(asterism);
+            for (Integer i : starsHypNumber){
+                indeces = starList
+            }
+
         }
         else{
             throw new IllegalArgumentException();
