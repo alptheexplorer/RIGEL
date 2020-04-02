@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -66,19 +64,11 @@ class HygDatabaseLoaderTestOurs {
                         .loadFrom(hygStream, HygDatabaseLoader.INSTANCE).loadFrom(astStream, AsterismLoader.INSTANCE)
                         .build();
 
-           for(Star s: catalogue.stars()){
-               if(s.hipparcosId() == 21861){
-                   s1 = s;
-               }
-               if(s.hipparcosId() == 21770){
-                   s2 = s;
-               }
-           }
 
-                List<Star> astBuilder = new ArrayList<>();
-                astBuilder.add(s1);
-                astBuilder.add(s2);
-                Asterism ast = new Asterism(astBuilder);
+                Asterism test = (Asterism)catalogue.asterisms().toArray()[0];
+                for(Star s: test.stars()){
+                    System.out.println(s.hipparcosId());
+                }
 
 
 
