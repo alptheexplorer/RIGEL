@@ -1,6 +1,8 @@
 package ch.epfl.rigel.coordinates;
 
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.Interval;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.util.Locale;
 import java.util.function.Function;
@@ -34,14 +36,13 @@ public final class StereographicProjection implements Function<HorizontalCoordin
 
         // these seems the only formulas we can calculate in the constructor
         //i.e. they depend only on the center of the projection
+        CENTER_HOR = center;
         LAMBDA_CENTER = center.az();
         PHI_CENTER = center.alt();
-        SIN_LAMBDA_CENTER = Math.sin(LAMBDA_CENTER);
-        SIN_PHI_CENTER = Math.sin(PHI_CENTER);
         COS_LAMBDA_CENTER = Math.cos(LAMBDA_CENTER);
         COS_PHI_CENTER = Math.cos(PHI_CENTER);
-        CENTER_HOR = center;
-
+        SIN_LAMBDA_CENTER = Math.sin(LAMBDA_CENTER);
+        SIN_PHI_CENTER = Math.sin(PHI_CENTER);
     }
 
     /**
@@ -132,22 +133,26 @@ public final class StereographicProjection implements Function<HorizontalCoordin
      * spherical coordinates ( Horizontal )
      */
     public HorizontalCoordinates inverseApply(CartesianCoordinates xy){
-        double xPwr = xy.x() * xy.x();
-        double yPwr = xy.y() * xy.y();
+        RightOpenInterval interval = RightOpenInterval.of(-Math.PI/2,Math.PI/2);
+        double xPwr = xy.x()*xy.x();
+        double yPwr = xy.y()*xy.y();
         double rho = Math.sqrt(xPwr + yPwr);
-        double rhoPwr = rho*rho;
+        double rhoPwr = xPwr + yPwr;
         double sinC = 2*rho/(
                 rhoPwr + 1 );
         double cosC = (1- rhoPwr)/(
                 rhoPwr + 1 );
 
         double atanNum = xy.x()*sinC;
-        double atanDen = rho*COS_PHI_CENTER *cosC - xy.y()* SIN_PHI_CENTER *sinC;//TODO error is probably here
-        double lambda = Angle.normalizePositive(Math.atan2(xy.x()*sinC,
-                rho*COS_PHI_CENTER*cosC -1*xy.y()*SIN_PHI_CENTER*sinC) + LAMBDA_CENTER);
+        double atanDen = rho*COS_PHI_CENTER*cosC - xy.y()*SIN_PHI_CENTER*sinC;
+        double lambda = Angle.normalizePositive(Math.atan2(
+                atanNum,
+                atanDen) + LAMBDA_CENTER);
 
-        double phi= Angle.normalizePositive(Math.asin(cosC* SIN_PHI_CENTER +
-                (xy.y()*sinC* COS_PHI_CENTER)/rho ));
+        double phi= interval.reduce(
+                Math.asin(cosC*SIN_PHI_CENTER +
+                (xy.y()*sinC*COS_PHI_CENTER)/rho
+                ));
 
         return HorizontalCoordinates.of(lambda, phi);
     }
