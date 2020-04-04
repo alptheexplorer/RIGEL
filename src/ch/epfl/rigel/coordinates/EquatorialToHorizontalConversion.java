@@ -23,12 +23,10 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
      */
     public EquatorialToHorizontalConversion(ZonedDateTime when, GeographicCoordinates where){
         //probably like in Sidereal we need to be more specific here(?)/convert min into decimal hours
-        this.H = Angle.ofHr(when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
-                + (double)when.getNano()/(1e9 * 3600.0));
+        //this.H = Angle.ofHr(when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
+          //      + (double)when.getNano()/(1e9 * 3600.0));
 
         this.sidTime = SiderealTime.local(when, where);
-
-
         this.phi = where.lat();
 
     }
@@ -42,7 +40,7 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
     @Override
     public HorizontalCoordinates apply(EquatorialCoordinates equatorialCoordinates) {
         // H is in Hours--> converted to rad
-        double H = Angle.ofHr(sidTime -equatorialCoordinates.ra());
+        double H = Angle.ofHr(sidTime - equatorialCoordinates.ra());
 
 
         this.h = Math.asin(

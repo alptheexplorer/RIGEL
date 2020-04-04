@@ -37,6 +37,7 @@ public final class SiderealTime {
         smallT = when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
                 + (double)when.getNano()/(1e9 * 3600.0);
 
+
         S_0 = day.reduce(poly.at(bigT));
         S_1 = day.reduce(1.002737909*smallT);
 
@@ -51,7 +52,7 @@ public final class SiderealTime {
      * @return sidereal local time in radians
      */
     public static double local(ZonedDateTime when, GeographicCoordinates where){
-        //System.out.println(where.lon());
+
         return Angle.normalizePositive(greenwich(when) + where.lon());
     }
 

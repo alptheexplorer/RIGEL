@@ -67,11 +67,6 @@ public final class RightOpenInterval extends Interval {
 
     }
 
-    /**TODO fix reduce
-     *
-     */
-
-
     /**
      *
      * @return string representation of the interval
