@@ -67,7 +67,9 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
 
     //Days since J2010 [Day]; Planet's Mean Anomaly [Rad]; True (Vrai) Anomaly [Rad]
     private double d,m,v;
-    //radius7distance from Sun [UA]; heliocentric longitude [rad]
+
+
+    //radius/distance from Sun [UA]; heliocentric longitude [rad]
     private double r,l;
     //radius projection on the ecliptic [UA]; heliocentric ecliptic longitude and latitude [rad]
     private double rPrime, lPrime, psi;
@@ -106,7 +108,7 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         cosLBigOmega = Math.cos(l-BIG_OMEGA_RAD);
         psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
 
-        rPrime = r*Math.cos(psi);
+        rPrime = Angle.normalizePositive(r*Math.cos(psi));
 
         lPrime = Angle.normalizePositive(
                 Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
@@ -131,8 +133,8 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
         rPrime = r*Math.cos(psi);
 
-        double bigL = EARTH.l;
-        double bigR = EARTH.r;
+        double bigL = EARTH.getL();
+        double bigR = EARTH.getR();
         double bigLMinusLPrime= bigL - lPrime;
 
         if(this.frenchName.equals("Mercure") || this.frenchName.equals("Vénus")) {
@@ -156,7 +158,9 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         ));
 
         //distance from Earth
-        double rho =Math.sqrt(bigR*bigR + r*r - 2*bigR*r*Math.cos(l-bigL)*Math.cos(psi));
+        double rho =Math.sqrt(
+                bigR*bigR + r*r - 2*bigR*r*Math.cos(l-bigL)*Math.cos(psi)
+        );
         angularSize = Angle.normalizePositive(ANG_SIZE_UA/rho);
 
         //phase= illuminated portion of the Planet's disk as seen from Earth
@@ -168,5 +172,15 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
 
         return new Planet(frenchName,equatorialCoordinates,(float)angularSize,(float)magnitude);
 
+    }
+
+    //useful methods
+
+    private double getR() {
+        return r;
+    }
+
+    private double getL() {
+        return l;
     }
 }
