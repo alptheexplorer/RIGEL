@@ -139,13 +139,14 @@ public final class StarCatalogue {
             return view;
         }
 
-        //TODO to do
+
         public Builder loadFrom(InputStream inputStream, Loader loader) throws IOException{
-            
+            loader.load(inputStream,this);
+            return this;
         }
     }
 
-    //TODO to do
+
     public interface Loader{
 
         /**
@@ -153,11 +154,11 @@ public final class StarCatalogue {
          * @param inputStream
          * @param builder
          * @throws IOException
+         * Charges the stars and/or asterisms of the input stream and adds them to the catalog
+         * in construction, or throws an exception in case of error.
          *
          */
-        public abstract void load(InputStream inputStream, Builder builder) throws IOException{
-
-        }
+        public abstract void load(InputStream inputStream, Builder builder) throws IOException;
 
 
     }
