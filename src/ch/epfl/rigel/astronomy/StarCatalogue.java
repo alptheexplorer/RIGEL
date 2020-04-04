@@ -50,7 +50,7 @@ public final class StarCatalogue {
     /**
      * @return the whole star list ( immutable )
      */
-    public List<Star> Star(){
+    public List<Star> stars(){
         // returns a copy of original starList
         return List.copyOf(starList);
     }
