@@ -96,7 +96,7 @@ public final class Angle {
      * @return converts hours to radians
      */
     public static double ofHr(double hr){
-        return ofDeg(hr*15.0);
+        return (ofDeg(hr*15.0));
     }
 
     /**

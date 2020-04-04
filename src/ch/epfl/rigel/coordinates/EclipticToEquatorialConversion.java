@@ -2,6 +2,7 @@ package ch.epfl.rigel.coordinates;
 
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.Polynomial;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.time.ZonedDateTime;
 import java.util.function.Function;
@@ -33,9 +34,10 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
      */
     @Override
     public EquatorialCoordinates apply(EclipticCoordinates eclipticCoordinates) {
+        RightOpenInterval toReduce = RightOpenInterval.of(Angle.ofDeg(-90),Angle.ofDeg(90));
         double ascension = Math.atan2((Math.sin(eclipticCoordinates.lon())*cosObliqueEcliptique - Math.tan(eclipticCoordinates.lat())*sinObliqueEcliptique), Math.cos(eclipticCoordinates.lon()));
-        double declination = Math.asin((Math.sin(eclipticCoordinates.lat())*cosObliqueEcliptique) + Math.cos(eclipticCoordinates.lat())*sinObliqueEcliptique*Math.sin(eclipticCoordinates.lon()));
-        return EquatorialCoordinates.of(ascension, declination);
+        double declination = toReduce.reduce(Math.asin((Math.sin(eclipticCoordinates.lat())*cosObliqueEcliptique) + Math.cos(eclipticCoordinates.lat())*sinObliqueEcliptique*Math.sin(eclipticCoordinates.lon())));
+        return EquatorialCoordinates.of(Angle.normalizePositive(ascension), toReduce.reduce(declination));
     }
 
     @Override

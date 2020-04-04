@@ -2,6 +2,7 @@ package ch.epfl.rigel.coordinates;
 
 import ch.epfl.rigel.astronomy.SiderealTime;
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.time.ZonedDateTime;
 import java.util.function.Function;
@@ -40,8 +41,8 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
     @Override
     public HorizontalCoordinates apply(EquatorialCoordinates equatorialCoordinates) {
         // H is in Hours--> converted to rad
-        double H = Angle.ofHr(sidTime - equatorialCoordinates.ra());
-
+        double H = sidTime - equatorialCoordinates.ra();
+        RightOpenInterval toReduce = RightOpenInterval.of(Angle.ofDeg(-90),Angle.ofDeg(90));
 
         this.h = Math.asin(
                 Math.sin(equatorialCoordinates.dec()) * Math.sin(phi) + Math.cos(equatorialCoordinates.dec()) * Math.cos(phi)*Math.cos(H)
@@ -52,7 +53,7 @@ public final class EquatorialToHorizontalConversion implements Function<Equatori
         );
         //need to normalize before putting into Horizontal!
         double A_NORM = Angle.normalizePositive(A);
-        double h_NORM = Angle.normalizePositive(h);
+        double h_NORM = toReduce.reduce(h);
 
 
         return HorizontalCoordinates.of(A_NORM,h_NORM);

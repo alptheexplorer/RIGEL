@@ -34,14 +34,14 @@ public final class SiderealTime {
         Polynomial poly = Polynomial.of(0.000025862,2400.051336,6.697374558);
         ZonedDateTime convertedToGW = when.withZoneSameInstant(ZoneId.of("UTC+00:00"));
         bigT = J2000.julianCenturiesUntil(convertedToGW.truncatedTo(ChronoUnit.DAYS));
-        smallT = when.getHour() +((double)when.getMinute()/60.0) +(double)when.getSecond()/3600.0
-                + (double)when.getNano()/(1e9 * 3600.0);
+        smallT = convertedToGW.getHour() +((double)convertedToGW.getMinute()/60.0) +(double)convertedToGW.getSecond()/3600.0
+                + (double)convertedToGW.getNano()/(1e9 * 3600.0);
 
-
+        double S = 0.000025862*bigT*bigT + 2400.051336*bigT + 6.697374558;
         S_0 = day.reduce(poly.at(bigT));
         S_1 = day.reduce(1.002737909*smallT);
 
-        result = S_0 + S_1;
+        result = S + S_1;
         return Angle.normalizePositive(Angle.ofHr(day.reduce(result)));
     }
 
@@ -52,7 +52,6 @@ public final class SiderealTime {
      * @return sidereal local time in radians
      */
     public static double local(ZonedDateTime when, GeographicCoordinates where){
-
         return Angle.normalizePositive(greenwich(when) + where.lon());
     }
 
