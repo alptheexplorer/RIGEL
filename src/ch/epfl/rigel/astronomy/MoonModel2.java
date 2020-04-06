@@ -5,12 +5,13 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.Angle;
 
-public enum MoonModel implements CelestialObjectModel<Moon>{
-
+public enum MoonModel2 implements CelestialObjectModel<Moon> {
     MOON;
 
+
     @Override
-    public Moon at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {   //neccesary constants
+    public Moon at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
+       //neccesary constants
         double longMoy = Angle.ofDeg(91.929336); // l0
         double longMoyPer = Angle.ofDeg(130.143076); //P0
         double longNAs = Angle.ofDeg(291.682547); //N0
@@ -36,14 +37,14 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
         double lambda = Angle.normalizePositive(Math.atan2(Math.sin(orbLongCorV-longCorN)*Math.cos(incOrb), Math.cos(orbLongCorV-longCorN)) + longCorN);
         double beta = Math.asin(Math.sin(orbLongCorV-longCorN)*Math.sin(incOrb));
         double phase = (1 + Math.cos(orbLongCorV-sunLongEcl))/2;
-        double rho = (1-(exenOrb*exenOrb))/(1+(exenOrb*Math.cos(anomCor+corCent)));
-        double ang = Angle.ofDeg(0.5181)/rho;
+        double rho = (1-(exenOrb*exenOrb))/(1+exenOrb*Math.cos(anomCor+corCent));
+        double ang = (Angle.ofDeg(0.5181))/rho;
 
         EclipticCoordinates eclipticCoordinates = EclipticCoordinates.of(lambda,beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
 
         return new Moon(equatorialCoordinates, (float)ang, (float)0, (float)phase);
+
+
     }
 }
-
-

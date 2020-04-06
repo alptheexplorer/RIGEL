@@ -83,7 +83,7 @@ public enum SunModel implements CelestialObjectModel<Sun> {
         phi = 0;
         double tmp= (1+E*Math.cos(v))/(1- E*E);
         theta = Angle.normalizePositive(THETA_0_RAD*tmp);
-        //if we want distance r = R_0/tmp
+
 
 
         EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,phi);
