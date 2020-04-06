@@ -1,5 +1,6 @@
 package ch.epfl.rigel.coordinates;
 
+import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.RightOpenInterval;
@@ -25,12 +26,8 @@ public final class HorizontalCoordinates extends
      * @return accepts arguments in radians and return horizontalcoordinate object
      */
     public static HorizontalCoordinates of(double az, double alt){
-        if(!AZIMUT_RAD.contains(az) || !heightRad.contains(alt)){
-            throw new IllegalArgumentException();
-        }
-        else{
-            return new HorizontalCoordinates(az,alt);
-        }
+
+        return new HorizontalCoordinates(Preconditions.checkInInterval(AZIMUT_RAD,az), Preconditions.checkInInterval(heightRad,alt));
     }
 
     /**
@@ -39,7 +36,7 @@ public final class HorizontalCoordinates extends
      * @param alt
      * @return accepts arguments in degrees and return horizontalcoordinate object
      */
-    public static HorizontalCoordinates ofDeg(double az, double alt){
+    public static HorizontalCoordinates ofDeg(double az, double alt) {
         if(!AZIMUT.contains(az) || !HEIGHT.contains(alt)){
             throw new IllegalArgumentException();
         }
