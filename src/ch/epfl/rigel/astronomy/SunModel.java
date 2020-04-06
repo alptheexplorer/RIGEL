@@ -79,10 +79,10 @@ public enum SunModel implements CelestialObjectModel<Sun> {
         d= daysSinceJ2010;
         m= MEAN_ANG_VEL*d + EPSILON_RAD - OMEGA_RAD;
         v = m + 2*E*Math.sin(m);
-        lambda = v + OMEGA_RAD;
+        lambda = Angle.normalizePositive(v + OMEGA_RAD);
         phi = 0;
         double tmp= (1+E*Math.cos(v))/(1- E*E);
-        theta = THETA_0_RAD*tmp;
+        theta = Angle.normalizePositive(THETA_0_RAD*tmp);
         //if we want distance r = R_0/tmp
 
 

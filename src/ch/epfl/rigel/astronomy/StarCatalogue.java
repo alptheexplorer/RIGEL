@@ -1,6 +1,5 @@
 package ch.epfl.rigel.astronomy;
 
-import javax.xml.catalog.Catalog;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -25,25 +24,26 @@ public final class StarCatalogue {
      @Throws IllegalArgumentException
      //TODO  check other classes to see if we need to add the throws, When should we write like this?
      **/
-    public StarCatalogue(List<Star> stars, List<Asterism> asterisms) throws IllegalArgumentException{
-        this.starList = stars;
-        List indeces = new ArrayList();
+    public StarCatalogue(List<Star> stars, List<Asterism> asterisms){
+        this.starList = List.copyOf(stars);
+
         // in this loop, we traverse through all asterisms and add a stars index to it if asterism contains star
         for(Asterism a: asterisms){
-            for(Star s:stars){
-                //temporary list object to work with
-                List asterismStars = a.stars();
-                if(asterismStars.contains(s) && !starList.contains(s)){ //TODO check
-                    // we throw an IAexception if the asterism has a star not in the actual star list
+            //temporary list objects to work with
+            List<Integer> indices = new ArrayList();
+            List<Star> asterismStars = a.stars();
+            for(Star s: asterismStars){
+                if(!starList.contains(s) && asterismStars.contains(s)){
+                    // we throw an IAexception if the asterism has a star not in the actual star list, IAexceptions is unchecked hence not in method signature
                     throw new IllegalArgumentException();
                 }
                 else if(asterismStars.contains(s)){
                     // we add the index of the star to the List which is the value of the asterism
-                    indeces.add(starList.indexOf(s));
+                    indices.add(starList.indexOf(s));
                 }
             }
             //finally we add the asterism-list pair to the catalogue
-            this.catalogue.put(a,indeces);
+            this.catalogue.put(a,indices);
         }
     }
 
@@ -60,7 +60,6 @@ public final class StarCatalogue {
      * @return set of asterisms in catalogue (immutable)
      */
     public Set<Asterism> asterisms(){
-
         return Set.copyOf(catalogue.keySet());
     }
 
@@ -70,8 +69,9 @@ public final class StarCatalogue {
      * @return List of indices of the stars of the given @asterism as occurring in starList
      */
     public List<Integer> asterismIndices(Asterism asterism){
-        if(asterisms().contains(asterism)){
-            return List.copyOf(catalogue.get(asterism));
+
+        if(this.asterisms().contains(asterism)){
+            return List.copyOf(this.catalogue.get(asterism));
         }
         else{
             throw new IllegalArgumentException();

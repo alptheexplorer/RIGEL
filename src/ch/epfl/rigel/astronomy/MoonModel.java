@@ -70,15 +70,14 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
         //calculating ecliptic position
         n = N_null - (Angle.ofDeg(0.0529539)*DAYS_SINCE);
         nP = n - Angle.ofDeg(0.16)*Math.sin(M_SUN);
-        lambda = Angle.normalizePositive(
-                Math.atan2(
+        lambda = Math.atan2(
                         Math.sin(lPP - nP) * Math.cos(i),
                         Math.cos(lPP - nP) )
-                        + nP );
-        beta = Angle.normalizePositive(
-                Math.asin(
+                        + nP;
+
+        beta = Math.asin(
                         Math.sin(lPP - nP) * Math.sin(i)
-                ));
+                );
 
         //calculating phase
         double phase = (1 - Math.cos(lPP-LAMBDA_SUN) )/ 2;
@@ -90,6 +89,7 @@ public enum MoonModel implements CelestialObjectModel<Moon>{
         //final steps
         EclipticCoordinates eclipticCoordinates = EclipticCoordinates.of(lambda,beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
+
         return new Moon(equatorialCoordinates, (float)angularSize, 0, (float)phase);
     }
 }

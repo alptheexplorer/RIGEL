@@ -19,7 +19,7 @@ public enum AsterismLoader  implements StarCatalogue.Loader{
             BufferedReader buffer = new BufferedReader(asciiDecodedStream)){
 
             // all temporary values declared here
-            List<Star> stars = new ArrayList();
+
             Asterism loadedAsterism;
             String line;
 
@@ -28,6 +28,7 @@ public enum AsterismLoader  implements StarCatalogue.Loader{
              * we separate each line from its commas and store value in an array, we access only useful elements from array.
              */
             while((line = buffer.readLine())!=null) {
+                List<Star> stars = new ArrayList();
                 // we first separate the txt file read by line into an array separated by the comma
                 String[] currentLine = line.split(",");
                 int i = 0;
