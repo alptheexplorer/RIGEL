@@ -4,6 +4,9 @@ import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.ClosedInterval;
+import ch.epfl.rigel.math.Interval;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,8 +81,12 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
 
     private double sinLBigOmega,cosLBigOmega;
 
-    //stuff we can calculate here to lighten at()
+    //stuff we can calculate here to lighten at() and useful intervals (use Horizontal ones)
     private final double MEAN_ANG_VEL= Angle.TAU/365.242191;
+    private static RightOpenInterval AZIMUT = RightOpenInterval.of(0,360);
+    private static ClosedInterval HEIGHT = ClosedInterval.symmetric(180);
+    private static RightOpenInterval azimutRad = RightOpenInterval.of(0, Angle.TAU);
+    private static ClosedInterval heightRad = ClosedInterval.symmetric(Math.PI);
 
 
 
@@ -91,28 +98,10 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         OMEGA_RAD = Angle.ofDeg(lonPerigee);
         E = eccentricity;
         A = halfOrbitMajorAxe;
-        I = inclination;
+        I = Angle.ofDeg(inclination);
         BIG_OMEGA_RAD = Angle.ofDeg(lonAscendNode);
         this.ANG_SIZE_UA = Angle.ofArcsec(angularSizeUA);
         this.MAGNITUDE_UA = magnitudeUA;
-
-        //calculation of constants for speedy runtime
-        double oneMinusE = 1 - (E*E);
-
-        m = MEAN_ANG_VEL*d/T_P + EPSILON_RAD - OMEGA_RAD;
-        v= m + 2*E*Math.sin(m);
-
-        r = (A*oneMinusE)/(1+ E*Math.cos(v));
-        l = v+OMEGA_RAD;
-        sinLBigOmega = Math.sin(l-BIG_OMEGA_RAD);
-        cosLBigOmega = Math.cos(l-BIG_OMEGA_RAD);
-        psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
-
-        rPrime = Angle.normalizePositive(r*Math.cos(psi));
-
-        lPrime = Angle.normalizePositive(
-                Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
-                ) + BIG_OMEGA_RAD);
 
     }
 
@@ -128,21 +117,32 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
     @Override
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
         double oneMinusE = 1 - (E*E);
+        double oneMinEEarth = 1 - (EARTH.E*EARTH.E);
 
         d = daysSinceJ2010;
-        psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
+        m = Angle.normalizePositive(MEAN_ANG_VEL*d/T_P) + EPSILON_RAD - OMEGA_RAD;
+        double mEarth = Angle.normalizePositive(MEAN_ANG_VEL*d/EARTH.T_P) + EARTH.EPSILON_RAD - EARTH.OMEGA_RAD;
+        v= Angle.normalizePositive(m + 2*E*Math.sin(m));
+        double vEarth = Angle.normalizePositive(mEarth + 2*EARTH.E*Math.sin(mEarth));
+        r = (A*oneMinusE)/(1+ E*Math.cos(v));
+        l = Angle.normalizePositive(v+OMEGA_RAD);
+        double bigR = (EARTH.A *oneMinEEarth)/(1 + EARTH.E*Math.cos(vEarth));
+        double bigL = Angle.normalizePositive(vEarth + EARTH.OMEGA_RAD);
+
+        sinLBigOmega = Math.sin(l-BIG_OMEGA_RAD);
+        cosLBigOmega = Math.cos(l-BIG_OMEGA_RAD);
+        psi = Math.asin(sinLBigOmega*Math.sin(I));
         rPrime = r*Math.cos(psi);
+        lPrime = Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
+                ) + BIG_OMEGA_RAD;
 
-        double bigL = EARTH.getL();
-        double bigR = EARTH.getR();
-        double bigLMinusLPrime= bigL - lPrime;
+        double bigLMinusLPrime = bigL - lPrime;
 
-        if(this.frenchName.equals("Mercure") || this.frenchName.equals("Vénus")) {
+        if ( this.A <= 1){
             lambda = Angle.normalizePositive(Math.PI + bigL + Math.atan2(
                     rPrime*Math.sin(bigLMinusLPrime),
                     bigR - rPrime*Math.cos(bigLMinusLPrime))
             );
-
         }
         else{
             lambda = Angle.normalizePositive(lPrime + Math.atan2(
@@ -152,20 +152,22 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
 
         }
 
-        beta =Angle.normalizePositive(Math.atan2(
-                rPrime*Math.tan(psi)*Math.sin(lambda-lPrime),
-                bigR*Math.sin(-bigLMinusLPrime)
-        ));
+        beta = Math.atan(
+                (rPrime*Math.tan(psi)*Math.sin(lambda-lPrime))/
+                        (bigR*Math.sin(-bigLMinusLPrime))
+        );
+
 
         //distance from Earth
-        double rho =Math.sqrt(
+        double rho = Math.sqrt(
                 bigR*bigR + r*r - 2*bigR*r*Math.cos(l-bigL)*Math.cos(psi)
         );
-        angularSize = Angle.normalizePositive(ANG_SIZE_UA/rho);
+        angularSize = ANG_SIZE_UA/rho;
 
         //phase= illuminated portion of the Planet's disk as seen from Earth
         double bigF = (1+ Math.cos(lambda - l))/2.0;
         magnitude = MAGNITUDE_UA + 5*Math.log10(r*rho/Math.sqrt(bigF));
+
 
         EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
@@ -174,13 +176,4 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
 
     }
 
-    //useful methods
-
-    private double getR() {
-        return r;
-    }
-
-    private double getL() {
-        return l;
-    }
 }

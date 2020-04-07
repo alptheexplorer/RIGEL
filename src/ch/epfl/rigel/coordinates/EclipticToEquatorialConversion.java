@@ -12,7 +12,10 @@ import static ch.epfl.rigel.astronomy.Epoch.J2000;
 
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates>  {
 
-    private Polynomial E = Polynomial.of(Angle.arcsSecToDeg(0.00181), -Angle.arcsSecToDeg(0.0006), -Angle.arcsSecToDeg(46.815), (23+ Angle.minToDeg(26) + Angle.arcsSecToDeg(21.45)));
+    private Polynomial E = Polynomial.of(Angle.arcsSecToDeg(0.00181),
+            -Angle.arcsSecToDeg(0.0006),
+            -Angle.arcsSecToDeg(46.815),
+            (23+ Angle.minToDeg(26) + Angle.arcsSecToDeg(21.45)));
     private double obliqueEcliptique;
     private double cosObliqueEcliptique;
     private double sinObliqueEcliptique;
@@ -34,9 +37,12 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
      */
     @Override
     public EquatorialCoordinates apply(EclipticCoordinates eclipticCoordinates) {
-        RightOpenInterval toReduce = RightOpenInterval.of(Angle.ofDeg(-90),Angle.ofDeg(90));
-        double ascension = Math.atan2((Math.sin(eclipticCoordinates.lon())*cosObliqueEcliptique - Math.tan(eclipticCoordinates.lat())*sinObliqueEcliptique), Math.cos(eclipticCoordinates.lon()));
-        double declination = toReduce.reduce(Math.asin((Math.sin(eclipticCoordinates.lat())*cosObliqueEcliptique) + Math.cos(eclipticCoordinates.lat())*sinObliqueEcliptique*Math.sin(eclipticCoordinates.lon())));
+        RightOpenInterval toReduce = RightOpenInterval.of(-Math.PI/2,Math.PI/2);
+        double ascension = Math.atan2((Math.sin(eclipticCoordinates.lon())*cosObliqueEcliptique -
+                        Math.tan(eclipticCoordinates.lat())*sinObliqueEcliptique),
+                Math.cos(eclipticCoordinates.lon()));
+        double declination = toReduce.reduce(Math.asin((Math.sin(eclipticCoordinates.lat())*cosObliqueEcliptique) +
+                Math.cos(eclipticCoordinates.lat())*sinObliqueEcliptique*Math.sin(eclipticCoordinates.lon())));
         return EquatorialCoordinates.of(Angle.normalizePositive(ascension), toReduce.reduce(declination));
     }
 
