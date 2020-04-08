@@ -7,16 +7,16 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum AsterismLoader  implements StarCatalogue.Loader{
+public enum AsterismLoader implements StarCatalogue.Loader {
 
-    INSTANCE,
-    ;
+    // only instance
+    INSTANCE;
 
 
     @Override
     public void load(InputStream inputStream, StarCatalogue.Builder builder) throws IOException {
-        try(InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
-            BufferedReader buffer = new BufferedReader(asciiDecodedStream)){
+        try (InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
+             BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
 
             // all temporary values declared here
 
@@ -27,7 +27,7 @@ public enum AsterismLoader  implements StarCatalogue.Loader{
             /**
              * we separate each line from its commas and store value in an array, we access only useful elements from array.
              */
-            while((line = buffer.readLine())!=null) {
+            while ((line = buffer.readLine()) != null) {
                 List<Star> stars = new ArrayList();
                 // we first separate the txt file read by line into an array separated by the comma
                 String[] currentLine = line.split(",");
@@ -50,14 +50,6 @@ public enum AsterismLoader  implements StarCatalogue.Loader{
             }
 
         }
-
-
-
-
-
-
-
-
 
 
     }

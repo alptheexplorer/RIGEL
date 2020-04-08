@@ -16,8 +16,8 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
 
         // everything happens inside try with resource block
 
-        try(InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
-            BufferedReader buffer = new BufferedReader(asciiDecodedStream)){
+        try (InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
+             BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
 
             // all temporary values declared here
             String line;
@@ -34,28 +34,25 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
             /**
              * we separate each line from its commas and store value in an array, we access only useful elements from array.
              */
-            while((line = buffer.readLine())!=null){
+            while ((line = buffer.readLine()) != null) {
                 String[] starVal = line.split(",");
 
 
                 // assigning hipparcosId found in position 1 of line
-                if(!starVal[1].isEmpty()){
+                if (!starVal[1].isEmpty()) {
                     hipparcosId = Integer.parseInt(starVal[1]);
-                }
-                else{
+                } else {
                     hipparcosId = 0;
                 }
 
                 // assigning name found in position 6 of line
-                if(!starVal[6].isEmpty()){
+                if (!starVal[6].isEmpty()) {
                     name = starVal[6];
-                }
-                else{
+                } else {
                     String bayer = starVal[27];
-                    if(!bayer.isEmpty()){
+                    if (!bayer.isEmpty()) {
                         name = bayer + " " + starVal[29];
-                    }
-                    else{
+                    } else {
                         name = "?" + " " + starVal[29];
                     }
                 }
@@ -64,35 +61,28 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
                 equatorialPos = EquatorialCoordinates.of(Double.parseDouble(starVal[23]), Double.parseDouble(starVal[24]));
 
                 // assigning magnitude found in position 13 of line
-                if(!starVal[13].isEmpty()){
+                if (!starVal[13].isEmpty()) {
 
-                     magnitude = (float) Double.parseDouble(starVal[13]);
-                }
-                else{
+                    magnitude = (float) Double.parseDouble(starVal[13]);
+                } else {
                     magnitude = 0;
                 }
 
                 // assigning colorIndex found in position 16 of line
-                if(!starVal[16].isEmpty()){
-                    colorIndex = (float)Double.parseDouble(starVal[16]);
-                }
-                else{
+                if (!starVal[16].isEmpty()) {
+                    colorIndex = (float) Double.parseDouble(starVal[16]);
+                } else {
                     colorIndex = 0;
                 }
 
-                currentStar = new Star(hipparcosId,name,equatorialPos,magnitude,colorIndex);
+                currentStar = new Star(hipparcosId, name, equatorialPos, magnitude, colorIndex);
                 // finally we add star to the starList inside builder.
                 builder.addStar(currentStar);
 
             }
 
 
-
-
-
         }
-
-
 
 
     }

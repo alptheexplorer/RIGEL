@@ -4,6 +4,8 @@ import ch.epfl.rigel.coordinates.EclipticCoordinates;
 import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.Angle;
+import ch.epfl.rigel.math.ClosedInterval;
+import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,17 +17,17 @@ import java.util.List;
  * in an ecliptic's plane, but has his own. Furthermore we want to determine the
  * planet's position in geocentric ecliptic coordinates so we need to know at
  * the same time the planet position as well as the Earth position.
- *
+ * <p>
  * We'll proceed in 4 steps:
  * 1-planet's position on his own orbit ( similar to Sun )
  * 2-projecting 1) on an ecliptic plane, express it in heliocentric ecliptic coord. ( Sun as origin)
  * 3-Earth Position in same coordinate system as 2)
  * 4-combine 2) and 3) and obtain planet's position in geocentric ecliptic coordinates
- *
+ * <p>
  * As with SunModel, be careful with the units/Angles: they are given in degrees
  * but need to be stocked in rad
  * AU = Astronomical Unit = Average distance between Sun and Earth
- *
+ * <p>
  * Theory- Outer and Inner Planets:
  * Inner: closer to the Sun than Earth: Mercure et Venus
  * Outer: further away from the Sun than Earth: Mars, Jupiter, Saturne, Uranus et Neptune
@@ -66,21 +68,24 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
     public static List<PlanetModel> ALL = new ArrayList<>(Arrays.asList(MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE));
 
     //Days since J2010 [Day]; Planet's Mean Anomaly [Rad]; True (Vrai) Anomaly [Rad]
-    private double d,m,v;
+    private double d, m, v;
 
 
     //radius/distance from Sun [UA]; heliocentric longitude [rad]
-    private double r,l;
+    private double r, l;
     //radius projection on the ecliptic [UA]; heliocentric ecliptic longitude and latitude [rad]
     private double rPrime, lPrime, psi;
     //Geocentric ecliptic longitude and latitude [rad]
     private double lambda, beta;
 
-    private double sinLBigOmega,cosLBigOmega;
+    private double sinLBigOmega, cosLBigOmega;
 
-    //stuff we can calculate here to lighten at()
-    private final double MEAN_ANG_VEL= Angle.TAU/365.242191;
-
+    //stuff we can calculate here to lighten at() and useful intervals (use Horizontal ones)
+    private final double MEAN_ANG_VEL = Angle.TAU / 365.242191;
+    private static RightOpenInterval AZIMUT = RightOpenInterval.of(0, 360);
+    private static ClosedInterval HEIGHT = ClosedInterval.symmetric(180);
+    private static RightOpenInterval azimutRad = RightOpenInterval.of(0, Angle.TAU);
+    private static ClosedInterval heightRad = ClosedInterval.symmetric(Math.PI);
 
 
     PlanetModel(String frenchName, double revolutionPeriod, double lonJ2010, double lonPerigee,
@@ -91,34 +96,15 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
         OMEGA_RAD = Angle.ofDeg(lonPerigee);
         E = eccentricity;
         A = halfOrbitMajorAxe;
-        I = inclination;
+        I = Angle.ofDeg(inclination);
         BIG_OMEGA_RAD = Angle.ofDeg(lonAscendNode);
         this.ANG_SIZE_UA = Angle.ofArcsec(angularSizeUA);
         this.MAGNITUDE_UA = magnitudeUA;
-
-        //calculation of constants for speedy runtime
-        double oneMinusE = 1 - (E*E);
-
-        m = MEAN_ANG_VEL*d/T_P + EPSILON_RAD - OMEGA_RAD;
-        v= m + 2*E*Math.sin(m);
-
-        r = (A*oneMinusE)/(1+ E*Math.cos(v));
-        l = v+OMEGA_RAD;
-        sinLBigOmega = Math.sin(l-BIG_OMEGA_RAD);
-        cosLBigOmega = Math.cos(l-BIG_OMEGA_RAD);
-        psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
-
-        rPrime = Angle.normalizePositive(r*Math.cos(psi));
-
-        lPrime = Angle.normalizePositive(
-                Math.atan2(sinLBigOmega*Math.cos(I),cosLBigOmega
-                ) + BIG_OMEGA_RAD);
 
     }
 
 
     /**
-     *
      * @param daysSinceJ2010
      * @param eclipticToEquatorialConversion
      * @return Planet at epoch J2010 + @daysSinceJ2010, using @eclipticToEquatorialConversion
@@ -127,60 +113,63 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
      */
     @Override
     public Planet at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
-        double oneMinusE = 1 - (E*E);
+        double oneMinusE = 1 - (E * E);
+        double oneMinEEarth = 1 - (EARTH.E * EARTH.E);
 
         d = daysSinceJ2010;
-        psi = Angle.normalizePositive(Math.asin(sinLBigOmega*Math.sin(I)));
-        rPrime = r*Math.cos(psi);
+        m = Angle.normalizePositive(MEAN_ANG_VEL * d / T_P) + EPSILON_RAD - OMEGA_RAD;
+        double mEarth = Angle.normalizePositive(MEAN_ANG_VEL * d / EARTH.T_P) + EARTH.EPSILON_RAD - EARTH.OMEGA_RAD;
+        v = Angle.normalizePositive(m + 2 * E * Math.sin(m));
+        double vEarth = Angle.normalizePositive(mEarth + 2 * EARTH.E * Math.sin(mEarth));
+        r = (A * oneMinusE) / (1 + E * Math.cos(v));
+        l = Angle.normalizePositive(v + OMEGA_RAD);
+        double bigR = (EARTH.A * oneMinEEarth) / (1 + EARTH.E * Math.cos(vEarth));
+        double bigL = Angle.normalizePositive(vEarth + EARTH.OMEGA_RAD);
 
-        double bigL = EARTH.getL();
-        double bigR = EARTH.getR();
-        double bigLMinusLPrime= bigL - lPrime;
+        sinLBigOmega = Math.sin(l - BIG_OMEGA_RAD);
+        cosLBigOmega = Math.cos(l - BIG_OMEGA_RAD);
+        psi = Math.asin(sinLBigOmega * Math.sin(I));
+        rPrime = r * Math.cos(psi);
+        lPrime = Math.atan2(sinLBigOmega * Math.cos(I), cosLBigOmega
+        ) + BIG_OMEGA_RAD;
 
-        if(this.frenchName.equals("Mercure") || this.frenchName.equals("Vénus")) {
+        double bigLMinusLPrime = bigL - lPrime;
+
+        if (this.A <= 1) {
             lambda = Angle.normalizePositive(Math.PI + bigL + Math.atan2(
-                    rPrime*Math.sin(bigLMinusLPrime),
-                    bigR - rPrime*Math.cos(bigLMinusLPrime))
+                    rPrime * Math.sin(bigLMinusLPrime),
+                    bigR - rPrime * Math.cos(bigLMinusLPrime))
             );
-
-        }
-        else{
+        } else {
             lambda = Angle.normalizePositive(lPrime + Math.atan2(
-                    bigR*Math.sin(-bigLMinusLPrime),
-                    rPrime - bigR*Math.cos(-bigLMinusLPrime)
+                    bigR * Math.sin(-bigLMinusLPrime),
+                    rPrime - bigR * Math.cos(-bigLMinusLPrime)
             ));
 
         }
 
-        beta =Angle.normalizePositive(Math.atan2(
-                rPrime*Math.tan(psi)*Math.sin(lambda-lPrime),
-                bigR*Math.sin(-bigLMinusLPrime)
-        ));
+        beta = Math.atan(
+                (rPrime * Math.tan(psi) * Math.sin(lambda - lPrime)) /
+                        (bigR * Math.sin(-bigLMinusLPrime))
+        );
+
 
         //distance from Earth
-        double rho =Math.sqrt(
-                bigR*bigR + r*r - 2*bigR*r*Math.cos(l-bigL)*Math.cos(psi)
+        double rho = Math.sqrt(
+                bigR * bigR + r * r - 2 * bigR * r * Math.cos(l - bigL) * Math.cos(psi)
         );
-        angularSize = Angle.normalizePositive(ANG_SIZE_UA/rho);
+        angularSize = ANG_SIZE_UA / rho;
 
         //phase= illuminated portion of the Planet's disk as seen from Earth
-        double bigF = (1+ Math.cos(lambda - l))/2.0;
-        magnitude = MAGNITUDE_UA + 5*Math.log10(r*rho/Math.sqrt(bigF));
+        double bigF = (1 + Math.cos(lambda - l)) / 2.0;
+        magnitude = MAGNITUDE_UA + 5 * Math.log10(r * rho / Math.sqrt(bigF));
 
-        EclipticCoordinates eclipticCoordinates= EclipticCoordinates.of(lambda,beta);
+
+        EclipticCoordinates eclipticCoordinates = EclipticCoordinates.of(lambda, beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
 
-        return new Planet(frenchName,equatorialCoordinates,(float)angularSize,(float)magnitude);
+        return new Planet(frenchName, equatorialCoordinates, (float) angularSize, (float) magnitude);
 
     }
 
-    //useful methods
-
-    private double getR() {
-        return r;
-    }
-
-    private double getL() {
-        return l;
-    }
 }

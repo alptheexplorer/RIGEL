@@ -4,10 +4,12 @@ import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.test.TestRandomizer;
 import org.junit.jupiter.api.Test;
 
+import javax.swing.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -191,7 +193,7 @@ public class StarCatalogueTest {
                 var indexIt = catalogue.asterismIndices(asterism).iterator();
                 for (var star : asterism.stars())
                     assertEquals(star, stars.get(indexIt.next()));
-                //assertFalse(indexIt.hasNext());
+                assertFalse(indexIt.hasNext());
             }
         }
     }
