@@ -17,35 +17,33 @@ public enum Epoch {
 
 
     private final ZonedDateTime timeObject;
-    private final double MIL_TO_DAY = 1000*60*60*24;
+    private final double MIL_TO_DAY = 1000 * 60 * 60 * 24;
     private final double MIL_TO_JULCENTURY = 36525;
-    Epoch(ZonedDateTime d){
+
+    Epoch(ZonedDateTime d) {
         this.timeObject = d;
     }
 
     /**
-     *
      * @return returns ZonedDateTime object inside enum
      */
-    public ZonedDateTime getTimeObject(){
+    public ZonedDateTime getTimeObject() {
         return this.timeObject;
     }
 
     /**
-     *
      * @param when
      * @return daysUntil between the astronomical unit and argument ZonedDateTime object
      */
-    public double daysUntil(ZonedDateTime when){
-        return timeObject.until(when, ChronoUnit.MILLIS)/MIL_TO_DAY;
+    public double daysUntil(ZonedDateTime when) {
+        return timeObject.until(when, ChronoUnit.MILLIS) / MIL_TO_DAY;
     }
 
     /**
-     *
      * @param when
      * @return julianCenturies between the astronomical unit and argument ZonedDateTime object
      */
-    public double julianCenturiesUntil(ZonedDateTime when){
-        return (daysUntil(when)/MIL_TO_JULCENTURY);
+    public double julianCenturiesUntil(ZonedDateTime when) {
+        return (daysUntil(when) / MIL_TO_JULCENTURY);
     }
 }

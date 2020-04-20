@@ -5,91 +5,48 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.Angle;
 
-public enum MoonModel implements CelestialObjectModel<Moon>{
+public enum MoonModel implements CelestialObjectModel<Moon> {
 
     MOON;
 
-
     @Override
-    public Moon at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {
+    /**
+     * @return Moon object
+     */
+    public Moon at(double daysSinceJ2010, EclipticToEquatorialConversion eclipticToEquatorialConversion) {   //neccesary constants
+        double longMoy = Angle.ofDeg(91.929336); // l0
+        double longMoyPer = Angle.ofDeg(130.143076); //P0
+        double longNAs = Angle.ofDeg(291.682547); //N0
+        double incOrb = Angle.ofDeg(5.145396); //i
+        double exenOrb = 0.0549;//e
 
-        /**
-         * declaration of all local variables first constants then values
-         */
-        final double DAYS_SINCE = daysSinceJ2010;
-        final double l_null = Angle.ofDeg(91.929336);
-        final double P_null = Angle.ofDeg(130.143076);
-        final double N_null = Angle.ofDeg(291.682547);
-        final double i = Angle.ofDeg(5.145396);
-        final double e = 0.0549;
-        /**
-         * Constant names in order:
-         * average orbital longitude
-         * lprimprime
-         * lprime
-         * Mean anomaly
-         * Mean anomaly corrected
-         * evection
-         * Correction of annual equation
-         * Correction 3
-         * Correction 4
-         * correction of centre equation
-         * variation
-         * Mean longitude of the ascending node
-         * corrected Mean longitude of the ascending node
-         * ecliptic longitude
-         * ecliptic latitude
-         *mean anomaly of sun
-         * longitude ecliptic of the sun
-         */
-        final double l,lPP,lP,m,mP,E,A,A3,A4,eC,V,n,nP,lambda,beta;
+        double sunMeanAnom = ((Angle.TAU / 365.242191)) * daysSinceJ2010 + Angle.ofDeg(279.557208) - Angle.ofDeg(283.112438);//ES
+        double sunLongEcl = Angle.normalizePositive(sunMeanAnom + 2 * 0.016705 * Math.sin(sunMeanAnom) + Angle.ofDeg(283.112438));//LAMBDAS
+        double orbLongAv = Angle.ofDeg(13.1763966) * daysSinceJ2010 + longMoy;//L
+        double anomAv = orbLongAv - (Angle.ofDeg(0.1114041) * daysSinceJ2010) - longMoyPer;//M
+        double evec = Angle.ofDeg(1.2739) * Math.sin(2 * (orbLongAv - sunLongEcl) - anomAv);//EV
+        double eqAnCorrec = Angle.ofDeg(0.1858) * Math.sin(sunMeanAnom);//AE
+        double cor3 = Angle.ofDeg(0.37) * Math.sin(sunMeanAnom);//A3
+        double anomCor = anomAv + evec - eqAnCorrec - cor3;//Mp
+        double corCent = Angle.ofDeg(6.2886) * Math.sin(anomCor);//EC
+        double cor4 = Angle.ofDeg(0.214) * Math.sin(2 * anomCor);//A4
+        double orbLongCor = orbLongAv + evec + corCent - eqAnCorrec + cor4;//Lp
+        double variation = Angle.ofDeg(0.6583) * Math.sin(2 * (orbLongCor - sunLongEcl)); //V
+        double orbLongCorV = orbLongCor + variation; //Lpp
 
-        // and some constants from the sun:
-        final double LAMBDA_SUN, M_SUN, V_SUN;
-        final double MEAN_ANG_VEL = Angle.TAU/365.242191;
-        final double EPSILON_RAD = Angle.ofDeg(279.557208);
-        final double OMEGA_RAD = Angle.ofDeg(283.112438);
-        final double E_SUN = 0.016705;
-        M_SUN= MEAN_ANG_VEL*DAYS_SINCE + EPSILON_RAD - OMEGA_RAD;
-        V_SUN = M_SUN + 2*E_SUN*Math.sin(M_SUN);
-        LAMBDA_SUN = V_SUN + OMEGA_RAD;
+        double longMoyN = longNAs - (Angle.ofDeg(0.0529539) * daysSinceJ2010); //N
+        double longCorN = longMoyN - (Angle.ofDeg(0.16) * Math.sin(sunMeanAnom)); //Np
+        double lambda = Angle.normalizePositive(Math.atan2(Math.sin(orbLongCorV - longCorN) * Math.cos(incOrb), Math.cos(orbLongCorV - longCorN)) + longCorN);
+        double beta = Math.asin(Math.sin(orbLongCorV - longCorN) * Math.sin(incOrb));
+        double phase = (1 + Math.cos(orbLongCorV - sunLongEcl)) / 2;
+        double rho = (1 - (exenOrb * exenOrb)) / (1 + (exenOrb * Math.cos(anomCor + corCent)));
+        double ang = Angle.ofDeg(0.5181) / rho;
 
-        //calculating orbital Longitude
-        l = (Angle.ofDeg(13.1763966)*DAYS_SINCE) + l_null;
-        m = l - Angle.ofDeg(0.1114041)*DAYS_SINCE - P_null;
-        E = Angle.ofDeg(1.2739)*Math.sin(2*(l-LAMBDA_SUN) - m);
-        A = Angle.ofDeg(0.1858)*Math.sin(M_SUN);
-        A3 = Angle.ofDeg(0.37)*Math.sin(M_SUN);
-        mP = m + E - A - A3;
-        eC = Angle.ofDeg(6.2886)*Math.sin(mP);
-        A4 = Angle.ofDeg(0.214)*Math.sin(2*mP);
-        lP = l + e + eC - A + A4;
-        V = Angle.ofDeg(0.6583)*Math.sin(2*(lP-LAMBDA_SUN));
-        lPP = lP + V;
-
-        //calculating ecliptic position
-        n = N_null - (Angle.ofDeg(0.0529539)*DAYS_SINCE);
-        nP = n - Angle.ofDeg(0.16)*Math.sin(M_SUN);
-        lambda = Angle.normalizePositive(
-                Math.atan2(
-                        Math.sin(lPP - nP) * Math.cos(i),
-                        Math.cos(lPP - nP) )
-                        + nP );
-        beta = Angle.normalizePositive(
-                Math.asin(
-                        Math.sin(lPP - nP) * Math.sin(i)
-                ));
-
-        //calculating phase
-        double phase = (1 - Math.cos(lPP-LAMBDA_SUN) )/ 2;
-
-        //calculating angular size:
-        double rho = (1 - (e*e) )/( 1 + e*Math.cos(mP + eC) );
-        double angularSize = Angle.normalizePositive(Angle.ofDeg(0.5181)/rho );
-
-        //final steps
-        EclipticCoordinates eclipticCoordinates = EclipticCoordinates.of(lambda,beta);
+        EclipticCoordinates eclipticCoordinates = EclipticCoordinates.of(lambda, beta);
         EquatorialCoordinates equatorialCoordinates = eclipticToEquatorialConversion.apply(eclipticCoordinates);
-        return new Moon(equatorialCoordinates, (float)angularSize, 0, (float)phase);
+
+        return new Moon(equatorialCoordinates, (float) ang, (float) 0, (float) phase);
     }
 }
+
+

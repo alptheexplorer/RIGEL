@@ -1,4 +1,5 @@
 package ch.epfl.rigel.astronomy;
+
 import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.coordinates.*;
 
@@ -17,15 +18,16 @@ public abstract class CelestialObject {
     /**
      * package private ( by default )
      * The only constructor
-     * @param name non null
+     *
+     * @param name          non null
      * @param equatorialPos non null
-     * @param angularSize not negative
+     * @param angularSize   not negative
      * @param magnitude
      */
     CelestialObject(String name, EquatorialCoordinates equatorialPos, float angularSize, float magnitude) {
 
 
-        Preconditions.checkArgument(angularSize>=0);
+        Preconditions.checkArgument(angularSize >= 0);
         this.angularSize = angularSize;
 
         this.name = Objects.requireNonNull(name);
@@ -35,53 +37,47 @@ public abstract class CelestialObject {
     }
 
     /**
-     *
      * @return name of Celestial Object
      */
-    public String name(){
+    public String name() {
         return this.name;
     }
 
     /**
-     *
      * @return angular Size of celestial object  in double even though it was
      * constructed in float
      */
-    public double angularSize(){
-        return (double)this.angularSize;
+    public double angularSize() {
+        return this.angularSize;
     }
 
     /**
-     *
      * @return magnitude of celestial object in double even though it was
      * constructed in float
      */
-    public double magnitude(){
-        return (double)this.magnitude;
+    public double magnitude() {
+        return this.magnitude;
     }
 
     /**
-     *
      * @return
      */
-    public EquatorialCoordinates equatorialPos(){
+    public EquatorialCoordinates equatorialPos() {
         return this.equatorialpos;
     }
 
     /**
-     *
      * @return a brief info text on the object, destined to the user
      * by default it will return name as name()
      */
-    public String info(){
+    public String info() {
         return this.name;
     }
 
     /**
-     *
      * @return redefined toString so it returns the same as info()
      */
-    public String toString(){
+    public String toString() {
         return info();
     }
 

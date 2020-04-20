@@ -3,6 +3,7 @@ package ch.epfl.rigel.astronomy;
 import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.coordinates.*;
 import ch.epfl.rigel.math.*;
+
 import java.util.Locale;
 
 /**
@@ -24,13 +25,10 @@ public final class Moon extends CelestialObject {
     public Moon(EquatorialCoordinates equatorialPos, float angularSize, float magnitude, float phase) {
         super("Lune", equatorialPos, angularSize, magnitude);
         ClosedInterval interval = ClosedInterval.of(0, 1);
-        this.phase = (float)Preconditions.checkInInterval(interval, phase);
+        this.phase = (float) Preconditions.checkInInterval(interval, phase);
     }
 
 
-    //TODO: check this one: if phase = 0.3752, print " Lune (37.5%) "
-    //TODO: ask if we need to simply cut it or to approximate it:
-    // what if it was 0.3757 ? 37.5% or 37.6% ?
     @Override
     /**
      * gives phase in percentage to the to one decimal place
