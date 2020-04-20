@@ -9,8 +9,10 @@ import ch.epfl.rigel.coordinates.StereographicProjection;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
@@ -35,22 +37,16 @@ public  final  class DrawSky extends Application {
             StarCatalogue catalog = new StarCatalogue.Builder().loadFrom(hs, HygDatabaseLoader.INSTANCE).build();
 
             ZonedDateTime when = ZonedDateTime.parse ( "2020-02-17T20:15:00+01:00" );
-            GeographicCoordinates where =
-                    GeographicCoordinates.ofDeg ( 6.57 , 46.52 );
-            HorizontalCoordinates projCenter =
-                    HorizontalCoordinates.ofDeg ( 180 , 45 );
-            StereographicProjection projection =
-                    new StereographicProjection (projCenter);
-            ObservedSky sky =
-                    new ObservedSky(when, where, projection, catalog);
+            GeographicCoordinates where = GeographicCoordinates.ofDeg ( 6.57, 46.52 );
+            HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg ( 180, 45 );
+            StereographicProjection projection = new StereographicProjection (projCenter);
+            ObservedSky sky = new ObservedSky(when, where, projection, catalog);
 
-            Canvas canvas =
-                    new Canvas ( 800 , 600 );
-            Transform planeToCanvas =
-                    Transform.affine( 1300 , 0 , 0 , - 1300 , 400 , 300 );
-            SkyCanvasPainter painter =
-                    new SkyCanvasPainter (canvas);
 
+            Canvas canvas = new Canvas ( 800, 600 );
+            Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , - 1300 , 400 , 300 );
+            SkyCanvasPainter painter = new SkyCanvasPainter (canvas);
+            painter.drawStars (sky, projection, planeToCanvas);
             painter.clear();
             painter.drawStars (sky, projection, planeToCanvas);
 
@@ -59,6 +55,9 @@ public  final  class DrawSky extends Application {
             BufferedImage swingImage =
                     SwingFXUtils.fromFXImage (fxImage, null );
             ImageIO.write (swingImage, "png" , new File( "sky.png" ));
+
+            primaryStage.setScene(new Scene(new BorderPane(canvas)));
+            primaryStage.show();
         }
         Platform.exit ();
 

@@ -58,6 +58,7 @@ public class SkyCanvasPainter {
      * @return void
      */
     public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
+
         double[] starCoordinates = sky.starCoordinates();
         int i =0;
         for(Star s:sky.stars()){

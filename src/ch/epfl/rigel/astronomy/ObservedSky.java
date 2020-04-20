@@ -50,16 +50,18 @@ public class ObservedSky {
         tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(tempEquatorial);
         this.sunCoordinates = projection.apply(tempHorizontal);
 
+
         //Calculation for moon
         this.currentMoon = MoonModel.MOON.at(Epoch.J2010.daysUntil(when),new EclipticToEquatorialConversion(when));
         tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(this.currentMoon.equatorialPos());
         this.moonCoordinates = projection.apply(tempHorizontal);
 
+
         int i = 0;
         //Calculation for all planets except for earth, we loop through all planetModel instances
         for(PlanetModel P: PlanetModel.values()){
             // iterate through all enums and add their projection to the hashmap
-            if(!P.name().equals("Terre")){
+            if(!P.getFrenchName().equals("Terre")){
                 final Planet currentPlanet; // we make sure that once currentPlanet is passed into list, list members are immutable
                 CartesianCoordinates projectedCoordinate;
                 currentPlanet = P.at(Epoch.J2010.daysUntil(when),new EclipticToEquatorialConversion(when));
