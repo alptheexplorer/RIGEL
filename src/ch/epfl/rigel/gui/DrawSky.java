@@ -7,7 +7,6 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -47,8 +46,9 @@ public  final  class DrawSky extends Application {
             Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , - 1300 , 400 , 300 );
             SkyCanvasPainter painter = new SkyCanvasPainter (canvas);
             painter.drawStars (sky, projection, planeToCanvas);
-            painter.clear();
-            painter.drawStars (sky, projection, planeToCanvas);
+
+            primaryStage.setScene(new Scene(new BorderPane(canvas)));
+            primaryStage.show();
 
             WritableImage fxImage =
                     canvas.snapshot ( null , null );
@@ -56,10 +56,8 @@ public  final  class DrawSky extends Application {
                     SwingFXUtils.fromFXImage (fxImage, null );
             ImageIO.write (swingImage, "png" , new File( "sky.png" ));
 
-            primaryStage.setScene(new Scene(new BorderPane(canvas)));
-            primaryStage.show();
         }
-        Platform.exit ();
+        //Platform.exit ();
 
     }
 }

@@ -2,11 +2,13 @@ package ch.epfl.rigel.gui;
 
 import ch.epfl.rigel.astronomy.*;
 import ch.epfl.rigel.coordinates.StereographicProjection;
+import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.EuclidianDistance;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 
 public class SkyCanvasPainter {
@@ -17,6 +19,10 @@ public class SkyCanvasPainter {
     public SkyCanvasPainter(Canvas canvas){
         this.canvas = canvas;
         this.ctx = canvas.getGraphicsContext2D();
+        //setting black background
+        this.clear();
+        ctx.setFill (Color.BLACK);
+        ctx.fillRect ( 0 , 0 , canvas.getWidth (), canvas.getHeight ());
     }
 
 
@@ -31,7 +37,7 @@ public class SkyCanvasPainter {
             ClosedInterval interval = ClosedInterval.of(-2, 5);
             double mP = interval.clip(object.magnitude());
             double f = (99 - (17 * mP)) / 140.0;
-            double discRadius =f * projection.applyToAngle(object.angularSize())/2.0;
+            double discRadius = f*projection.applyToAngle(Angle.ofDeg(0.5))/2.0;
             Point2D transformedRadiusVector = planeToCanvas.deltaTransform(new Point2D(discRadius,0));
             return EuclidianDistance.norm(transformedRadiusVector.getX(),transformedRadiusVector.getY());
         }
@@ -63,10 +69,14 @@ public class SkyCanvasPainter {
         int i =0;
         for(Star s:sky.stars()){
             double discRadius = this.transformedDiscRadius(s,projection,planeToAffine);
+            System.out.println(s.angularSize());
             Point2D transformedCoordinates = this.transformCoordinates(starCoordinates[i],starCoordinates[i+1],planeToAffine);
             ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
             ctx.fillOval(transformedCoordinates.getX(),transformedCoordinates.getY(),discRadius,discRadius);
+            ctx.fillOval(10,12,discRadius,discRadius);
+            i++;
         }
+
 
     }
 
