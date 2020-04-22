@@ -38,7 +38,7 @@ public enum MoonModel implements CelestialObjectModel<Moon> {
         double longCorN = longMoyN - (Angle.ofDeg(0.16) * Math.sin(sunMeanAnom)); //Np
         double lambda = Angle.normalizePositive(Math.atan2(Math.sin(orbLongCorV - longCorN) * Math.cos(incOrb), Math.cos(orbLongCorV - longCorN)) + longCorN);
         double beta = Math.asin(Math.sin(orbLongCorV - longCorN) * Math.sin(incOrb));
-        double phase = (1 + Math.cos(orbLongCorV - sunLongEcl)) / 2;
+        double phase = (1 - Math.cos(orbLongCorV - sunLongEcl)) / 2;
         double rho = (1 - (exenOrb * exenOrb)) / (1 + (exenOrb * Math.cos(anomCor + corCent)));
         double ang = Angle.ofDeg(0.5181) / rho;
 

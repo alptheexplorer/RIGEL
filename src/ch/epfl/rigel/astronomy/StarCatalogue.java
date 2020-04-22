@@ -142,10 +142,12 @@ public final class StarCatalogue {
     public interface Loader {
 
         /**
+         * Charges the stars and/or asterisms of the input stream and adds them to the catalog
+         * in construction, or throws an exception in case of error.
          * @param inputStream
          * @param builder
-         * @throws IOException Charges the stars and/or asterisms of the input stream and adds them to the catalog
-         *                     in construction, or throws an exception in case of error.
+         * @throws IOException
+         *
          */
         void load(InputStream inputStream, Builder builder) throws IOException;
 
