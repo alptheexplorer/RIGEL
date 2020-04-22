@@ -18,7 +18,10 @@ public class BlackBodyColor {
     private static Map<Integer,String> readFromBbr(){
 
         Map<Integer,String> BBRVALUES = new HashMap<>();
-        try (InputStream inputStream = new FileInputStream("bbr_color.txt");
+        File file = new File("C:\\Users\\alpoz\\Desktop\\projectBA2\\resources\\bbr_color.txt");
+
+
+        try (InputStream inputStream = new FileInputStream(file);
                 InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
              BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
 
@@ -27,8 +30,10 @@ public class BlackBodyColor {
             String currentRGB;
             while ((line = buffer.readLine()) != null) {
                 // we ignore the # and 2deg cases
-                while(line.charAt(0)!='#' && line.charAt(12)!='2'){
-                     currentInteger = Integer.parseInt(line.substring(2,6));
+                if((line.charAt(0)!='#') && (line.charAt(11)!='2')){
+                    // returns integer at [1,6] cutting off space at beginning if there is any
+                     currentInteger = Integer.parseInt(line.substring(1,6).trim());
+                     System.out.println(currentInteger);
                      currentRGB = line.substring(80,87);
                      BBRVALUES.put(currentInteger,currentRGB);
                 }
@@ -50,7 +55,7 @@ public class BlackBodyColor {
         }
         else{
             // we then round kelvin to the nearest 100th
-            int filteredKelvin = (int) (((Kelvin + 99) / 100 ) * 100);
+            int filteredKelvin = (int)(Math.round( Kelvin / 100.0) * 100);
             String colArg = BBRVALUES.get(filteredKelvin);
             return Color.web(colArg);
         }

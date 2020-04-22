@@ -10,7 +10,7 @@ import java.util.Locale;
 public final class GeographicCoordinates extends SphericalCoordinates {
 
     private static RightOpenInterval longitude = RightOpenInterval.of(-180.0, 180.0);
-    private static ClosedInterval latitude = ClosedInterval.of(-90, 90);
+    private static ClosedInterval latitude = ClosedInterval.of(-90.0, 90.0);
 
     private GeographicCoordinates(double l, double la) {
         super(l, la);

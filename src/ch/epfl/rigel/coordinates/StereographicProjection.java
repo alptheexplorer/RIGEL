@@ -92,7 +92,6 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     public double applyToAngle(double rad) {
         double diameter = 2 * Math.tan(rad / 4.0);
         return diameter;
-
     }
 
 

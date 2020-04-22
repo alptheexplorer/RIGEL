@@ -172,4 +172,12 @@ public enum PlanetModel implements CelestialObjectModel<Planet> {
 
     }
 
+    /**
+     *
+     * @return copy of frenchname
+     */
+    public String getFrenchName(){
+        return this.frenchName;
+    }
+
 }
