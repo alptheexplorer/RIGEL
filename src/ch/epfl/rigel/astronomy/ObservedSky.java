@@ -58,6 +58,7 @@ public class ObservedSky {
 
 
         int i = 0;
+        int j = 0;
         //Calculation for all planets except for earth, we loop through all planetModel instances
         for(PlanetModel P: PlanetModel.values()){
             // iterate through all enums and add their projection to the hashmap
@@ -67,25 +68,28 @@ public class ObservedSky {
                 currentPlanet = P.at(Epoch.J2010.daysUntil(when),new EclipticToEquatorialConversion(when));
                 tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(currentPlanet.equatorialPos());
                 projectedCoordinate = projection.apply(tempHorizontal);
-                planets[i] = currentPlanet;
+                planets[j] = currentPlanet;
                 planetCoordinates[i] = projectedCoordinate.x();
                 planetCoordinates[i+1] = projectedCoordinate.y();
-                ++i;
+                ++j;
+                i+=2;
             }
         }
 
-        int j = 0;
+        int a = 0;
+        int b = 0;
         //Calculation for stars of catalogue
         for(Star s:catalogue.stars()){
-            final Star currentStar; // we make sure that once currentPlanet is passed into list, list members are immutable
+            Star currentStar = s;
             CartesianCoordinates projectedCoordinate;
-            currentStar = s;
             tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(s.equatorialPos());
             projectedCoordinate = projection.apply(tempHorizontal);
-            stars[j] = currentStar;
-            starCoordinates[j] = projectedCoordinate.x();
-            starCoordinates[j+1] = projectedCoordinate.y();
-            ++j;
+            stars[a] = currentStar;
+            starCoordinates[b] = projectedCoordinate.x();
+            System.out.println(projectedCoordinate.x());
+            starCoordinates[b+1] = projectedCoordinate.y();
+            ++a;
+            b+=2;
         }
 
     }
@@ -171,6 +175,7 @@ public class ObservedSky {
         return currentCatalogue.asterismIndices(asterism);
     }
 
+    //TODO fix implementation to avoid duplicates
     /**
      *
      * @param xy
@@ -181,7 +186,7 @@ public class ObservedSky {
             // contains each nearby celestial object with distance as key and object as value
             Map<Double, CelestialObject> nearbyDistances = new HashMap<>();
 
-            for(int i = 0; i<planetCoordinates.length;++i){
+            for(int i = 0; i<planetCoordinates.length;i+=2){
                 double currentX = planetCoordinates[i];
                 double currentY = planetCoordinates[i+1];
                 double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
@@ -191,9 +196,9 @@ public class ObservedSky {
                 }
             }
 
-            for(int i = 0; i<this.starCoordinates().length;++i){
-                double currentX = planetCoordinates[i];
-                double currentY = planetCoordinates[i+1];
+            for(int i = 0; i<this.starCoordinates().length;i+=2){
+                double currentX = starCoordinates[i];
+                double currentY = starCoordinates[i+1];
                 // the distance at index i in starDistances is the star at index i in stars
                 double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
                 if(currentDistance<=maxDist){
@@ -220,6 +225,7 @@ public class ObservedSky {
                     distances.add(key);
                 }
                 double minVal = Collections.min(distances);
+                //TODO handle case for same distance
                 return nearbyDistances.get(minVal);
             }
 

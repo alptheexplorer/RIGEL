@@ -69,16 +69,14 @@ public class SkyCanvasPainter {
         int i =0;
         for(Star s:sky.stars()){
             double discRadius = this.transformedDiscRadius(s,projection,planeToAffine);
-            System.out.println(s.angularSize());
             Point2D transformedCoordinates = this.transformCoordinates(starCoordinates[i],starCoordinates[i+1],planeToAffine);
             ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
             ctx.fillOval(transformedCoordinates.getX(),transformedCoordinates.getY(),discRadius,discRadius);
-            ctx.fillOval(10,12,discRadius,discRadius);
             i++;
         }
-
-
     }
+
+
 
 
 

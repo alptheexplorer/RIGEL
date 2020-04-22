@@ -19,6 +19,8 @@ public class BlackBodyColor {
 
         Map<Integer,String> BBRVALUES = new HashMap<>();
         File file = new File("C:\\Users\\alpoz\\Desktop\\projectBA2\\resources\\bbr_color.txt");
+
+
         try (InputStream inputStream = new FileInputStream(file);
                 InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
              BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
@@ -31,6 +33,7 @@ public class BlackBodyColor {
                 if((line.charAt(0)!='#') && (line.charAt(11)!='2')){
                     // returns integer at [1,6] cutting off space at beginning if there is any
                      currentInteger = Integer.parseInt(line.substring(1,6).trim());
+                     System.out.println(currentInteger);
                      currentRGB = line.substring(80,87);
                      BBRVALUES.put(currentInteger,currentRGB);
                 }

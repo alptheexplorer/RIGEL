@@ -41,11 +41,10 @@ public  final  class DrawSky extends Application {
             StereographicProjection projection = new StereographicProjection (projCenter);
             ObservedSky sky = new ObservedSky(when, where, projection, catalog);
 
-
             Canvas canvas = new Canvas ( 800, 600 );
-            Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , - 1300 , 400 , 300 );
+            Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , -1300 , 400 , 300 );
             SkyCanvasPainter painter = new SkyCanvasPainter (canvas);
-            painter.drawStars (sky, projection, planeToCanvas);
+            painter.drawStars(sky, projection, planeToCanvas);
 
             primaryStage.setScene(new Scene(new BorderPane(canvas)));
             primaryStage.show();
