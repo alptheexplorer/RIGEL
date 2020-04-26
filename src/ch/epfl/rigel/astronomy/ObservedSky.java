@@ -86,7 +86,6 @@ public class ObservedSky {
             projectedCoordinate = projection.apply(tempHorizontal);
             stars[a] = currentStar;
             starCoordinates[b] = projectedCoordinate.x();
-            System.out.println(projectedCoordinate.x());
             starCoordinates[b+1] = projectedCoordinate.y();
             ++a;
             b+=2;

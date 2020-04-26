@@ -45,6 +45,9 @@ public  final  class DrawSky extends Application {
             Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , -1300 , 400 , 300 );
             SkyCanvasPainter painter = new SkyCanvasPainter (canvas);
             painter.drawStars(sky, projection, planeToCanvas);
+            painter.drawPlanets(sky, projection, planeToCanvas);
+            painter.drawSun(sky, projection, planeToCanvas);
+            painter.drawMoon(sky, projection, planeToCanvas);
 
             primaryStage.setScene(new Scene(new BorderPane(canvas)));
             primaryStage.show();
