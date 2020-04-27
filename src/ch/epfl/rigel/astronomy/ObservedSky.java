@@ -63,7 +63,7 @@ public class ObservedSky {
         for(PlanetModel P: PlanetModel.values()){
             // iterate through all enums and add their projection to the hashmap
             if(!P.getFrenchName().equals("Terre")){
-                final Planet currentPlanet; // we make sure that once currentPlanet is passed into list, list members are immutable
+                Planet currentPlanet;
                 CartesianCoordinates projectedCoordinate;
                 currentPlanet = P.at(Epoch.J2010.daysUntil(when),new EclipticToEquatorialConversion(when));
                 tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(currentPlanet.equatorialPos());

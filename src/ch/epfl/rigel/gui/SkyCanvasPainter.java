@@ -1,6 +1,8 @@
 package ch.epfl.rigel.gui;
 
 import ch.epfl.rigel.astronomy.*;
+import ch.epfl.rigel.coordinates.CartesianCoordinates;
+import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
@@ -25,9 +27,9 @@ public class SkyCanvasPainter {
 
 
     // returns transformed diameter of celestial objects
-    private double transformedDiscRadius(CelestialObject object, StereographicProjection projection, Transform planeToCanvas){
+    private double transformedDiscDiameter(CelestialObject object, StereographicProjection projection, Transform planeToCanvas){
         if((object instanceof Sun)|| (object instanceof Moon)){
-            double discRadius = projection.applyToAngle(object.angularSize());
+            double discRadius = projection.applyToAngle(Angle.ofDeg(0.5));
             Point2D transformedRadiusVector = planeToCanvas.deltaTransform(new Point2D(discRadius,0));
             return EuclidianDistance.norm(transformedRadiusVector.getX(),transformedRadiusVector.getY());
         }
@@ -56,6 +58,7 @@ public class SkyCanvasPainter {
         ctx.fillRect ( 0 , 0 , canvas.getWidth (), canvas.getHeight ());
     }
 
+    public int j = 0;
     /**
      * draws stars and asterism
      * @param sky
@@ -67,11 +70,12 @@ public class SkyCanvasPainter {
 
         int i =0;
         for(Star s:sky.stars()){
-            double discRadius = this.transformedDiscRadius(s,projection,planeToAffine);
+            double discRadius = this.transformedDiscDiameter(s,projection,planeToAffine);
             Point2D transformedCoordinates = this.transformCoordinates(sky.starCoordinates()[i],sky.starCoordinates()[i+1],planeToAffine);
             ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
             ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
-            i++;
+            i+=2;
+            j++;
         }
     }
 
@@ -85,11 +89,11 @@ public class SkyCanvasPainter {
 
         int i =0;
         for(Planet planet:sky.planets()){
-            double discRadius = this.transformedDiscRadius(planet,projection,planeToAffine);
+            double discRadius = this.transformedDiscDiameter(planet,projection,planeToAffine);
             Point2D transformedCoordinates = this.transformCoordinates(sky.planetCoordinates()[i],sky.planetCoordinates()[i+1],planeToAffine);
             ctx.setFill(Color.LIGHTGRAY);
             ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
-            i++;
+            i+=2;
         }
     }
 
@@ -101,7 +105,7 @@ public class SkyCanvasPainter {
      */
     public void drawSun(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
 
-            double discRadius = this.transformedDiscRadius(sky.sun(),projection,planeToAffine);
+            double discRadius = this.transformedDiscDiameter(sky.sun(),projection,planeToAffine);
             Point2D transformedCoordinates = this.transformCoordinates(sky.sunPosition().x(),sky.sunPosition().y(),planeToAffine);
             // drawing smallest disc
             ctx.setFill(Color.WHITE);
@@ -114,6 +118,7 @@ public class SkyCanvasPainter {
             ctx.setFill(Color.YELLOW);
             ctx.fillOval(transformedCoordinates.getX()-(discRadius*2.2),transformedCoordinates.getY()+(discRadius*2.2),(discRadius*2.2),(discRadius*2.2));
             canvas.setOpacity(1);
+
         }
 
     /**
@@ -124,14 +129,20 @@ public class SkyCanvasPainter {
      */
 
     public void drawMoon(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
-
-        double discRadius = this.transformedDiscRadius(sky.moon(),projection,planeToAffine);
+        double discRadius = this.transformedDiscDiameter(sky.moon(),projection,planeToAffine);
         Point2D transformedCoordinates = this.transformCoordinates(sky.moonPosition().x(),sky.moonPosition().y(),planeToAffine);
         ctx.setFill(Color.WHITE);
         ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
     }
 
-    public void drawHorizon(){
+    public void drawHorizon(StereographicProjection projection, Transform planeToAffine){
+        HorizontalCoordinates horizonCoord = HorizontalCoordinates.ofDeg(0, 0);
+        double discRadius = projection.circleRadiusForParallel(horizonCoord);
+        CartesianCoordinates circleCenter = projection.circleCenterForParallel(horizonCoord);
+        Point2D transformedRadius = planeToAffine.deltaTransform(discRadius,discRadius);
+        Point2D transformedCoordinates = this.transformCoordinates(circleCenter.x(),circleCenter.y(),planeToAffine);
+        ctx.setStroke(Color.RED);
+        ctx.strokeOval(transformedCoordinates.getX() - transformedRadius.getX(),transformedCoordinates.getY() + transformedRadius.getX(), transformedRadius.getX()*2, transformedRadius.getX()*2);
 
     }
 }
