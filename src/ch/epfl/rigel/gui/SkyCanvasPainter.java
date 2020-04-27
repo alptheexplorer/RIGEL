@@ -11,6 +11,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Transform;
 
 public class SkyCanvasPainter {
@@ -139,10 +140,28 @@ public class SkyCanvasPainter {
         HorizontalCoordinates horizonCoord = HorizontalCoordinates.ofDeg(0, 0);
         double discRadius = projection.circleRadiusForParallel(horizonCoord);
         CartesianCoordinates circleCenter = projection.circleCenterForParallel(horizonCoord);
-        Point2D transformedRadius = planeToAffine.deltaTransform(discRadius,discRadius);
+        double transformedRadius = planeToAffine.deltaTransform(new Point2D(discRadius,discRadius)).getX();
+        System.out.println(transformedRadius);
         Point2D transformedCoordinates = this.transformCoordinates(circleCenter.x(),circleCenter.y(),planeToAffine);
+        double horizonX = transformedCoordinates.getX() - transformedRadius;
+        double horizonY = transformedCoordinates.getY() + transformedRadius;
         ctx.setStroke(Color.RED);
-        ctx.strokeOval(transformedCoordinates.getX() - transformedRadius.getX(),transformedCoordinates.getY() + transformedRadius.getX(), transformedRadius.getX()*2, transformedRadius.getX()*2);
+        ctx.setLineWidth(2);
+        ctx.strokeOval(horizonX,horizonY, transformedRadius*2, transformedRadius*2);
+        ctx.setLineWidth(1);
+        //adding horizon annotations
+
+        ctx.setFill(Color.RED);
+        ctx.setTextAlign(TextAlignment.CENTER);
+        // all 8 annotations
+        ctx.fillText("S",horizonX+transformedRadius,horizonY);
+        ctx.fillText("SE",horizonX + transformedRadius*(3.0/2.0),horizonY+(transformedRadius - transformedRadius*Math.sin(45)));
+        ctx.fillText("E",horizonX+transformedRadius*2,horizonY+transformedRadius);
+        ctx.fillText("NE",horizonX + transformedRadius*(3.0/2.0),horizonY+(transformedRadius + transformedRadius*Math.sin(45)));
+        ctx.fillText("N",horizonX+transformedRadius,horizonY+transformedRadius*2);
+        ctx.fillText("NO", horizonX + (transformedRadius-transformedRadius*Math.cos(45)),horizonY + transformedRadius + transformedRadius*Math.sin(45));
+        ctx.fillText("O",horizonX,horizonY+transformedRadius);
+        ctx.fillText("SO",horizonX+(transformedRadius-transformedRadius*Math.cos(45)),horizonY+(transformedRadius - transformedRadius*Math.sin(45)));
 
     }
 }
