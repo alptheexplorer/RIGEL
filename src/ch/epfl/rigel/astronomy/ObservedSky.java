@@ -14,20 +14,22 @@ public class ObservedSky {
     private final CartesianCoordinates sunCoordinates, moonCoordinates;
     private final Planet[] planets = new Planet[7];
     private final Star[] stars;
-    // we store planets and stars in an arraylist
+    // we store planets and stars in an array
     private final double[] planetCoordinates = new double[14];
     private final double[] starCoordinates;
 
 
 
     /**
-     * Insantitates ObservedSky object containing each object in sky as hashmap with key being name as string and value being projected cartesian coordinates
+     * Instantiate ObservedSky object containing each object in sky as hashmap
+     * with key being name as string and value being projected cartesian coordinates
      * @param when
      * @param where
      * @param projection
      * @param catalogue
      */
-    public ObservedSky(ZonedDateTime when, GeographicCoordinates where, StereographicProjection projection, StarCatalogue catalogue){
+    public ObservedSky(ZonedDateTime when, GeographicCoordinates where,
+                       StereographicProjection projection, StarCatalogue catalogue){
 
         this.currentCatalogue = catalogue;
         this.stars = new Star[catalogue.stars().size()];
@@ -37,7 +39,8 @@ public class ObservedSky {
         EquatorialCoordinates tempEquatorial;
         HorizontalCoordinates tempHorizontal;
 
-        // using provided information, calculate projected position in the plane of all celestial objects, namely: the Sun, the Moon, the planets of the system solar - except the Earth - and the stars of the catalog.
+        // using provided information, calculate projected position in the plane of all celestial objects, namely:
+        // the Sun, the Moon, the planets of the system solar - except the Earth - and the stars of the catalog.
         /**
          * Objects for which calculations made:
          * SUN
@@ -61,7 +64,7 @@ public class ObservedSky {
         int j = 0;
         //Calculation for all planets except for earth, we loop through all planetModel instances
         for(PlanetModel P: PlanetModel.values()){
-            // iterate through all enums and add their projection to the hashmap
+            // iterate through all enums and add their projection to the array
             if(!P.getFrenchName().equals("Terre")){
                 final Planet currentPlanet; // we make sure that once currentPlanet is passed into list, list members are immutable
                 CartesianCoordinates projectedCoordinate;
@@ -86,7 +89,6 @@ public class ObservedSky {
             projectedCoordinate = projection.apply(tempHorizontal);
             stars[a] = currentStar;
             starCoordinates[b] = projectedCoordinate.x();
-            System.out.println(projectedCoordinate.x());
             starCoordinates[b+1] = projectedCoordinate.y();
             ++a;
             b+=2;
@@ -137,7 +139,7 @@ public class ObservedSky {
     /**
      *  @return planet coordinates, odd index being x coordinate of the ith planet and even index being ith coordinate
      */
-    public double[] planetCoordinates(){
+    public double[] planetPositions(){
         return Arrays.copyOf(planetCoordinates,planetCoordinates.length);
     }
 
@@ -153,7 +155,7 @@ public class ObservedSky {
      *
      * @return returns star coordinates, odd index being x coordinate of the ith star and even index being ith coordinate
      */
-    public double[] starCoordinates(){
+    public double[] starPositions(){
         return Arrays.copyOf(starCoordinates,starCoordinates.length);
     }
 
@@ -196,7 +198,7 @@ public class ObservedSky {
                 }
             }
 
-            for(int i = 0; i<this.starCoordinates().length;i+=2){
+            for(int i = 0; i<this.starPositions().length; i+=2){
                 double currentX = starCoordinates[i];
                 double currentY = starCoordinates[i+1];
                 // the distance at index i in starDistances is the star at index i in stars

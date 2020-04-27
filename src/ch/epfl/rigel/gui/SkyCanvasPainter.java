@@ -65,7 +65,7 @@ public class SkyCanvasPainter {
      */
     public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
 
-        double[] starCoordinates = sky.starCoordinates();
+        double[] starCoordinates = sky.starPositions();
         int i =0;
         for(Star s:sky.stars()){
             double discRadius = this.transformedDiscRadius(s,projection,planeToAffine);

@@ -124,7 +124,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
      * spherical coordinates ( Horizontal )
      */
     public HorizontalCoordinates inverseApply(CartesianCoordinates xy) {
-        RightOpenInterval interval = RightOpenInterval.of(-Math.PI / 2, Math.PI / 2);
+        RightOpenInterval interval = RightOpenInterval.symmetric(Math.PI);
         double xPwr = xy.x() * xy.x();
         double yPwr = xy.y() * xy.y();
         double rho = Math.sqrt(xPwr + yPwr);
