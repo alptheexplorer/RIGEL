@@ -80,7 +80,7 @@ public class SkyCanvasPainter {
             //we store transformedstarcoordinates in an array to use when drawing asterism later.
             transformedStarPos[j] =transformedCoordinates;
             ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
-            ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
+            ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()-discRadius,discRadius,discRadius);
             i+=2;
             j++;
         }
@@ -99,7 +99,7 @@ public class SkyCanvasPainter {
             double discRadius = this.transformedDiscDiameter(planet,projection,planeToAffine);
             Point2D transformedCoordinates = this.transformCoordinates(sky.planetCoordinates()[i],sky.planetCoordinates()[i+1],planeToAffine);
             ctx.setFill(Color.LIGHTGRAY);
-            ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
+            ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()-discRadius,discRadius,discRadius);
             i+=2;
         }
     }
@@ -116,14 +116,14 @@ public class SkyCanvasPainter {
             Point2D transformedCoordinates = this.transformCoordinates(sky.sunPosition().x(),sky.sunPosition().y(),planeToAffine);
             // drawing smallest disc
             ctx.setFill(Color.WHITE);
-            ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
+            ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()-discRadius,discRadius,discRadius);
             //drawing middle size disc
             ctx.setFill(Color.YELLOW);
-            ctx.fillOval(transformedCoordinates.getX()-(discRadius+2),transformedCoordinates.getY()+(discRadius+2),(discRadius+2),(discRadius+2));
+            ctx.fillOval(transformedCoordinates.getX()-(discRadius+2),transformedCoordinates.getY()-(discRadius+2),(discRadius+2),(discRadius+2));
             //drawing largest disc the halo
             canvas.setOpacity(0.25);
             ctx.setFill(Color.YELLOW);
-            ctx.fillOval(transformedCoordinates.getX()-(discRadius*2.2),transformedCoordinates.getY()+(discRadius*2.2),(discRadius*2.2),(discRadius*2.2));
+            ctx.fillOval(transformedCoordinates.getX()-(discRadius*2.2),transformedCoordinates.getY()-(discRadius*2.2),(discRadius*2.2),(discRadius*2.2));
             canvas.setOpacity(1);
 
         }
@@ -139,17 +139,17 @@ public class SkyCanvasPainter {
         double discRadius = this.transformedDiscDiameter(sky.moon(),projection,planeToAffine);
         Point2D transformedCoordinates = this.transformCoordinates(sky.moonPosition().x(),sky.moonPosition().y(),planeToAffine);
         ctx.setFill(Color.WHITE);
-        ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
+        ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()-discRadius,discRadius,discRadius);
     }
 
     public void drawHorizon(ObservedSky sky, StereographicProjection projection, Transform planeToAffine){
-        HorizontalCoordinates horizonCoord = HorizontalCoordinates.ofDeg(0, 23);
+        HorizontalCoordinates horizonCoord = HorizontalCoordinates.ofDeg(0, 0);
         double discRadius = projection.circleRadiusForParallel(horizonCoord);
         CartesianCoordinates circleCenter = projection.circleCenterForParallel(horizonCoord);
         double transformedRadius = planeToAffine.deltaTransform(new Point2D(discRadius,discRadius)).getX();
         Point2D transformedCoordinates = this.transformCoordinates(circleCenter.x(),circleCenter.y(),planeToAffine);
-        double horizonX = transformedCoordinates.getX() - transformedRadius;
-        double horizonY = transformedCoordinates.getY() + transformedRadius;
+        double horizonX = transformedCoordinates.getX() - transformedRadius ;
+        double horizonY = transformedCoordinates.getY() - transformedRadius;
         ctx.setStroke(Color.RED);
         ctx.setLineWidth(2);
         ctx.strokeOval(horizonX,horizonY, transformedRadius*2, transformedRadius*2);
@@ -162,7 +162,7 @@ public class SkyCanvasPainter {
         ctx.fillText("S",horizonX+transformedRadius,horizonY);
         ctx.fillText("SE",horizonX + transformedRadius + transformedRadius*Math.cos(Angle.ofDeg(45)),horizonY+(transformedRadius - transformedRadius*Math.sin(Angle.ofDeg(45))));
         ctx.fillText("E",horizonX+transformedRadius*2,horizonY+transformedRadius);
-        ctx.fillText("NE",horizonX + transformedRadius*Math.cos(Angle.ofDeg(45)),horizonY+(transformedRadius + transformedRadius*Math.sin(Angle.ofDeg(45))));
+        ctx.fillText("NE",horizonX + + transformedRadius + transformedRadius*Math.cos(Angle.ofDeg(45)),horizonY+(transformedRadius + transformedRadius*Math.sin(Angle.ofDeg(45))));
         ctx.fillText("N",horizonX+transformedRadius,horizonY+transformedRadius*2);
         ctx.fillText("NO", horizonX + (transformedRadius-transformedRadius*Math.cos(Angle.ofDeg(45))),horizonY + transformedRadius + transformedRadius*Math.sin(Angle.ofDeg(45)));
         ctx.fillText("O",horizonX,horizonY+transformedRadius);
