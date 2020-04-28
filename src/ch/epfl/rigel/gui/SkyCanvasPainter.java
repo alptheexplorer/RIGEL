@@ -7,6 +7,7 @@ import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.EuclidianDistance;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -14,10 +15,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Transform;
 
+import java.util.List;
+
 public class SkyCanvasPainter {
 
     private Canvas canvas;
     private GraphicsContext ctx;
+    private Point2D[] transformedStarPos;
 
     public SkyCanvasPainter(Canvas canvas){
         this.canvas = canvas;
@@ -59,7 +63,6 @@ public class SkyCanvasPainter {
         ctx.fillRect ( 0 , 0 , canvas.getWidth (), canvas.getHeight ());
     }
 
-    public int j = 0;
     /**
      * draws stars and asterism
      * @param sky
@@ -68,11 +71,14 @@ public class SkyCanvasPainter {
      * @return void
      */
     public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
-
+        this.transformedStarPos = new Point2D[sky.stars().length];
         int i =0;
+        int j = 0;
         for(Star s:sky.stars()){
             double discRadius = this.transformedDiscDiameter(s,projection,planeToAffine);
             Point2D transformedCoordinates = this.transformCoordinates(sky.starCoordinates()[i],sky.starCoordinates()[i+1],planeToAffine);
+            //we store transformedstarcoordinates in an array to use when drawing asterism later.
+            transformedStarPos[j] =transformedCoordinates;
             ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
             ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
             i+=2;
@@ -136,12 +142,11 @@ public class SkyCanvasPainter {
         ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()+discRadius,discRadius,discRadius);
     }
 
-    public void drawHorizon(StereographicProjection projection, Transform planeToAffine){
-        HorizontalCoordinates horizonCoord = HorizontalCoordinates.ofDeg(0, 0);
+    public void drawHorizon(ObservedSky sky, StereographicProjection projection, Transform planeToAffine){
+        HorizontalCoordinates horizonCoord = HorizontalCoordinates.ofDeg(0, 23);
         double discRadius = projection.circleRadiusForParallel(horizonCoord);
         CartesianCoordinates circleCenter = projection.circleCenterForParallel(horizonCoord);
         double transformedRadius = planeToAffine.deltaTransform(new Point2D(discRadius,discRadius)).getX();
-        System.out.println(transformedRadius);
         Point2D transformedCoordinates = this.transformCoordinates(circleCenter.x(),circleCenter.y(),planeToAffine);
         double horizonX = transformedCoordinates.getX() - transformedRadius;
         double horizonY = transformedCoordinates.getY() + transformedRadius;
@@ -155,14 +160,56 @@ public class SkyCanvasPainter {
         ctx.setTextAlign(TextAlignment.CENTER);
         // all 8 annotations
         ctx.fillText("S",horizonX+transformedRadius,horizonY);
-        ctx.fillText("SE",horizonX + transformedRadius*(3.0/2.0),horizonY+(transformedRadius - transformedRadius*Math.sin(45)));
+        ctx.fillText("SE",horizonX + transformedRadius + transformedRadius*Math.cos(Angle.ofDeg(45)),horizonY+(transformedRadius - transformedRadius*Math.sin(Angle.ofDeg(45))));
         ctx.fillText("E",horizonX+transformedRadius*2,horizonY+transformedRadius);
-        ctx.fillText("NE",horizonX + transformedRadius*(3.0/2.0),horizonY+(transformedRadius + transformedRadius*Math.sin(45)));
+        ctx.fillText("NE",horizonX + transformedRadius*Math.cos(Angle.ofDeg(45)),horizonY+(transformedRadius + transformedRadius*Math.sin(Angle.ofDeg(45))));
         ctx.fillText("N",horizonX+transformedRadius,horizonY+transformedRadius*2);
-        ctx.fillText("NO", horizonX + (transformedRadius-transformedRadius*Math.cos(45)),horizonY + transformedRadius + transformedRadius*Math.sin(45));
+        ctx.fillText("NO", horizonX + (transformedRadius-transformedRadius*Math.cos(Angle.ofDeg(45))),horizonY + transformedRadius + transformedRadius*Math.sin(Angle.ofDeg(45)));
         ctx.fillText("O",horizonX,horizonY+transformedRadius);
-        ctx.fillText("SO",horizonX+(transformedRadius-transformedRadius*Math.cos(45)),horizonY+(transformedRadius - transformedRadius*Math.sin(45)));
+        ctx.fillText("SO",horizonX+(transformedRadius-transformedRadius*Math.cos(Angle.ofDeg(45))),horizonY+(transformedRadius - transformedRadius*Math.sin(Angle.ofDeg(45))));
 
+
+        /** some test code
+        ctx.beginPath();
+        ctx.moveTo(100,100);
+        ctx.lineTo(200,200);
+        ctx.moveTo(200,200);
+        ctx.lineTo(300,500);
+        ctx.closePath();
+        ctx.setStroke(Color.BLUE);
+        ctx.stroke();
+         */
+        //finally we draw asterisms
+        Bounds canvasBound = canvas.getBoundsInLocal();
+
+        for(Asterism a:sky.asterisms()){
+            //Path path = new Path();
+            ctx.beginPath();
+            List<Integer> currentStarIndex = sky.starIndices(a);
+            int j = 0;
+            for(int i:currentStarIndex){
+                // we move our ctxHead to wherever the current Star is positioned
+                if(j == 0){
+                    ctx.moveTo(this.transformedStarPos[i].getX(),this.transformedStarPos[i].getY());
+                    j+=1;
+                }
+                else{
+                    // we make sure here to not draw a line if both start are outside of the canvas
+                    if(!canvasBound.contains(this.transformedStarPos[i-1].getX(),this.transformedStarPos[i-1].getY())&&!canvasBound.contains(this.transformedStarPos[i].getX(),this.transformedStarPos[i].getY())){
+                        continue;
+                    }
+                    else{
+                        // we then draw a line from current head to the next star
+                        ctx.lineTo(this.transformedStarPos[i].getX(),this.transformedStarPos[i].getY());
+                        // then we move pathHead to that star
+                        ctx.moveTo(this.transformedStarPos[i].getX(),this.transformedStarPos[i].getY());
+                    }
+                }
+            }
+            ctx.closePath();
+            ctx.setStroke(Color.BLUE);
+            ctx.stroke();
+        }
     }
 }
 
