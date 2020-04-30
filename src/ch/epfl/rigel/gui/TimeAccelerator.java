@@ -3,7 +3,7 @@ package ch.epfl.rigel.gui;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-
+//part of the MODEL of the MVC pattern
 @FunctionalInterface
 public interface TimeAccelerator {
      ZonedDateTime adjust(ZonedDateTime initialTime, long actualTimeSinceStart);
@@ -14,7 +14,7 @@ public interface TimeAccelerator {
      * @return the continuousAccelerator implementation of the functional interface
      */
      static TimeAccelerator continuous(double acceleration){
-         return (ZonedDateTime initialTime, long actualTimeSinceStart)->{
+         return (initialTime, actualTimeSinceStart)->{
              return initialTime.plusNanos((long)acceleration*actualTimeSinceStart);
          };
      }
@@ -26,7 +26,7 @@ public interface TimeAccelerator {
      * @return the discreteAccelerator implementation of the functional interface
      */
      static TimeAccelerator discrete(Duration step, long frequency){
-            return (ZonedDateTime initialTime, long actualTimeSinceStart) ->{
+            return (initialTime, actualTimeSinceStart) ->{
                 return initialTime.plusSeconds((long)(step.toSeconds()*Math.floor(frequency*actualTimeSinceStart))) ;
             };
      }
