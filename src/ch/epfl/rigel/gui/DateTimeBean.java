@@ -12,9 +12,13 @@ import java.time.ZonedDateTime;
 // this class is a JavaFX bean, it represents a mutable version of the ZonedDateTime class
 public final class DateTimeBean {
 
-    private ObjectProperty<LocalDate> date;
-    private ObjectProperty<LocalTime> time;
-    private ObjectProperty<ZoneId> zone;
+    private ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
+    private ObjectProperty<LocalTime> time = new SimpleObjectProperty<>();
+    private ObjectProperty<ZoneId> zone = new SimpleObjectProperty<>();
+
+    public DateTimeBean(){
+
+    }
 
     /**
      *

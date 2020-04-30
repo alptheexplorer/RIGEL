@@ -9,8 +9,8 @@ import javafx.beans.property.SimpleObjectProperty;
 public final class TimeAnimator extends AnimationTimer {
 
     private DateTimeBean toModifyTime;
-    private SimpleObjectProperty<TimeAccelerator> accelerator;
-    private SimpleBooleanProperty running;
+    private SimpleObjectProperty<TimeAccelerator> accelerator = new SimpleObjectProperty<>();
+    private SimpleBooleanProperty running = new SimpleBooleanProperty();
     private long timeElapsed;
 
     public TimeAnimator(DateTimeBean toModifyTime){
