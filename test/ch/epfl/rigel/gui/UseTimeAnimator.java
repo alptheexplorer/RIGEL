@@ -30,6 +30,5 @@ public final class UseTimeAnimator extends Application {
             System.out.printf("Nouvelle heure : %s%n", n);
         });
         timeAnimator.start();
-        timeAnimator.stop();
     }
 }

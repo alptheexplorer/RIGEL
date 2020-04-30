@@ -11,7 +11,13 @@ public final class TimeAnimator extends AnimationTimer {
     private DateTimeBean toModifyTime;
     private SimpleObjectProperty<TimeAccelerator> accelerator = new SimpleObjectProperty<>();
     private SimpleBooleanProperty running = new SimpleBooleanProperty();
-    private long timeElapsed;
+    private long initialTime = System.nanoTime();
+    private long timeBlock = System.nanoTime() - initialTime;
+    // currentDuration was obtained by subtracting default l values passed by AnimationTimer
+    private long currentDuration = (1161813778127600l - 1161813763450200l);
+    private long duration;
+    private long previousL;
+    private long currentL;
 
     public TimeAnimator(DateTimeBean toModifyTime){
         this.toModifyTime = toModifyTime;
@@ -20,14 +26,14 @@ public final class TimeAnimator extends AnimationTimer {
 
     @Override
     public void handle(long l) {
-        accelerator.get().adjust(toModifyTime.getZonedDateTime(),l);
+        l = this.currentDuration;
+        toModifyTime.setZonedDateTime(getAccelerator().adjust(toModifyTime.getZonedDateTime(),l));
     }
 
     @Override
     public void start(){
         super.start();
         this.running.set(true);
-        this.handle(System.nanoTime());
     }
 
     @Override
