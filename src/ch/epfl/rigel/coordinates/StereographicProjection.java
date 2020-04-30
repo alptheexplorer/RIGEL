@@ -136,16 +136,22 @@ public final class StereographicProjection implements Function<HorizontalCoordin
 
         double atanNum = xy.x() * sinC;
         double atanDen = rho * COS_PHI_CENTER * cosC - xy.y() * SIN_PHI_CENTER * sinC;
-        double lambda = Angle.normalizePositive(Math.atan2(
-                atanNum,
-                atanDen) + LAMBDA_CENTER);
 
-        double phi = interval.reduce(
-                Math.asin(cosC * SIN_PHI_CENTER +
-                        (xy.y() * sinC * COS_PHI_CENTER) / rho
-                ));
+        if(xy.equals(CartesianCoordinates.of(0,0))){
+            //correction of error ETAPE 9
+            return HorizontalCoordinates.of(LAMBDA_CENTER,PHI_CENTER);
+        }
+        else{
+            double lambda = Angle.normalizePositive(Math.atan2(
+                    atanNum,
+                    atanDen) + LAMBDA_CENTER);
 
-        return HorizontalCoordinates.of(lambda, phi);
+            double phi = interval.reduce(
+                    Math.asin(cosC * SIN_PHI_CENTER +
+                            (xy.y() * sinC * COS_PHI_CENTER) / rho
+                    ));
+            return HorizontalCoordinates.of(lambda, phi);
+        }
     }
 
 
