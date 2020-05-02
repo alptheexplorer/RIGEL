@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 public class ViewingParametersBean {
 
-    private SimpleDoubleProperty angleOfView = new SimpleDoubleProperty();
+    private SimpleDoubleProperty fieldOfView = new SimpleDoubleProperty();
     private SimpleObjectProperty<HorizontalCoordinates> projectionCenter = new SimpleObjectProperty<>();
 
     public ViewingParametersBean(){ };
@@ -15,24 +15,24 @@ public class ViewingParametersBean {
      *
      * @return contents of angle property
      */
-    public double getAngleOfView() {
-        return angleOfView.get();
+    public double getFieldOfView() {
+        return fieldOfView.get();
     }
 
     /**
      *
      * @return angleOfView property
      */
-    public SimpleDoubleProperty angleOfViewProperty() {
-        return angleOfView;
+    public SimpleDoubleProperty fieldOfViewProperty() {
+        return fieldOfView;
     }
 
     /**
      *
-     * @param angleOfView
+     * @param angleOfView in degrees
      */
-    public void setAngleOfView(double angleOfView) {
-        this.angleOfView.set(angleOfView);
+    public void setFieldOfViewDeg(double angleOfView) {
+        this.fieldOfView.set(angleOfView);
     }
 
     /**
@@ -55,7 +55,8 @@ public class ViewingParametersBean {
      *
      * @param projectionCenter
      */
-    public void setProjectionCenter(HorizontalCoordinates projectionCenter) {
+    public void setCenter(HorizontalCoordinates projectionCenter) {
         this.projectionCenter.set(projectionCenter);
     }
+
 }

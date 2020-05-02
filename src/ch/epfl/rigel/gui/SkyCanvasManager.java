@@ -27,7 +27,7 @@ public class SkyCanvasManager {
     private final double maxObjectDist = 10;
     // all properties defined here
     private ObjectProperty<Canvas> canvas;
-    private ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>();
+    private ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>(new Point2D(10,12));
     private ViewingParametersBean viewParam;
 
     //initial value of fieldOfView is 100 degrees
@@ -45,10 +45,13 @@ public class SkyCanvasManager {
     private ObservableDoubleValue mouseAzDeg;
 
     // the sole function of the constructor is to define bindings and add listeners
-    public SkyCanvasManager(StarCatalogue catalogue, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters, DateTimeBean when){
+    public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters){
             this.canvas = new SimpleObjectProperty<>(new Canvas ( 800, 600 ));
             this.viewParam = viewingParameters;
-            this.viewParam.setAngleOfView(90);
+            this.viewParam.setFieldOfViewDeg(90);
+
+
+
             // adding mouse related event listeners
             canvas.get().setOnMouseMoved(e -> this.setMousePosition(e));
             canvas.get().setOnScroll(e -> this.setFieldOfView(e));
@@ -68,10 +71,10 @@ public class SkyCanvasManager {
                     when.getZonedDateTime(),observerLocation.getCoordinates(),this.projection);
 
             this.planeToCanvas = Bindings.createObjectBinding(() -> {
-                double dilation = (canvas.get().getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getAngleOfView())));
+                double dilation = (canvas.get().getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
                 return Transform.affine(dilation,0,0,-1*dilation,canvas.get().getWidth()/2.0,canvas.get().getHeight()/2);
                     },
-                    canvas,viewParam.angleOfViewProperty()
+                    canvas,viewParam.fieldOfViewProperty()
             );
 
             this.objectUnderMouse = Bindings.createObjectBinding(()->
@@ -94,15 +97,15 @@ public class SkyCanvasManager {
     // this method sets the field of view to a number within the given range and based on the mouse scroll
     private void setFieldOfView(ScrollEvent e){
         if(Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())){
-            double newFieldOfView = viewParam.getAngleOfView() + e.getDeltaX();
+            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaX();
             if(this.fieldOfViewRange.contains(newFieldOfView)){
-                this.viewParam.setAngleOfView(newFieldOfView);
+                this.viewParam.setFieldOfViewDeg(newFieldOfView);
             }
         }
         else{
-            double newFieldOfView = viewParam.getAngleOfView() + e.getDeltaY();
+            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaY();
             if(this.fieldOfViewRange.contains(newFieldOfView)){
-                this.viewParam.setAngleOfView(newFieldOfView);
+                this.viewParam.setFieldOfViewDeg(newFieldOfView);
             }
         }
     }
@@ -117,16 +120,16 @@ public class SkyCanvasManager {
         double currentY = viewParam.getProjectionCenter().az();
         switch (e.getCode()){
             case LEFT:
-                viewParam.setProjectionCenter(HorizontalCoordinates.ofDeg(currentX-10,currentY));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX-10,currentY));
                 break;
             case RIGHT:
-                viewParam.setProjectionCenter(HorizontalCoordinates.ofDeg(currentX+10,currentY));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX+10,currentY));
                 break;
             case DOWN:
-                viewParam.setProjectionCenter(HorizontalCoordinates.ofDeg(currentX,currentY-5));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX,currentY-5));
                 break;
             case UP:
-                viewParam.setProjectionCenter(HorizontalCoordinates.ofDeg(currentX,currentY+5));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX,currentY+5));
                 break;
 
         }
@@ -156,5 +159,13 @@ public class SkyCanvasManager {
 
     private double getMouseY(){
         return this.mousePosition.get().getY();
+    }
+
+    public ObservableObjectValue<CelestialObject> objectUnderMouseProperty(){
+        return this.objectUnderMouseProperty();
+    }
+
+    public Canvas canvas(){
+        return this.canvas();
     }
 }

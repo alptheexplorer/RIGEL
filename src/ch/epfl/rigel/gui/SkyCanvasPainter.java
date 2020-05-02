@@ -76,7 +76,7 @@ public class SkyCanvasPainter {
         int j = 0;
         for(Star s:sky.stars()){
             double discRadius = this.transformedDiscDiameter(s,projection,planeToAffine);
-            Point2D transformedCoordinates = this.transformCoordinates(sky.starCoordinates()[i],sky.starCoordinates()[i+1],planeToAffine);
+            Point2D transformedCoordinates = this.transformCoordinates(sky.starPositions()[i],sky.starPositions()[i+1],planeToAffine);
             //we store transformedstarcoordinates in an array to use when drawing asterism later.
             transformedStarPos[j] =transformedCoordinates;
             ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
@@ -97,7 +97,7 @@ public class SkyCanvasPainter {
         int i =0;
         for(Planet planet:sky.planets()){
             double discRadius = this.transformedDiscDiameter(planet,projection,planeToAffine);
-            Point2D transformedCoordinates = this.transformCoordinates(sky.planetCoordinates()[i],sky.planetCoordinates()[i+1],planeToAffine);
+            Point2D transformedCoordinates = this.transformCoordinates(sky.planetPositions()[i],sky.planetPositions()[i+1],planeToAffine);
             ctx.setFill(Color.LIGHTGRAY);
             ctx.fillOval(transformedCoordinates.getX()-discRadius,transformedCoordinates.getY()-discRadius,discRadius,discRadius);
             i+=2;

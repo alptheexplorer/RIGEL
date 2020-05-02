@@ -77,4 +77,9 @@ public class ObserverLocationBean {
     public ObservableObjectValue<GeographicCoordinates> coordinatesProperty() {
         return coordinates;
     }
+
+    public void setCoordinates(GeographicCoordinates coord){
+        this.setLatDeg(coord.latDeg());
+        this.setLonDeg(coord.lonDeg());
+    }
 }

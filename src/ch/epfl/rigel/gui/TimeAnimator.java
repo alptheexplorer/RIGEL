@@ -27,7 +27,7 @@ public final class TimeAnimator extends AnimationTimer {
     @Override
     public void handle(long l) {
         l = this.currentDuration;
-        toModifyTime.setZonedDateTime(getAccelerator().adjust(toModifyTime.getZonedDateTime(),l));
+        toModifyTime.setZonedDateTime(getAccelerator().adjust(toModifyTime.getZonedDateTime().get(),l));
     }
 
     @Override
