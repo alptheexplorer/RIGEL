@@ -1,3 +1,4 @@
+
 package ch.epfl.rigel.astronomy;
 
 import ch.epfl.rigel.coordinates.*;
@@ -14,20 +15,22 @@ public class ObservedSky {
     private final CartesianCoordinates sunCoordinates, moonCoordinates;
     private final Planet[] planets = new Planet[7];
     private final Star[] stars;
-    // we store planets and stars in an arraylist
+    // we store planets and stars in an array
     private final double[] planetCoordinates = new double[14];
     private final double[] starCoordinates;
 
 
 
     /**
-     * Insantitates ObservedSky object containing each object in sky as hashmap with key being name as string and value being projected cartesian coordinates
+     * Instantiate ObservedSky object containing each object in sky as hashmap
+     * with key being name as string and value being projected cartesian coordinates
      * @param when
      * @param where
      * @param projection
      * @param catalogue
      */
-    public ObservedSky(ZonedDateTime when, GeographicCoordinates where, StereographicProjection projection, StarCatalogue catalogue){
+    public ObservedSky(ZonedDateTime when, GeographicCoordinates where,
+                       StereographicProjection projection, StarCatalogue catalogue){
 
         this.currentCatalogue = catalogue;
         this.stars = new Star[catalogue.stars().size()];
@@ -37,7 +40,8 @@ public class ObservedSky {
         EquatorialCoordinates tempEquatorial;
         HorizontalCoordinates tempHorizontal;
 
-        // using provided information, calculate projected position in the plane of all celestial objects, namely: the Sun, the Moon, the planets of the system solar - except the Earth - and the stars of the catalog.
+        // using provided information, calculate projected position in the plane of all celestial objects, namely:
+        // the Sun, the Moon, the planets of the system solar - except the Earth - and the stars of the catalog.
         /**
          * Objects for which calculations made:
          * SUN
@@ -61,9 +65,9 @@ public class ObservedSky {
         int j = 0;
         //Calculation for all planets except for earth, we loop through all planetModel instances
         for(PlanetModel P: PlanetModel.values()){
-            // iterate through all enums and add their projection to the hashmap
+            // iterate through all enums and add their projection to the array
             if(!P.getFrenchName().equals("Terre")){
-                Planet currentPlanet;
+                final Planet currentPlanet; // we make sure that once currentPlanet is passed into list, list members are immutable
                 CartesianCoordinates projectedCoordinate;
                 currentPlanet = P.at(Epoch.J2010.daysUntil(when),new EclipticToEquatorialConversion(when));
                 tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(currentPlanet.equatorialPos());
@@ -136,7 +140,7 @@ public class ObservedSky {
     /**
      *  @return planet coordinates, odd index being x coordinate of the ith planet and even index being ith coordinate
      */
-    public double[] planetCoordinates(){
+    public double[] planetPositions(){
         return Arrays.copyOf(planetCoordinates,planetCoordinates.length);
     }
 
@@ -152,7 +156,7 @@ public class ObservedSky {
      *
      * @return returns star coordinates, odd index being x coordinate of the ith star and even index being ith coordinate
      */
-    public double[] starCoordinates(){
+    public double[] starPositions(){
         return Arrays.copyOf(starCoordinates,starCoordinates.length);
     }
 
@@ -174,59 +178,74 @@ public class ObservedSky {
         return currentCatalogue.asterismIndices(asterism);
     }
 
-    //TODO fix implementation to avoid duplicates
+
     /**
-     *
+     * We cycle through the arrays and add to an Hashmap only the celestial objects in
+     * the desired radius. The we find the minimum in that HashMap.
+     * We handle the case of collision of more than one objectClosestTo in an arbitrary manner
      * @param xy
      * @param maxDist
      * @return closest celestial object to given position and within maxDist
      */
     public CelestialObject objectClosestTo(CartesianCoordinates xy, double maxDist){
-            // contains each nearby celestial object with distance as key and object as value
-            Map<Double, CelestialObject> nearbyDistances = new HashMap<>();
 
-            for(int i = 0; i<planetCoordinates.length;i+=2){
-                double currentX = planetCoordinates[i];
-                double currentY = planetCoordinates[i+1];
-                double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
-                // the distance at index i in planetDistances is the planet at index i in planets
-                if(currentDistance<=maxDist){
-                    nearbyDistances.put(currentDistance,planets()[i]);
+        // contains each nearby celestial object with key the object and value the distance
+        Map<CelestialObject, Double> nearbyDistances = new HashMap<>();
+
+        // cycles trough the planets
+        for(int i = 0; i<planetCoordinates.length; i+=2){
+            double currentX = planetCoordinates[i];
+            double currentY = planetCoordinates[i+1];
+            double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
+            //insert the planets inside the circle centered in xy of radius maxDist
+            if(currentDistance < maxDist){
+                nearbyDistances.put(planets()[i], currentDistance);
+            }
+        }
+
+        // cycles trough the stars
+        for(int i = 0; i<this.starPositions().length; i+=2){
+            double currentX = starCoordinates[i];
+            double currentY = starCoordinates[i+1];
+            //insert the stars inside the circle centered in xy of radius maxDist
+            double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
+            if(currentDistance < maxDist){
+                nearbyDistances.put( stars()[i], currentDistance);
+            }
+        }
+
+        // checks Sun and Moon
+        double sunDistance = EuclidianDistance.distanceTo(sunPosition().x(),sunPosition().y(),xy.x(),xy.y());
+        if(sunDistance < maxDist){
+            nearbyDistances.put(sun(), sunDistance);
+        }
+
+        double moonDistance = EuclidianDistance.distanceTo(moonPosition().x(),moonPosition().y(),xy.x(),xy.y());
+        if(moonDistance < maxDist){
+            nearbyDistances.put(moon(), moonDistance);
+        }
+
+        if(nearbyDistances.isEmpty()){
+            return null;
+        }
+        else{
+            //create a list in case there's more than one with the same closest distance
+            CelestialObject[] closestObjects = new CelestialObject[nearbyDistances.size()];
+            int i = 0;
+            //find minimal distance
+            double minDist = Collections.min(nearbyDistances.values());
+            //find Celestial Objects corresponding to that minimal distance
+            for( CelestialObject obj : nearbyDistances.keySet()){
+                if(minDist == nearbyDistances.get(obj)){
+                    closestObjects[i] = obj;
+                    ++i;
                 }
             }
+            // to handle conflicting cases, they should be very few so the performance should stay the same
+            // here we decide to take the first of the competing possible Celestial Objects
+            return closestObjects[0];
+        }
 
-            for(int i = 0; i<this.starCoordinates().length;i+=2){
-                double currentX = starCoordinates[i];
-                double currentY = starCoordinates[i+1];
-                // the distance at index i in starDistances is the star at index i in stars
-                double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
-                if(currentDistance<=maxDist){
-                    nearbyDistances.put(currentDistance,stars()[i]);
-                }
-            }
-
-            double sunDistance = EuclidianDistance.distanceTo(sunPosition().x(),sunPosition().y(),xy.x(),xy.y());
-            if(sunDistance <= maxDist){
-                nearbyDistances.put(sunDistance,sun());
-            }
-
-            double moonDistance = EuclidianDistance.distanceTo(moonPosition().x(),moonPosition().y(),xy.x(),xy.y());
-            if(moonDistance <= maxDist){
-                nearbyDistances.put(moonDistance,moon());
-            }
-
-            if(nearbyDistances.isEmpty()){
-                return null;
-            }
-            else{
-                List<Double> distances = new ArrayList<>();
-                for(double key:nearbyDistances.keySet()){
-                    distances.add(key);
-                }
-                double minVal = Collections.min(distances);
-                //TODO handle case for same distance
-                return nearbyDistances.get(minVal);
-            }
 
     }
 
