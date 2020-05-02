@@ -42,7 +42,6 @@ public  final  class DrawSky extends Application {
             HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg ( 180, 45);
             StereographicProjection projection = new StereographicProjection (projCenter);
             ObservedSky sky = new ObservedSky(when, where, projection, catalog);
-            System.out.println(sky.stars().length);
 
             Canvas canvas = new Canvas ( 800, 600 );
             Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , -1300 , 400 , 300 );

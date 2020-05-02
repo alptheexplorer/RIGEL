@@ -16,21 +16,11 @@ public final class DateTimeBean {
     private ObjectProperty<LocalTime> time = new SimpleObjectProperty<>();
     private ObjectProperty<ZoneId> zone = new SimpleObjectProperty<>();
 
+
+    // no-arg constructor
     public DateTimeBean(){
-
     }
 
-    /**
-     *
-     * @param date
-     * @param time
-     * @param zone
-     */
-    public DateTimeBean(ObjectProperty<LocalDate> date, ObjectProperty<LocalTime> time, ObjectProperty<ZoneId> zone) {
-        this.date = new SimpleObjectProperty(date);
-        this.time = new SimpleObjectProperty(time);
-        this.zone = new SimpleObjectProperty(zone);
-    }
 
     /**
      *
@@ -108,8 +98,8 @@ public final class DateTimeBean {
      *
      * @return zonedatetime instance
      */
-    public ZonedDateTime getZonedDateTime(){
-        return  ZonedDateTime.of(this.getDate(),this.getTime(),this.getZone());
+    public SimpleObjectProperty<ZonedDateTime> getZonedDateTime(){
+        return  new SimpleObjectProperty<>(ZonedDateTime.of(this.getDate(),this.getTime(),this.getZone()));
     }
 
     /**
