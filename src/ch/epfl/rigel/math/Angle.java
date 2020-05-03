@@ -67,7 +67,13 @@ public final class Angle {
             throw new IllegalArgumentException();
         }
         else{
-            return ofDeg( deg + min/60.0 + sec/3600.0);
+            if(deg < 0){
+                //correction of error ETAPE 9
+                throw new UnsupportedOperationException();
+            }
+            else{
+                return ofDeg( deg + min/60.0 + sec/3600.0);
+            }
         }
     }
 

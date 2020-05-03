@@ -1,5 +1,6 @@
 package ch.epfl.rigel.gui;
 
+import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.ObservedSky;
 import ch.epfl.rigel.astronomy.StarCatalogue;
@@ -32,12 +33,13 @@ public  final  class DrawSky extends Application {
 
     @Override
     public void start (Stage primaryStage) throws Exception    {
-        try (InputStream hs = resourceStream ( "/hygdata_v3.csv" )) {
-            StarCatalogue catalog = new StarCatalogue.Builder().loadFrom(hs, HygDatabaseLoader.INSTANCE).build();
+        try (InputStream hs = resourceStream ( "/hygdata_v3.csv" );
+             InputStream as = resourceStream ( "/asterisms.txt" ) ) {
+            StarCatalogue catalog = new StarCatalogue.Builder().loadFrom(hs, HygDatabaseLoader.INSTANCE).loadFrom(as, AsterismLoader.INSTANCE).build();
 
             ZonedDateTime when = ZonedDateTime.parse ( "2020-02-17T20:15:00+01:00" );
             GeographicCoordinates where = GeographicCoordinates.ofDeg ( 6.57, 46.52 );
-            HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg ( 180, 45 );
+            HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg ( 180, 45);
             StereographicProjection projection = new StereographicProjection (projCenter);
             ObservedSky sky = new ObservedSky(when, where, projection, catalog);
 
@@ -45,6 +47,10 @@ public  final  class DrawSky extends Application {
             Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , -1300 , 400 , 300 );
             SkyCanvasPainter painter = new SkyCanvasPainter (canvas);
             painter.drawStars(sky, projection, planeToCanvas);
+            painter.drawHorizon( sky,projection, planeToCanvas);
+            painter.drawPlanets(sky, projection, planeToCanvas);
+            painter.drawSun(sky, projection, planeToCanvas);
+            painter.drawMoon(sky, projection, planeToCanvas);
 
             primaryStage.setScene(new Scene(new BorderPane(canvas)));
             primaryStage.show();
