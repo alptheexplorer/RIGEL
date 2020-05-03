@@ -199,7 +199,7 @@ public class ObservedSky {
             double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
             //insert the planets inside the circle centered in xy of radius maxDist
             if(currentDistance < maxDist){
-                nearbyDistances.put(planets()[i], currentDistance);
+                nearbyDistances.put(planets()[i/2], currentDistance);
             }
         }
 
@@ -210,7 +210,7 @@ public class ObservedSky {
             //insert the stars inside the circle centered in xy of radius maxDist
             double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
             if(currentDistance < maxDist){
-                nearbyDistances.put( stars()[i], currentDistance);
+                nearbyDistances.put( stars()[i/2], currentDistance);
             }
         }
 

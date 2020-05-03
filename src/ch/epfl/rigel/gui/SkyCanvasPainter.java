@@ -58,7 +58,6 @@ public class SkyCanvasPainter {
      * @return void
      */
     public void clear(){
-        ctx.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         ctx.setFill (Color.BLACK);
         ctx.fillRect ( 0 , 0 , canvas.getWidth (), canvas.getHeight ());
     }

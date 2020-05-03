@@ -137,7 +137,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         double atanNum = xy.x() * sinC;
         double atanDen = rho * COS_PHI_CENTER * cosC - xy.y() * SIN_PHI_CENTER * sinC;
 
-        if(xy.equals(CartesianCoordinates.of(0,0))){
+        if(xy.x() == 0 && xy.y() ==0){
             //correction of error ETAPE 9
             return HorizontalCoordinates.of(LAMBDA_CENTER,PHI_CENTER);
         }
