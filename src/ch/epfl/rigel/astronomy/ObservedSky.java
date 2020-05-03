@@ -21,8 +21,6 @@ public class ObservedSky {
 
 
     /**
-     * Instantiate ObservedSky object containing each object in sky as hashmap
-     * with key being name as string and value being projected cartesian coordinates
      * @param when
      * @param where
      * @param projection
@@ -228,7 +226,7 @@ public class ObservedSky {
                 return null;
             }
             else{
-                //create a list in case there's more than one with the same closest distance
+                //create a list in case there's more than one with the exact same closest distance
                 CelestialObject[] closestObjects = new CelestialObject[nearbyDistances.size()];
                 int i = 0;
                 //find minimal distance
@@ -240,7 +238,7 @@ public class ObservedSky {
                         ++i;
                     }
                 }
-                // to handle conflicting cases, they should be very few so the performance should stay the same
+                // to handle conflicting cases, they should be very few so the performance stays the same
                 // here we decide to take the first of the competing possible Celestial Objects
                 return closestObjects[0];
             }

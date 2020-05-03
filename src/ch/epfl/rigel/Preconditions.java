@@ -16,7 +16,7 @@ public final class Preconditions {
      * @throws IllegalArgumentException
      */
     public static void checkArgument(boolean isTrue){
-        if(isTrue == false) {
+        if(!isTrue) {
             throw new IllegalArgumentException();
         }
     }

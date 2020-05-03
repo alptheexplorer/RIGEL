@@ -1,9 +1,11 @@
 package ch.epfl.rigel.gui;
 
+import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.math.ClosedInterval;
 import javafx.scene.paint.Color;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,12 +19,10 @@ public class BlackBodyColor {
     //used to read data from bbr_color.txt and store it in a hashmap for later use
     private static Map<Integer,String> readFromBbr(){
 
-        Map<Integer,String> BBRVALUES = new HashMap<>();
-        File file = new File("C:\\Users\\alpoz\\Desktop\\projectBA2\\resources\\bbr_color.txt");
+        Map<Integer,String> bbrValues = new HashMap<>();
 
-
-        try (InputStream inputStream = new FileInputStream(file);
-                InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
+        try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("bbr_color.txt");
+             InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
              BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
 
             String line;
@@ -33,32 +33,31 @@ public class BlackBodyColor {
                 if((line.charAt(0)!='#') && (line.charAt(11)!='2')){
                     // returns integer at [1,6] cutting off space at beginning if there is any
                      currentInteger = Integer.parseInt(line.substring(1,6).trim());
-                     System.out.println(currentInteger);
                      currentRGB = line.substring(80,87);
-                     BBRVALUES.put(currentInteger,currentRGB);
+                     bbrValues.put(currentInteger,currentRGB);
                 }
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return BBRVALUES;
+        return bbrValues;
     }
 
-    //returns a Color instance for the given temperature of blackbody in Kelvin
-    public static Color colorForTemperature(double Kelvin) throws IllegalArgumentException {
 
-        // we check that argument is valid
+
+    /**
+     * @param kelvin
+     * @return a Color instance for the given temperature of blackbody in kelvin
+     * @throws IllegalArgumentException if the temperature is not in the range [1000,40000]
+     */
+    public static Color colorForTemperature(double kelvin) throws IllegalArgumentException {
         ClosedInterval tempInterval = ClosedInterval.of(1000,40000);
-        if(!tempInterval.contains(Kelvin)){
-            // IA exception if argument not in range
-            throw new IllegalArgumentException();
-        }
-        else{
-            // we then round kelvin to the nearest 100th
-            int filteredKelvin = (int)(Math.round( Kelvin / 100.0) * 100);
-            String colArg = BBRVALUES.get(filteredKelvin);
-            return Color.web(colArg);
-        }
+
+        int filteredKelvin = (int) Math.round(
+                Preconditions.checkInInterval(tempInterval,kelvin)/100.0
+        ) * 100;
+        String colArg = BBRVALUES.get(filteredKelvin);
+        return Color.web(colArg);
 
     }
 
