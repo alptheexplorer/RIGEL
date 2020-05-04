@@ -63,61 +63,42 @@ public final class Polynomial {
                 if(exp==1) builder.append(coef + "x");
                 else if(coef >0) builder.append("+"+ coef);
                 else if( coef<0) builder.append(coef);
-
             }
-
             else {
                 if(coef>0){
                     if (coef!=1){
                         if (exp == polynomials.length - 1) builder.append(coef + "x^" + exp);
-
                         else if (exp == 1) builder.append("+" + coef + "x");
-
                         else if (exp == 0) builder.append("+"+coef);
-
                         else builder.append("+" + coef + "x^" + exp);
                     }
                     else{
                         if (exp == polynomials.length - 1) builder.append("x^" + exp);
-
                         else if (exp == 1) builder.append("+x");
-
                         else if (exp == 0) builder.append(coef);
-
                         else builder.append("+x^" + exp);
                     }
                 }
                 else if(coef<0){
                     if(coef!=-1){
                         if(exp==polynomials.length-1 && exp!= 1) builder.append(coef + "x^"+exp);
-
                         else if (exp==1) builder.append(coef + "x");
-
                         else if(exp==0) builder.append(coef);
-
                         else builder.append( coef + "x^"+ exp);
-
                     }
                     else{
                         if(exp==polynomials.length-1 && exp!= 1) builder.append("-x^"+exp);
-
                         else if (exp==1) builder.append("-x");
-
                         else if(exp==0) builder.append(coef);
-
                         else builder.append("-x^"+ exp);
-
                     }
-
                 }
                 else if(coef==0){}//nothing
             }
             exp -= 1;
         }
-
         out = builder.toString();
         return out;
-
     }
 
 

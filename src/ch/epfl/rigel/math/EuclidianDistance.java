@@ -1,6 +1,6 @@
 package ch.epfl.rigel.math;
 
-// this class offers static methods used to find objects close to certain vectors
+// this class offers static methods useful with vectors or points on a plane
 public class EuclidianDistance {
 
     /**
@@ -21,8 +21,11 @@ public class EuclidianDistance {
      * @param subjectTwoY
      * @return finds distance between two CartesianCoordinates
      */
-    public static double distanceTo(double subjectOneX, double subjectOneY, double subjectTwoX, double subjectTwoY){
-        return Math.abs(norm(subjectOneX,subjectOneY) - norm(subjectTwoX,subjectTwoY));
+    public static double distance(double subjectOneX, double subjectOneY, double subjectTwoX, double subjectTwoY){
+        return Math.sqrt(
+                (subjectOneX - subjectTwoX)*(subjectOneX - subjectTwoX)
+                + (subjectOneY - subjectTwoY)*(subjectOneY - subjectTwoY)
+        );
     }
 
 }

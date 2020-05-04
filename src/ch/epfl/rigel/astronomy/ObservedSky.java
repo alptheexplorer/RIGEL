@@ -14,7 +14,7 @@ public class ObservedSky {
     private final CartesianCoordinates sunCoordinates, moonCoordinates;
     private final Planet[] planets = new Planet[7];
     private final Star[] stars;
-    // we store planets and stars in an array
+    // we store planets and stars in an array, same for their coordinates
     private final double[] planetCoordinates = new double[14];
     private final double[] starCoordinates;
 
@@ -51,12 +51,10 @@ public class ObservedSky {
         tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(tempEquatorial);
         this.sunCoordinates = projection.apply(tempHorizontal);
 
-
         //Calculation for moon
         this.currentMoon = MoonModel.MOON.at(Epoch.J2010.daysUntil(when),new EclipticToEquatorialConversion(when));
         tempHorizontal = new EquatorialToHorizontalConversion(when,where).apply(this.currentMoon.equatorialPos());
         this.moonCoordinates = projection.apply(tempHorizontal);
-
 
         int i = 0;
         int j = 0;
@@ -135,7 +133,7 @@ public class ObservedSky {
     }
 
     /**
-     *  @return planet coordinates, odd index being x coordinate of the ith planet and even index being ith coordinate
+     *  @return planet coordinates, even indeces being x coordinates of ith star and odd being y
      */
     public double[] planetPositions(){
         return Arrays.copyOf(planetCoordinates,planetCoordinates.length);
@@ -151,7 +149,7 @@ public class ObservedSky {
 
     /**
      *
-     * @return returns star coordinates, odd index being x coordinate of the ith star and even index being ith coordinate
+     * @return returns star coordinates, even indeces being x coordinates of ith star and odd being y
      */
     public double[] starPositions(){
         return Arrays.copyOf(starCoordinates,starCoordinates.length);
@@ -169,7 +167,7 @@ public class ObservedSky {
     /**
      *
      * @param asterism
-     * @return indeces of stars in given asterism
+     * @return indeces of stars in given asterism as occurring in starCatalog
      */
     public List<Integer> starIndices(Asterism asterism){
         return currentCatalogue.asterismIndices(asterism);
@@ -193,7 +191,7 @@ public class ObservedSky {
             for(int i = 0; i<planetCoordinates.length; i+=2){
                 double currentX = planetCoordinates[i];
                 double currentY = planetCoordinates[i+1];
-                double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
+                double currentDistance = EuclidianDistance.distance(currentX,currentY,xy.x(),xy.y());
                //insert the planets inside the circle centered in xy of radius maxDist
                 if(currentDistance < maxDist){
                     nearbyDistances.put(planets()[i], currentDistance);
@@ -205,19 +203,19 @@ public class ObservedSky {
                 double currentX = starCoordinates[i];
                 double currentY = starCoordinates[i+1];
                 //insert the stars inside the circle centered in xy of radius maxDist
-                double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
+                double currentDistance = EuclidianDistance.distance(currentX,currentY,xy.x(),xy.y());
                 if(currentDistance < maxDist){
                     nearbyDistances.put( stars()[i], currentDistance);
                 }
             }
 
             // checks Sun and Moon
-            double sunDistance = EuclidianDistance.distanceTo(sunPosition().x(),sunPosition().y(),xy.x(),xy.y());
+            double sunDistance = EuclidianDistance.distance(sunPosition().x(),sunPosition().y(),xy.x(),xy.y());
             if(sunDistance < maxDist){
                 nearbyDistances.put(sun(), sunDistance);
             }
 
-            double moonDistance = EuclidianDistance.distanceTo(moonPosition().x(),moonPosition().y(),xy.x(),xy.y());
+            double moonDistance = EuclidianDistance.distance(moonPosition().x(),moonPosition().y(),xy.x(),xy.y());
             if(moonDistance < maxDist){
                 nearbyDistances.put(moon(), moonDistance);
             }

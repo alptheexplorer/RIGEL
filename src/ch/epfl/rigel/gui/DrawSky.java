@@ -35,23 +35,26 @@ public  final  class DrawSky extends Application {
     public void start (Stage primaryStage) throws Exception    {
         try (InputStream hs = resourceStream ( "/hygdata_v3.csv" );
              InputStream as = resourceStream ( "/asterisms.txt" ) ) {
-            StarCatalogue catalog = new StarCatalogue.Builder().loadFrom(hs, HygDatabaseLoader.INSTANCE).loadFrom(as, AsterismLoader.INSTANCE).build();
+            StarCatalogue catalog = new StarCatalogue.Builder()
+                    .loadFrom(hs, HygDatabaseLoader.INSTANCE)
+                    .loadFrom(as, AsterismLoader.INSTANCE)
+                    .build();
 
             ZonedDateTime when = ZonedDateTime.parse ( "2020-02-17T20:15:00+01:00" );
             GeographicCoordinates where = GeographicCoordinates.ofDeg ( 6.57, 46.52 );
-            HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg ( 180, 45);
+            HorizontalCoordinates projCenter = HorizontalCoordinates.ofDeg ( 250, 25);
             StereographicProjection projection = new StereographicProjection (projCenter);
             ObservedSky sky = new ObservedSky(when, where, projection, catalog);
 
             Canvas canvas = new Canvas ( 800, 600 );
-            Transform planeToCanvas = Transform.affine( 1300 , 0 , 0 , -1300 , 400 , 300 );
+            Transform planeToCanvas = Transform.affine( 300 , 0 , 0 , -300 , 400 , 300 );
             SkyCanvasPainter painter = new SkyCanvasPainter (canvas);
+            //clear here!
             painter.drawStars(sky, projection, planeToCanvas);
-            painter.drawHorizon( sky,projection, planeToCanvas);
             painter.drawPlanets(sky, projection, planeToCanvas);
             painter.drawSun(sky, projection, planeToCanvas);
             painter.drawMoon(sky, projection, planeToCanvas);
-
+            painter.drawHorizon( sky,projection, planeToCanvas);
             primaryStage.setScene(new Scene(new BorderPane(canvas)));
             primaryStage.show();
 
