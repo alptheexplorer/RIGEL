@@ -191,20 +191,18 @@ public class SkyCanvasPainter {
         ctx.setStroke(Color.RED);
         ctx.setLineWidth(2);
         ctx.strokeOval(horizonX,horizonY, transformedRadius*2, transformedRadius*2);
-        
+
         //adding horizon annotations
         ctx.setFill(Color.RED);
         ctx.setTextAlign(TextAlignment.CENTER);
         ctx.setTextBaseline(VPos.TOP);
-        // all 8 annotations
-        ctx.fillText("S", horizonX + transformedRadius,horizonY);
-        ctx.fillText("SE",horizonX + transformedRadius + transformedRadius*Math.cos(Angle.ofDeg(45)),horizonY+(transformedRadius - transformedRadius*Math.sin(Angle.ofDeg(45))));
-        ctx.fillText("E",horizonX+transformedRadius*2,horizonY+transformedRadius);
-        ctx.fillText("NE",horizonX + + transformedRadius + transformedRadius*Math.cos(Angle.ofDeg(45)),horizonY+(transformedRadius + transformedRadius*Math.sin(Angle.ofDeg(45))));
-        ctx.fillText("N",horizonX+transformedRadius,horizonY+transformedRadius*2);
-        ctx.fillText("NO", horizonX + (transformedRadius-transformedRadius*Math.cos(Angle.ofDeg(45))),horizonY + transformedRadius + transformedRadius*Math.sin(Angle.ofDeg(45)));
-        ctx.fillText("O",horizonX,horizonY+transformedRadius);
-        ctx.fillText("SO",horizonX+(transformedRadius-transformedRadius*Math.cos(Angle.ofDeg(45))),horizonY+(transformedRadius - transformedRadius*Math.sin(Angle.ofDeg(45))));
+
+        for(double azDeg = 0; azDeg <360; azDeg+=45){
+            HorizontalCoordinates horizCoord = HorizontalCoordinates.ofDeg(azDeg,-0.5);
+            CartesianCoordinates cartesianCoord = projection.apply(horizCoord);
+            Point2D canvasCoordinates = transformCoordinates(cartesianCoord.x(),cartesianCoord.y(),planeToAffine);
+            ctx.fillText(horizCoord.azOctantName("N","E","S","W"), canvasCoordinates.getX(),canvasCoordinates.getY());
+        }
 
     }
 }
