@@ -35,7 +35,7 @@ public class SkyCanvasManager {
     private ViewingParametersBean viewParam;
 
     //initial value of fieldOfView is 100 degrees
-    private ClosedInterval fieldOfViewRange = ClosedInterval.of(0,450);
+    private ClosedInterval fieldOfViewRange = ClosedInterval.of(30,150);
 
     //below are all observable and binded objects
     private ObservableObjectValue<Transform> planeToCanvas;
@@ -124,8 +124,8 @@ public class SkyCanvasManager {
         e.consume();
         // call to focus
         canvas.get().requestFocus();
-        double currentX = Angle.toDeg(viewParam.getProjectionCenter().alt());
-        double currentY = Angle.toDeg(viewParam.getProjectionCenter().az());
+        double currentX = Angle.toDeg(viewParam.getProjectionCenter().az());
+        double currentY = Angle.toDeg(viewParam.getProjectionCenter().alt());
         switch (e.getCode()){
             case LEFT:
                 viewParam.setCenter(HorizontalCoordinates.ofDeg(azInterval.reduce(currentX-10),currentY));
@@ -150,7 +150,6 @@ public class SkyCanvasManager {
         painter.get().drawPlanets(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawSun(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawMoon(sky.get(), projection.get(), planeToCanvas.get());
-
     }
 
     /**

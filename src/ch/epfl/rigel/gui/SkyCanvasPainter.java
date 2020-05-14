@@ -168,16 +168,6 @@ public class SkyCanvasPainter {
         ctx.fillText("SO",horizonX+(transformedRadius-transformedRadius*Math.cos(Angle.ofDeg(45))),horizonY+(transformedRadius - transformedRadius*Math.sin(Angle.ofDeg(45))));
 
 
-        /** some test code
-        ctx.beginPath();
-        ctx.moveTo(100,100);
-        ctx.lineTo(200,200);
-        ctx.moveTo(200,200);
-        ctx.lineTo(300,500);
-        ctx.closePath();
-        ctx.setStroke(Color.BLUE);
-        ctx.stroke();
-         */
         //finally we draw asterisms
         Bounds canvasBound = canvas.getBoundsInLocal();
 
