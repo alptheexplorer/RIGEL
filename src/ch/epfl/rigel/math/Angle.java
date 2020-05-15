@@ -1,5 +1,7 @@
 package ch.epfl.rigel.math;
 
+import ch.epfl.rigel.Preconditions;
+
 /**
  * @author Alp Ozen
  */
@@ -55,26 +57,17 @@ public final class Angle {
     }
 
     /**
-     *
+     * Doesn't accept negative degrees (etape 9), put a minus before the call to have correct negative angle
      * @param deg
      * @param min
      * @param sec
-     * @return converts deg,arcmin,arcsec to degree
+     * @return converts deg,arcmin,arcsec to degree.
      */
     public static double ofDMS(int deg, int min, double sec){
-        double result;
-        if(!minSecInterval.contains(sec) || !minSecInterval.contains(min)){
-            throw new IllegalArgumentException();
-        }
-        else{
-            if(deg < 0){
-                //correction of error ETAPE 9
-                throw new UnsupportedOperationException();
-            }
-            else{
-                return ofDeg( deg + min/60.0 + sec/3600.0);
-            }
-        }
+        Preconditions.checkInInterval(minSecInterval,sec);
+        Preconditions.checkInInterval(minSecInterval,min);
+        Preconditions.checkArgument(deg>=0); // etape 9 correction
+        return ofDeg(deg + min/60.0 + sec/3600.0);
     }
 
     /**

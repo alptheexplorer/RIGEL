@@ -6,28 +6,32 @@ import java.time.ZonedDateTime;
 //part of the MODEL of the MVC pattern
 @FunctionalInterface
 public interface TimeAccelerator {
+    /**
+     *
+     * @param initialTime
+     * @param actualTimeSinceStart in nanoseconds
+     * @return simulated time T in ZoneDateTime form
+     */
      ZonedDateTime adjust(ZonedDateTime initialTime, long actualTimeSinceStart);
 
     /**
      *
-     * @param acceleration
+     * @param accelerationFactor
      * @return the continuousAccelerator implementation of the functional interface
      */
-     static TimeAccelerator continuous(double acceleration){
-         return (initialTime, actualTimeSinceStart)->{
-             return initialTime.plusNanos((long)acceleration*actualTimeSinceStart);
-         };
+     static TimeAccelerator continuous(int accelerationFactor){
+         return (initialTime, actualTimeSinceStart)->
+                 initialTime.plusNanos((long)accelerationFactor*actualTimeSinceStart);
      }
 
     /**
      *
      * @param step
-     * @param frequency
+     * @param frequency in nanoseconds
      * @return the discreteAccelerator implementation of the functional interface
      */
      static TimeAccelerator discrete(Duration step, long frequency){
-            return (initialTime, actualTimeSinceStart) ->{
-                return initialTime.plusSeconds((long)(step.toSeconds()*Math.floor(frequency*actualTimeSinceStart))) ;
-            };
+            return (initialTime, actualTimeSinceStart) ->
+                    initialTime.plusNanos((long)(step.toNanos()*Math.floor(frequency*actualTimeSinceStart)));
      }
 }
