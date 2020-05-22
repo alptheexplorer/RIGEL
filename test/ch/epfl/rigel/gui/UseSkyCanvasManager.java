@@ -1,5 +1,6 @@
 package ch.epfl.rigel.gui;
 
+import ch.epfl.rigel.astronomy.AsterismLoader;
 import ch.epfl.rigel.astronomy.HygDatabaseLoader;
 import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.GeographicCoordinates;
@@ -23,10 +24,12 @@ public  final  class UseSkyCanvasManager extends Application {
 
     @Override
     public void start (Stage primaryStage) throws IOException {
-        try (InputStream hs = resourceStream ( "/hygdata_v3.csv" )) {
+        try (InputStream hs = resourceStream ( "/hygdata_v3.csv" );
+                InputStream as = resourceStream ( "/asterisms.txt" ) ) {
             StarCatalogue catalog = new StarCatalogue.Builder ()
-                    .loadFrom (hs, HygDatabaseLoader.INSTANCE)
-                    .build ();
+                    .loadFrom (hs, HygDatabaseLoader.INSTANCE).loadFrom(as, AsterismLoader.INSTANCE).build();
+
+            primaryStage.setTitle("Rigel");
 
             ZonedDateTime when =
                     ZonedDateTime.parse ( "2020-02-17T20:15:00+01:00" );
@@ -50,14 +53,15 @@ public  final  class UseSkyCanvasManager extends Application {
                     observeLocationBean,
                     viewingParametersBean);
 
-            canvasManager.objectUnderMouseProperty (). addListener (
-                    (p, o, n) -> { if (n!= null ) System.out.println (n);});
+            canvasManager.objectUnderMouseProperty().addListener (
+                    (p, o, n) -> { if (n!= null ) {System.out.println (n);}
+                    else{
+                        System.out.println("hello");
+                    };});
 
-            Canvas sky = canvasManager.canvas ();
+            Canvas sky = canvasManager.canvas();
             BorderPane root = new BorderPane (sky);
 
-            sky.widthProperty (). bind (root.widthProperty ());
-            sky.heightProperty (). bind (root.heightProperty ());
 
             primaryStage.setMinWidth ( 800 );
             primaryStage.setMinHeight ( 600 );

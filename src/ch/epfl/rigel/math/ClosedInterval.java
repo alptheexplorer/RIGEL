@@ -72,6 +72,19 @@ public final class ClosedInterval extends Interval {
                 this.high());
     }
 
+    /**
+     *
+     * @param v
+     * @return reduced form
+     *
+     */
+    public double reduce(double v){
+        return this.low() + florMod(v-this.low(), this.high() - this.low());
+    }
+
+    private double florMod(double x, double y){
+        return x- y*Math.floor(x/y);
+    }
 
 
 
