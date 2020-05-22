@@ -198,6 +198,7 @@ public class ObservedSky {
             double currentY = planetCoordinates[i+1];
             double currentDistance = EuclidianDistance.distanceTo(currentX,currentY,xy.x(),xy.y());
             //insert the planets inside the circle centered in xy of radius maxDist
+
             if(currentDistance < maxDist){
                 nearbyDistances.put(planets()[i/2], currentDistance);
             }
@@ -235,8 +236,8 @@ public class ObservedSky {
             //find minimal distance
             double minDist = Collections.min(nearbyDistances.values());
             //find Celestial Objects corresponding to that minimal distance
-            for( CelestialObject obj : nearbyDistances.keySet()){
-                if(minDist == nearbyDistances.get(obj)){
+            for( CelestialObject obj : nearbyDistances.keySet()) {
+                if (minDist == nearbyDistances.get(obj)) {
                     closestObjects[i] = obj;
                     ++i;
                 }

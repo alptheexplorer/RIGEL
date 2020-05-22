@@ -22,7 +22,7 @@ public class EuclidianDistance {
      * @return finds distance between two CartesianCoordinates
      */
     public static double distanceTo(double subjectOneX, double subjectOneY, double subjectTwoX, double subjectTwoY){
-        return Math.abs(norm(subjectOneX,subjectOneY) - norm(subjectTwoX,subjectTwoY));
+        return Math.abs(norm(subjectTwoX - subjectOneX, subjectTwoY - subjectOneY));
     }
 
 }

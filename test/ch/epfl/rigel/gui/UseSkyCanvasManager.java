@@ -29,6 +29,8 @@ public  final  class UseSkyCanvasManager extends Application {
             StarCatalogue catalog = new StarCatalogue.Builder ()
                     .loadFrom (hs, HygDatabaseLoader.INSTANCE).loadFrom(as, AsterismLoader.INSTANCE).build();
 
+            primaryStage.setTitle("Rigel");
+
             ZonedDateTime when =
                     ZonedDateTime.parse ( "2020-02-17T20:15:00+01:00" );
             DateTimeBean dateTimeBean = new DateTimeBean ();
@@ -51,19 +53,15 @@ public  final  class UseSkyCanvasManager extends Application {
                     observeLocationBean,
                     viewingParametersBean);
 
-            canvasManager.objectUnderMouseProperty (). addListener (
+            canvasManager.objectUnderMouseProperty().addListener (
                     (p, o, n) -> { if (n!= null ) {System.out.println (n);}
                     else{
-                        System.out.println("n");
+                        System.out.println("hello");
                     };});
 
             Canvas sky = canvasManager.canvas();
             BorderPane root = new BorderPane (sky);
 
-            /** this line causes error for some weird reason
-            sky.widthProperty (). bind (root.widthProperty ());
-            sky.heightProperty (). bind (root.heightProperty ());
-             */
 
             primaryStage.setMinWidth ( 800 );
             primaryStage.setMinHeight ( 600 );
