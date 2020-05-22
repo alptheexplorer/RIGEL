@@ -7,6 +7,7 @@ import ch.epfl.rigel.coordinates.GeographicCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -18,13 +19,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.converter.LocalTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.UnaryOperator;
 
@@ -84,7 +89,7 @@ public class Main extends Application {
             skyPane.getChildren().add(sky);
             root.setTop(setController(observeLocationBean, dateTimeBean, timeAnimator));
             root.setCenter(skyPane);
-            root.setBottom(setInformationPane());
+            root.setBottom(setInformationPane(viewingParametersBean, canvasManager));
 
             primaryStage.setMinWidth ( 800 );
             primaryStage.setMinHeight ( 600 );
@@ -220,6 +225,7 @@ public class Main extends Application {
         acceleratorChoice.setItems(acceleratorValues);
         observationControl.getChildren().add(timePassage);
         acceleratorChoice.disableProperty().bind(timeAnimator.isRunning());
+        acceleratorChoice.setValue(NamedTimeAccelerator.TIMES_300);
         timeAnimator.acceleratorProperty().bind(Bindings.select(acceleratorChoice.valueProperty(), "accelerator"));
 
         // creating Buttons
@@ -258,14 +264,36 @@ public class Main extends Application {
     }
 
 
-    private BorderPane setInformationPane(){
+    private BorderPane setInformationPane(ViewingParametersBean viewParamBean, SkyCanvasManager canvasManager){
+        // left corner
         BorderPane infoPane = new BorderPane();
+        HBox containerLeft = new HBox();
         infoPane.setStyle("-fx-padding: 4; -fx-background-color: white;");
-        TextField fov = new TextField();
-        Label fovLabel = new Label("Champ de vue :");
+        Text fov = new Text();
+        Label fovLabel = new Label("Champ de vue : ");
+        fov.textProperty().bind(Bindings.format(("%.1f°"),viewParamBean.fieldOfViewProperty()));
+        containerLeft.getChildren().addAll(fovLabel,fov);
+        infoPane.setLeft(containerLeft);
+
+        //middle part
+        Text objectUnderMouse = new Text();
+        ObservableObjectValue<String> objectUnderMouseValue = Bindings.createStringBinding(()->canvasManager.objectUnderMouseProperty().get().info(),canvasManager.objectUnderMouseProperty());
+        objectUnderMouse.textProperty().bind(objectUnderMouseValue);
+        infoPane.setCenter(objectUnderMouse);
 
 
+        // right corner
+        HBox containerRight = new HBox();
+        Text azValue = new Text();
+        Label az = new Label("Azimut :");
+        azValue.textProperty().bind(Bindings.format("%.2f° , ",canvasManager.mouseAzDegProperty()));
+        containerRight.getChildren().addAll(az, azValue);
+        Text heightValue = new Text();
+        Label height = new Label("hauteur :");
+        heightValue.textProperty().bind(Bindings.format("%.2f°",canvasManager.mouseAltDegProperty()));
+        containerRight.getChildren().addAll(height, heightValue);
 
+        infoPane.setRight(containerRight);
 
 
         return infoPane;

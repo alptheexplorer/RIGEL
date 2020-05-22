@@ -27,7 +27,7 @@ public interface TimeAccelerator {
      */
      static TimeAccelerator discrete(Duration step, long frequency){
             return (initialTime, actualTimeSinceStart) ->{
-                return initialTime.plusSeconds((long)(step.toSeconds()*Math.floor(frequency*actualTimeSinceStart))) ;
+                return initialTime.plusNanos((long)(step.toNanos()*Math.floor(frequency*actualTimeSinceStart))) ;
             };
      }
 }

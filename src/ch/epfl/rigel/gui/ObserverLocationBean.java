@@ -10,7 +10,7 @@ public class ObserverLocationBean {
 
     private SimpleDoubleProperty lonDeg = new SimpleDoubleProperty();
     private SimpleDoubleProperty latDeg = new SimpleDoubleProperty();
-    // this object depends on lonDeg and latDeg
+    // this object depends on lonDeg and latDeg and is observable
     private ObservableObjectValue<GeographicCoordinates> coordinates = Bindings.createObjectBinding(()-> GeographicCoordinates.ofDeg(lonDeg.get(),latDeg.get()),lonDeg,latDeg);
     public ObserverLocationBean(){ }
 

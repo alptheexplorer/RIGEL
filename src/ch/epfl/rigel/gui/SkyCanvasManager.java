@@ -179,4 +179,24 @@ public class SkyCanvasManager {
     public Canvas canvas(){
         return this.canvas.get();
     }
+
+
+    public Number getMouseAzDeg() {
+        return mouseAzDeg.get();
+    }
+
+    public ObservableDoubleValue mouseAzDegProperty() {
+        return mouseAzDeg;
+    }
+
+    public Number getMouseAltDeg() {
+        return mouseAltDeg.get();
+    }
+
+    public ObservableDoubleValue mouseAltDegProperty() {
+        return mouseAltDeg;
+    }
+
+
+
 }
