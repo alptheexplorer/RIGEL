@@ -9,7 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public class BlackBodyColor {
 
     //using a static method to read the txt file, we only read once to improve performance

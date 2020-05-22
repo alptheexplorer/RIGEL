@@ -1,53 +1,59 @@
 package ch.epfl.rigel.coordinates;
 
+import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
 import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.util.Locale;
 
-
+/**
+ * Geographical Coordinates, a kind of spherical coordinates
+ * Longitude [-180,180[; latitude [-90,90] degrees
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public final class GeographicCoordinates extends SphericalCoordinates {
 
-    private static RightOpenInterval longitude = RightOpenInterval.of(-180.0, 180.0);
-    private static ClosedInterval latitude = ClosedInterval.of(-90.0, 90.0);
+    private final static RightOpenInterval LONG_INTERVAL = RightOpenInterval.of(-180.0, 180.0);
+    private final static ClosedInterval LAT_INTERVAL = ClosedInterval.of(-90.0, 90.0);
 
     private GeographicCoordinates(double l, double la) {
         super(l, la);
     }
 
     /**
-     * @param lonDeg
-     * @param latDeg
+     * @param lonDeg longitude in degrees
+     * @param latDeg latitude in degrees
      * @return geographicCoordinates object with longitude and latitude in radians
+     * @throws IllegalArgumentException if arguments not in right intervals
      */
     public static GeographicCoordinates ofDeg(double lonDeg, double latDeg) {
-        if (!longitude.contains(lonDeg) || !latitude.contains(latDeg)) {
-            throw new IllegalArgumentException();
-        } else {
-            return new GeographicCoordinates(Angle.ofDeg(lonDeg), Angle.ofDeg(latDeg));
-        }
+        Preconditions.checkInInterval(LONG_INTERVAL,lonDeg);
+        Preconditions.checkInInterval(LAT_INTERVAL,latDeg);
+        return new GeographicCoordinates(Angle.ofDeg(lonDeg), Angle.ofDeg(latDeg));
     }
 
     /**
-     * @param lonDeg
+     * @param lonDeg longitude in degrees
      * @return true if entry is valid longitude
      */
     public static boolean isValidLonDeg(double lonDeg) {
-        return longitude.contains(lonDeg);
+        return LONG_INTERVAL.contains(lonDeg);
     }
 
     /**
-     * @param latDeg
+     * @param latDeg latitude in degrees
      * @return true if entry is valid latitude
      */
     public static boolean isValidLatDeg(double latDeg) {
-        return latitude.contains(latDeg);
+        return LAT_INTERVAL.contains(latDeg);
     }
 
     /**
      * @return longitude in radians
      */
+    @Override
     public double lon() {
         return super.lon();
     }
@@ -55,6 +61,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     /**
      * @return longitude in degrees
      */
+    @Override
     public double lonDeg() {
         return super.lonDeg();
     }
@@ -62,6 +69,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     /**
      * @return latitude in radians
      */
+    @Override
     public double lat() {
         return super.lat();
     }
@@ -69,6 +77,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
     /**
      * @return latitude in degrees
      */
+    @Override
     public double latDeg() {
         return super.latDeg();
     }

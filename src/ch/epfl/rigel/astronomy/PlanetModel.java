@@ -12,25 +12,30 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Model of a Planet in our solar system
+ * <p>
  * Theory:
  * The position of a planet is more complicated to calculate: a planet doesn't orbit
  * in an ecliptic's plane, but has his own. Furthermore we want to determine the
  * planet's position in geocentric ecliptic coordinates so we need to know at
  * the same time the planet position as well as the Earth position.
- * <p>
+ * </p> <p>
  * We'll proceed in 4 steps:
  * 1-planet's position on his own orbit ( similar to Sun )
  * 2-projecting 1) on an ecliptic plane, express it in heliocentric ecliptic coord. ( Sun as origin)
  * 3-Earth Position in same coordinate system as 2)
  * 4-combine 2) and 3) and obtain planet's position in geocentric ecliptic coordinates
- * <p>
+ * </p> <p>
  * As with SunModel, be careful with the units/Angles: they are given in degrees
  * but need to be stocked in rad
  * AU = Astronomical Unit = Average distance between Sun and Earth
- * <p>
+ * </p> <p>
  * Theory- Outer and Inner Planets:
  * Inner: closer to the Sun than Earth: Mercure et Venus
  * Outer: further away from the Sun than Earth: Mars, Jupiter, Saturne, Uranus et Neptune
+ * </p>
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public enum PlanetModel implements CelestialObjectModel<Planet> {
     MERCURY("Mercure", 0.24085, 75.5671, 77.612, 0.205627,

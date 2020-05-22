@@ -4,6 +4,10 @@ import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public class ViewingParametersBean {
 
     private SimpleDoubleProperty fieldOfView = new SimpleDoubleProperty();

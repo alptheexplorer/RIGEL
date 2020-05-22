@@ -12,7 +12,8 @@ import java.time.temporal.ChronoUnit;
 import static ch.epfl.rigel.astronomy.Epoch.J2000;
 
 /**
- * @author Alp-Ozen
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class SiderealTime {
     private SiderealTime() {

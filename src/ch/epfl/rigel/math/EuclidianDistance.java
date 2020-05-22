@@ -1,6 +1,11 @@
 package ch.epfl.rigel.math;
 
 // this class offers static methods useful with vectors or points on a plane
+
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public class EuclidianDistance {
 
     /**

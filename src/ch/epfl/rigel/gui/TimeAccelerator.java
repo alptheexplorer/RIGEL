@@ -4,6 +4,11 @@ package ch.epfl.rigel.gui;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 //part of the MODEL of the MVC pattern
+
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 @FunctionalInterface
 public interface TimeAccelerator {
     /**

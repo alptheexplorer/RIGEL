@@ -9,13 +9,16 @@ import java.util.function.Function;
 
 import static ch.epfl.rigel.astronomy.Epoch.J2000;
 
-
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public final class EclipticToEquatorialConversion implements Function<EclipticCoordinates, EquatorialCoordinates> {
 
-    private Polynomial E = Polynomial.of(Angle.arcsSecToDeg(0.00181),
-            -Angle.arcsSecToDeg(0.0006),
-            -Angle.arcsSecToDeg(46.815),
-            (23 + Angle.minToDeg(26) + Angle.arcsSecToDeg(21.45)));
+    private Polynomial E = Polynomial.of(Angle.ofArcsec(0.00181),
+            -Angle.ofArcsec(0.0006),
+            -Angle.ofArcsec(46.815),
+            Angle.ofDMS(23,26,21.45));
     private double obliqueEcliptique;
     private double cosObliqueEcliptique;
     private double sinObliqueEcliptique;
@@ -26,7 +29,7 @@ public final class EclipticToEquatorialConversion implements Function<EclipticCo
      * @param when
      */
     public EclipticToEquatorialConversion(ZonedDateTime when) {
-        this.obliqueEcliptique = Angle.ofDeg(E.at(J2000.julianCenturiesUntil(when)));
+        this.obliqueEcliptique = E.at(J2000.julianCenturiesUntil(when));
         this.cosObliqueEcliptique = Math.cos(obliqueEcliptique);
         this.sinObliqueEcliptique = Math.sin(obliqueEcliptique);
     }

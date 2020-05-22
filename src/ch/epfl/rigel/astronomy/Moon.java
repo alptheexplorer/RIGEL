@@ -8,6 +8,8 @@ import java.util.Locale;
 
 /**
  * represents the Moon at a given instant
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class Moon extends CelestialObject {
 

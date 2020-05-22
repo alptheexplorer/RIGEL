@@ -4,7 +4,8 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 /**
- * @author Alp Ozen
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public enum Epoch {
 

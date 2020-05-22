@@ -14,6 +14,9 @@ import java.util.function.Function;
  * the parallels will be projected as circles on the plane
  * the meridians will be projected into circles too, but in this
  * project we will not draw those, so we won't compute them
+ * </p>
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class StereographicProjection implements Function<HorizontalCoordinates, CartesianCoordinates> {
 

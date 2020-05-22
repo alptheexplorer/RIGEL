@@ -7,7 +7,10 @@ import ch.epfl.rigel.math.RightOpenInterval;
 import java.time.ZonedDateTime;
 import java.util.function.Function;
 
-
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public final class EquatorialToHorizontalConversion implements Function<EquatorialCoordinates, HorizontalCoordinates> {
 
     private double phi;

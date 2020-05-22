@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public final class StarCatalogue {
 
     //Catalogue object: key is Asterism, each of which has a list of integers (the value)

@@ -10,6 +10,11 @@ import java.time.ZonedDateTime;
 
 //part of the MODEL of the MVC pattern
 // this class is a JavaFX bean, it represents a mutable version of the ZonedDateTime class
+
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public final class DateTimeBean {
 
     private ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();

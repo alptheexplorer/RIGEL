@@ -2,6 +2,10 @@ package ch.epfl.rigel.coordinates;
 
 import java.util.Locale;
 
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public final class CartesianCoordinates {
 
     private final double ordY;

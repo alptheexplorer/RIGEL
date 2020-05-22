@@ -6,6 +6,8 @@ import ch.epfl.rigel.math.Interval;
 
 /**
  * Useful class to check conditions and throwing exceptions
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class Preconditions {
     private Preconditions(){};
@@ -28,7 +30,6 @@ public final class Preconditions {
      * @return value if in range else exception
      * @throws IllegalArgumentException
      */
-
     public static double checkInInterval(Interval interval, double value){
         if(interval.contains(value)){
             return value;

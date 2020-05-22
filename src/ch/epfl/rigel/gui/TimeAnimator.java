@@ -6,6 +6,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 //part of the MODEL of the MVC pattern
+
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public final class TimeAnimator extends AnimationTimer {
 
     private DateTimeBean toModifyTime;

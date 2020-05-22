@@ -18,6 +18,10 @@ import javafx.scene.transform.Transform;
 
 import java.util.List;
 
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public class SkyCanvasPainter {
 
     private Canvas canvas;

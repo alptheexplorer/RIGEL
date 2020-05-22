@@ -13,6 +13,8 @@ import java.util.Objects;
  * <p>
  * Public, final and immutable class, represents an Asterism, which in this
  * project is just a list of stars, so this class is very basic
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class Asterism {
 

@@ -15,11 +15,14 @@ import ch.epfl.rigel.math.Angle;
  * Be careful with the units: the constants are given in degrees but the formula are in
  * radiants as we use that as a default in the project
  * I'll name the constants as in the text, with comments.
+ * </p>
  * <p>
  * The formulas allow to determine the Sun's position in Geocentric Ecliptic Coordinates,
  * i.e. Center of the Earth as origin, in a given instant
- * <p>
+ * </p>
  * Pag105 (and on) of Book for test
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public enum SunModel implements CelestialObjectModel<Sun> {
     SUN;

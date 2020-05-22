@@ -46,6 +46,10 @@ import java.time.ZonedDateTime;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public class testCanvas extends Application {
     public static void main (String [] args)     {launch (args); }
 

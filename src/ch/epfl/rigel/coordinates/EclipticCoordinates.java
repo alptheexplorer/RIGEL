@@ -7,11 +7,15 @@ import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.util.Locale;
 
-public class EclipticCoordinates extends SphericalCoordinates {
+/**
+ * Ecliptic Coordinates, a kind o spherical coordinates
+ * ecliptic longitude and ecliptic latitude usually noted respectively lambda and beta
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
+public final class EclipticCoordinates extends SphericalCoordinates {
 
-    //Bounds of az and alt, added both in degrees and rad for clarity, use the same as in Horizontal Coordinates
-    private static RightOpenInterval AZIMUT = RightOpenInterval.of(0, 360);
-    private static ClosedInterval HEIGHT = ClosedInterval.symmetric(180);
+    //Bounds of l and la
     private static RightOpenInterval azimutRad = RightOpenInterval.of(0, Angle.TAU);
     private static ClosedInterval heightRad = ClosedInterval.symmetric(Math.PI);
 
@@ -20,12 +24,12 @@ public class EclipticCoordinates extends SphericalCoordinates {
     }
 
     /**
-     * @param lon
-     * @param lat
+     * @param lon ecliptic longitude (lambda)
+     * @param lat ecliptic latitude (beta)
      * @return immutable eclipticCoordinates object, note that arguments are in RADIANS!
+     * @throws IllegalArgumentException if arguments out of range
      */
     public static EclipticCoordinates of(double lon, double lat) {
-
         return new EclipticCoordinates(Preconditions.checkInInterval(azimutRad, lon),
                 Preconditions.checkInInterval(heightRad, lat));
     }

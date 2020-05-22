@@ -9,32 +9,34 @@ import ch.epfl.rigel.coordinates.EclipticToEquatorialConversion;
  * It's a generic interface ( <O> ) where O is the type of objects
  * modelled by this interface.
  * It has only one method.
- * <p>
+ * </p> <p>
  * Theory- Position of celestial Objects:
  * A model is just a set of math equation used to determine the (approximate) position
  * of an object in a given instant.
  * Better precision means more complex mathematical equations, in the project we'll
  * trade off a bit of precision for the sake of simplicity.
  * This model though has to be exact enough to be perceived correctly at the naked eye.
- * <p>
+ * </p> <p>
  * We will try to achieve a model precise enough to be used for a temporal span of about
  * ten years  ( i.e. we are not recasting the model every frame a priori, we use it to predict
  * the movement of a celestial object in a span of 10years in the simulation )
  * (more precise = more complex = can be used for longer )
- * <p>
+ * </p> <p>
  * We are allowed to adopt more precise models but only in the bonus part
- * <p>
+ * </p> <p>
  * We base our model on the empiric observation (thus given as known, we'll store these I suppose)
  * of the position of the Object in a specific given epoch (here J2010), then use the formulas
  * to obtain estimated path of the object between the epoch and the observation instant to
  * have its position in that instant.
- * <p>
+ * </p> <p>
  * Many celestial objects have an elliptical trajectory around another object that
  * occupies one of the foci ( a focus ) of the ellipse (ex. Solar System).
  * In this case: first we estimate the position as if it was a circular orbit (this position
  * is called Average/Mean: circular orbit, same average speed as real),
  * then adjust the result to consider that the orbit is elliptical ( Real/True ).
- *
+ * </p>
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  * @param <O>
  */
 public interface CelestialObjectModel<O> {

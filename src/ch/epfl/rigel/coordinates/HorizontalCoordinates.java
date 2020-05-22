@@ -7,13 +7,14 @@ import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.util.Locale;
 
+/**
+ * Horizontal Coordinates, a kind of spherical coordinates
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
+public final class HorizontalCoordinates extends SphericalCoordinates {
 
-public final class HorizontalCoordinates extends
-        SphericalCoordinates {
-
-    //Bounds of az and alt, added both in degrees and rad for clarity
-    private static RightOpenInterval AZIMUT = RightOpenInterval.of(0, 360);
-    private static ClosedInterval HEIGHT = ClosedInterval.symmetric(180);
+    //Bounds of az and alt
     private static RightOpenInterval azimutRad = RightOpenInterval.of(0, Angle.TAU);
     private static ClosedInterval heightRad = ClosedInterval.symmetric(Math.PI);
 
@@ -33,9 +34,10 @@ public final class HorizontalCoordinates extends
     }
 
     /**
-     * @param az
-     * @param alt
+     * @param az azimut in degrees [0,360[
+     * @param alt altitude in degrees [-90,90]
      * @return accepts arguments in degrees and return horizontalcoordinate object
+     * @throws IllegalArgumentException if arguments not in intervals
      */
     public static HorizontalCoordinates ofDeg(double az, double alt) {
         double azRad = Preconditions.checkInInterval(azimutRad, Angle.ofDeg(az));
@@ -72,47 +74,50 @@ public final class HorizontalCoordinates extends
     }
 
     /**
-     * @param n
-     * @param e
-     * @param s
-     * @param w
-     * @return the relevant octant
+     * @param n north
+     * @param e east
+     * @param s south
+     * @param w west
+     * @return the corresponding octant
      */
     public String azOctantName(String n, String e, String s, String w) {
-        double azimut = AZIMUT.reduce(this.azDeg());
-        RightOpenInterval oct1 = RightOpenInterval.of(0, 22.5);
-        RightOpenInterval oct2 = RightOpenInterval.of(22.5, 67.5);
-        RightOpenInterval oct3 = RightOpenInterval.of(67.5, 112.5);
-        RightOpenInterval oct4 = RightOpenInterval.of(112.5, 157.5);
-        RightOpenInterval oct5 = RightOpenInterval.of(157.5, 202.5);
-        RightOpenInterval oct6 = RightOpenInterval.of(202.5, 247.5);
-        RightOpenInterval oct7 = RightOpenInterval.of(247.5, 292.5);
-        //RightOpenInterval oct8 = RightOpenInterval.of(292.5,337.5);
-        RightOpenInterval oct9 = RightOpenInterval.of(337.5, 360);
-
-        if (oct1.contains(azimut) || oct9.contains(azimut)) {
-            return n;
-        } else if (oct2.contains(azimut)) {
-            return n + e;
-        } else if (oct3.contains(azimut)) {
-            return e;
-        } else if (oct4.contains(azimut)) {
-            return s + e;
-        } else if (oct5.contains(azimut)) {
-            return s;
-        } else if (oct6.contains(azimut)) {
-            return s + w;
-        } else if (oct7.contains(azimut)) {
-            return w;
-        } else {
-            return n + w;
-        }
-
+        //this interval is easier to use because we start at the north-west bound of the north octant
+        //then we can just add 45 degrees 7 times to have all the octants
+        RightOpenInterval shiftedInterval = RightOpenInterval.of(-22.5, 337.5);
+        //azimut reduced to [-22.5,337.5[ (i.e. shifted [0,360[ by half an octave)
+        double azimut = shiftedInterval.reduce(this.azDeg());
+        //creates the 8 octaves as intervals of 45 degrees starting from north and checks in which we are
+        int octantNumber = 0;
+        do {
+            RightOpenInterval octN = RightOpenInterval.of(-22.5 + octantNumber*45.0,  22.5 + octantNumber*45.0);
+            if (octN.contains(azimut)) {
+                switch (octantNumber) {
+                    case 0:
+                        return n;
+                    case 1:
+                        return n + e;
+                    case 2:
+                        return e;
+                    case 3:
+                        return s + e;
+                    case 4:
+                        return s;
+                    case 5:
+                        return s + w;
+                    case 6:
+                        return w;
+                    case 7:
+                        return n + w;
+                }
+            }
+            ++octantNumber;
+        } while(octantNumber < 8);
+        return null; //should never return this
     }
 
     /**
      * @param that
-     * @return angular distance between current object
+     * @return angular distance between current object (this) and that
      */
     public double angularDistanceTo(HorizontalCoordinates that) {
         double result = Math.acos(Math.sin(this.alt()) * Math.sin(that.alt()) + Math.cos(this.alt()) * Math.cos(that.alt()) * Math.cos(this.az() - that.az()));

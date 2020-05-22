@@ -22,6 +22,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public  final  class DrawSky extends Application {
 
 
