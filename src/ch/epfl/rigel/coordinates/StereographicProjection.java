@@ -1,13 +1,12 @@
 package ch.epfl.rigel.coordinates;
 
 import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.RightOpenInterval;
 
 import java.util.Locale;
 import java.util.function.Function;
 
 /**
- * stereographic projection of horizontal coordinates
+ * Stereographic Projection of horizontal coordinates. Instantiation leads to faster conversion in apply().
  * <p>
  * lambda = longitude = az() = lon()
  * phi = latitude = lat() = lat()
@@ -19,49 +18,47 @@ import java.util.function.Function;
  * @author Jacopo Ferro (299301)
  */
 public final class StereographicProjection implements Function<HorizontalCoordinates, CartesianCoordinates> {
-
-    // attribute names based on formula in 2.1- Projection stéréographique
+    //attribute names based on formula in 2.1- Projection stéréographique
     //they are all in function of the center
-    final private double SIN_PHI_CENTER, SIN_LAMBDA_CENTER, COS_PHI_CENTER, COS_LAMBDA_CENTER, LAMBDA_CENTER, PHI_CENTER;
-    final private HorizontalCoordinates CENTER_HOR;
+    final private double sinPhiCenter, cosPhiCenter, lambdaCenter, phiCenter;
+    final private HorizontalCoordinates centerHor;
 
     /**
+     * we calculate all the necessary attributes here to speed up on apply()
      * @param center
      * @return the stereographic projection centered in @center
-     * we calculate all the necessary attributes here
+     *
      */
     public StereographicProjection(HorizontalCoordinates center) {
 
-        // how to define lambda and phi now? WE CANNOT, but we can define the
-        // attributes that depend only on the center
-
-        // these seems the only formulas we can calculate in the constructor
+        //only formulas we can calculate in the constructor
         //i.e. they depend only on the center of the projection
-        CENTER_HOR = center;
-        LAMBDA_CENTER = center.az();
-        PHI_CENTER = center.alt();
-        COS_LAMBDA_CENTER = Math.cos(LAMBDA_CENTER);
-        COS_PHI_CENTER = Math.cos(PHI_CENTER);
-        SIN_LAMBDA_CENTER = Math.sin(LAMBDA_CENTER);
-        SIN_PHI_CENTER = Math.sin(PHI_CENTER);
+        centerHor = center;
+        lambdaCenter = center.az();
+        phiCenter = center.alt();
+        cosPhiCenter = Math.cos(phiCenter);
+        sinPhiCenter = Math.sin(phiCenter);
     }
 
     /**
      * @param hor
      * @return Cartesian Coordinates of center of circle corresponding to the projection
      * of the parallel passing though @hor
-     * the ordY of the center could be infinite, that means that the "cercle"
-     * is in fact a simple line ( equator)
-     * note also that the projections of the paralallels will not be concentric as
-     * we move from the north or south poles
+     * <p>
+     *     the ordY of the center could be infinite, that means that the "cercle"
+     *     is in fact a simple line ( equator)
+     *     note also that the projections of the paralallels will not be concentric as
+     *     we move from the north or south poles
+     * </p>
+     *
      */
     public CartesianCoordinates circleCenterForParallel(HorizontalCoordinates hor) {
         //Only need the latitude=phi of @hor to project it
         double circleCenterX = 0.0;
         double phi = hor.lat();
 
-        double circleCenterY = COS_PHI_CENTER / (
-                Math.sin(phi) + SIN_PHI_CENTER);
+        double circleCenterY = cosPhiCenter / (
+                Math.sin(phi) + sinPhiCenter);
         return CartesianCoordinates.of(circleCenterX, circleCenterY);
     }
 
@@ -79,7 +76,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         double sinPhi = Math.sin(phi);
 
         double radius = cosPhi / (
-                sinPhi + SIN_PHI_CENTER);
+                sinPhi + sinPhiCenter);
         return radius;
     }
 
@@ -106,16 +103,18 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     public CartesianCoordinates apply(HorizontalCoordinates azAlt) {
 
         double phi = azAlt.lat();
+        double cosPhi = Math.cos(phi);
+        double sinPhi = Math.sin(phi);
         double lambda = azAlt.lon();
-        double lambdaDelta = (lambda - LAMBDA_CENTER);
+        double lambdaDelta = (lambda - lambdaCenter);
         double cosLambdaDelta = Math.cos(lambdaDelta);
         double d = 1.0 / (
-                1 + Math.sin(phi) * SIN_PHI_CENTER +
-                        Math.cos(phi) * COS_PHI_CENTER * Math.cos(lambdaDelta));
+                1 + sinPhi * sinPhiCenter +
+                       cosPhi * cosPhiCenter * Math.cos(lambdaDelta));
 
-        double x = d * Math.cos(phi) * Math.sin(lambdaDelta);
-        double y = d * (Math.sin(phi) * COS_PHI_CENTER -
-                Math.cos(phi) * SIN_PHI_CENTER * cosLambdaDelta);
+        double x = d * cosPhi * Math.sin(lambdaDelta);
+        double y = d * (sinPhi * cosPhiCenter -
+               cosPhi * sinPhiCenter * cosLambdaDelta);
 
         return CartesianCoordinates.of(x, y);
     }
@@ -127,7 +126,6 @@ public final class StereographicProjection implements Function<HorizontalCoordin
      * spherical coordinates ( Horizontal )
      */
     public HorizontalCoordinates inverseApply(CartesianCoordinates xy) {
-        RightOpenInterval interval = RightOpenInterval.symmetric(Math.PI);
         double xPwr = xy.x() * xy.x();
         double yPwr = xy.y() * xy.y();
         double rho = Math.sqrt(xPwr + yPwr);
@@ -138,7 +136,7 @@ public final class StereographicProjection implements Function<HorizontalCoordin
                 rhoPwr + 1);
 
         double atanNum = xy.x() * sinC;
-        double atanDen = rho * COS_PHI_CENTER * cosC - xy.y() * SIN_PHI_CENTER * sinC;
+        double atanDen = rho * cosPhiCenter * cosC - xy.y() * sinPhiCenter * sinC;
 
         if(xy.x()==0 & xy.y()==0){
             //correction of error ETAPE 9
@@ -147,12 +145,12 @@ public final class StereographicProjection implements Function<HorizontalCoordin
         else{
             double lambda = Angle.normalizePositive(Math.atan2(
                     atanNum,
-                    atanDen) + LAMBDA_CENTER);
+                    atanDen) + lambdaCenter);
 
-            double phi = interval.reduce(
-                    Math.asin(cosC * SIN_PHI_CENTER +
-                            (xy.y() * sinC * COS_PHI_CENTER) / rho
-                    ));
+            double phi = Math.asin(
+                    cosC * sinPhiCenter +
+                            (xy.y() * sinC * cosPhiCenter) / rho
+                    );
             return HorizontalCoordinates.of(lambda, phi);
         }
     }
@@ -184,8 +182,8 @@ public final class StereographicProjection implements Function<HorizontalCoordin
     public String toString() {
         return String.format(Locale.ROOT,
                 "  StereographicProjection (center): (%f,%f) --> (%f,%f)",
-                PHI_CENTER,
-                LAMBDA_CENTER, apply(CENTER_HOR).x(), apply(CENTER_HOR).y())
+                phiCenter,
+                lambdaCenter, apply(centerHor).x(), apply(centerHor).y())
                 ;
     }
 }

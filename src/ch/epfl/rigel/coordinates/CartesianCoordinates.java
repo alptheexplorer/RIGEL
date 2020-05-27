@@ -3,6 +3,7 @@ package ch.epfl.rigel.coordinates;
 import java.util.Locale;
 
 /**
+ * Cartesian Coordinates, as in maths ( differ from canvas coordinates later in the project)
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
  */

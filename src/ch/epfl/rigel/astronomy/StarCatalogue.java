@@ -1,20 +1,25 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.Preconditions;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
 /**
+ * Star Catalog: map Asterism -->Indeces of its stars
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
  */
 public final class StarCatalogue {
 
-    //Catalogue object: key is Asterism, each of which has a list of integers (the value)
+    // Catalogue object: key is Asterism, each of which has a list of integers (the value)
     // representing the indices ( corresponding to the position of the star in starList) of the stars in asterism.
     private final HashMap<Asterism, List<Integer>> catalogue = new HashMap();
     // List to store StarList passed to constructor
     private final List<Star> starList;
+    // star and corresponding index on starList
+    private final HashMap<Star, Integer> starIndex = new HashMap<>();
 
 
     /**
@@ -23,28 +28,26 @@ public final class StarCatalogue {
      * If an Asterism contains a star not in the star list, the constructor will throw an exception
      * @param stars
      * @param  asterisms
-     * @Throws IllegalArgumentException
-     *
-     **/
+     * @throws IllegalArgumentException (trough Preconditions, if asterism contains some stars that are not starList)
+     */
     public StarCatalogue(List<Star> stars, List<Asterism> asterisms) {
+        //saves a unmodifiable (copy) list here so we can just return the attribute in the getter
         this.starList = List.copyOf(stars);
-
-        // in this loop, we traverse through all asterisms and add a stars index to it if asterism contains star
-        for (Asterism a : asterisms) {
+        // List Star --> index of that star(Integer)
+        for(Star s: starList){
+            starIndex.put(s, starList.indexOf(s));
+        }
+        //Put for each star of each asterism the corresponding index of that star
+        //so we create catalog  Asterism --> List of indeces of the stars of that asterism
+        for(Asterism a: asterisms){
             //temporary list objects to work with
             List<Integer> indices = new ArrayList();
-            List<Star> asterismStars = a.stars();
-            for (Star s : asterismStars) {
-                if (!starList.contains(s) && asterismStars.contains(s)) {
-                    // we throw an IAexception if the asterism has a star not in the actual star list, IAexceptions is unchecked hence not in method signature
-                    throw new IllegalArgumentException();
-                } else if (asterismStars.contains(s)) {
-                    // we add the index of the star to the List which is the value of the asterism
-                    indices.add(starList.indexOf(s));
-                }
+            for(Star s: a.stars()){
+                Preconditions.checkArgument(starList.contains(s));
+                indices.add(starIndex.get(s));
+                catalogue.put(a, indices);
             }
-            //finally we add the asterism-list pair to the catalogue
-            this.catalogue.put(a, indices);
+
         }
     }
 
@@ -52,8 +55,7 @@ public final class StarCatalogue {
      * @return the whole star list ( immutable )
      */
     public List<Star> stars() {
-        // returns a copy of original starList
-        return List.copyOf(starList);
+        return starList;
     }
 
     /**
@@ -66,15 +68,11 @@ public final class StarCatalogue {
     /**
      * @param asterism
      * @return List of indices of the stars of the given @asterism as occurring in starList
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException ( from Preconditions, if asterism is not on the catalog)
      */
     public List<Integer> asterismIndices(Asterism asterism) {
-
-        if (this.asterisms().contains(asterism)) {
-            return List.copyOf(this.catalogue.get(asterism));
-        } else {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(this.asterisms().contains(asterism));
+        return List.copyOf(catalogue.get(asterism));
     }
 
 
@@ -83,8 +81,8 @@ public final class StarCatalogue {
      */
     public final static class Builder {
         // Builder has same attributes as StarCatalogue
-        private List<Star> star_builder;
-        private List<Asterism> asterism_builder;
+        private final List<Star> star_builder;
+        private final List<Asterism> asterism_builder;
 
 
         // we initialize both lists as empty
@@ -130,8 +128,7 @@ public final class StarCatalogue {
          * @return a possibly mutable but not modifiable view of the asterism list
          */
         public List<Asterism> asterisms() {
-            List<Asterism> view = Collections.unmodifiableList(asterism_builder);
-            return view;
+            return Collections.unmodifiableList(asterism_builder);
         }
 
 

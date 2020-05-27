@@ -7,13 +7,14 @@ import ch.epfl.rigel.math.*;
 import java.util.Locale;
 
 /**
- * represents the Moon at a given instant
+ * Moon at a given instant
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
  */
 public final class Moon extends CelestialObject {
 
     private final float phase;
+    private static final ClosedInterval phaseInterval = ClosedInterval.of(0, 1);
 
     /**
      * name is "Lune"
@@ -22,22 +23,22 @@ public final class Moon extends CelestialObject {
      * @param angularSize
      * @param magnitude
      * @param phase         must be in [0,1]
-     * @throws IllegalArgumentException if not in specified phase
      */
     public Moon(EquatorialCoordinates equatorialPos, float angularSize, float magnitude, float phase) {
         super("Lune", equatorialPos, angularSize, magnitude);
-        ClosedInterval interval = ClosedInterval.of(0, 1);
-        this.phase = (float) Preconditions.checkInInterval(interval, phase);
+        this.phase = (float) Preconditions.checkInInterval(phaseInterval, phase);
     }
 
 
-    @Override
+
     /**
      * gives phase in percentage to the to one decimal place
      */
+    @Override
     public String info() {
+        String name = super.info();
         double percentage = phase * 100;
-        return String.format(Locale.ROOT, "Lune (%.1f", percentage) + "%)";
+        return String.format(Locale.ROOT, name + " (%.1f", percentage) + "%)";
     }
 
 }

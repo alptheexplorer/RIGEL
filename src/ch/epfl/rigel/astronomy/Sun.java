@@ -5,7 +5,7 @@ import ch.epfl.rigel.coordinates.*;
 import java.util.Objects;
 
 /**
- * represents Sun in a given moment
+ * Sun in a given moment
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
  */

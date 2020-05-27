@@ -22,7 +22,6 @@ public final class Asterism {
 
     /**
      * Construct the asterism ( a list of stars), throws exception if null or empty
-     *
      * @param stars
      */
     public Asterism(List<Star> stars) {
@@ -37,6 +36,6 @@ public final class Asterism {
      * @return list of stars of the asterism
      */
     public List<Star> stars() {
-        return List.copyOf(asterism);
+        return asterism;
     }
 }

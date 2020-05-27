@@ -1,5 +1,6 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.coordinates.EquatorialCoordinates;
 import ch.epfl.rigel.math.ClosedInterval;
 
@@ -24,36 +25,34 @@ import ch.epfl.rigel.math.ClosedInterval;
 public final class Star extends CelestialObject {
 
     private final int hipparcosId;
+    //stocked in attribute for clarity, even though we could just have color Temperature
     private final float colorIndex;
-    private final ClosedInterval intervalColorIndex = ClosedInterval.of(-0.5, 5.5);
+    private final int colorTemperature;
+    private static final ClosedInterval INTERVAL_COLOR_INDEX = ClosedInterval.of(-0.5, 5.5);
 
     /**
-     * @param hipparcosId
+     * Constructs a star
+     * angular size is considered 0: star is a point in the sky due to distance from Earth
+     * @param hipparcosId >= 0
      * @param name
      * @param equatorialPos
      * @param magnitude
-     * @param colorIndex    Constructs a star and throws an IllegalArgumentException if the
-     *                      Hipparcos number is negative, or if the colorIndex is not in [-0.5,5.5]
-     *                      <p>
-     *                      Gives 0 in angular size of Celestial Object: stars are modelled as points
-     *                      due to their distance from earth
+     * @param colorIndex [-0.5,5.5]
      */
     public Star(int hipparcosId, String name, EquatorialCoordinates equatorialPos,
                 float magnitude, float colorIndex) {
 
         super(name, equatorialPos, 0, magnitude);
+        Preconditions.checkArgument(hipparcosId >= 0);
+        this.hipparcosId = hipparcosId;
+        this.colorIndex = (float) Preconditions.checkInInterval(INTERVAL_COLOR_INDEX, colorIndex);
 
-        if (hipparcosId < 0) {
-            throw new IllegalArgumentException();
-        } else {
-            this.hipparcosId = hipparcosId;
-        }
-
-        if (intervalColorIndex.contains(colorIndex)) {
-            this.colorIndex = colorIndex;
-        } else {
-            throw new IllegalArgumentException();
-        }
+        // we can also already calculate color temperature
+        double tmp = 0.92*this.colorIndex;
+        double T = 4600 * (
+                (1 / (tmp + 1.7)) + (1 / (tmp + 0.62))
+        );
+        colorTemperature = (int) T;
     }
 
 
@@ -67,20 +66,9 @@ public final class Star extends CelestialObject {
     /**
      * @return Color temperature in Kelvin degrees, rounded by default
      * (i.e. to the closest inferior integer )
-     * <p>
-     * Formula from text, c is ColorIndex, T is ColorTemperature
      */
     public int colorTemperature() {
-
-        double c = this.colorIndex;
-
-        double T = 4600 * (
-                (1 / (0.92 * c + 1.7)) + (1 / (0.92 * c + 0.62))
-        );
-
-        int TRounded = (int) Math.floor(T);
-
-        return TRounded;
+        return colorTemperature;
     }
 
 }
