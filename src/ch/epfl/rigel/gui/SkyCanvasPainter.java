@@ -16,8 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Transform;
 
-import java.util.List;
-
 /**
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
@@ -205,7 +203,7 @@ public class SkyCanvasPainter {
             HorizontalCoordinates horizCoord = HorizontalCoordinates.ofDeg(azDeg,-0.5);
             CartesianCoordinates cartesianCoord = projection.apply(horizCoord);
             Point2D canvasCoordinates = transformCoordinates(cartesianCoord.x(),cartesianCoord.y(),planeToAffine);
-            ctx.fillText(horizCoord.azOctantName("N","E","S","W"), canvasCoordinates.getX(),canvasCoordinates.getY());
+            ctx.fillText(horizCoord.azOctantName("N","E","S","O"), canvasCoordinates.getX(),canvasCoordinates.getY());
         }
 
     }

@@ -3,40 +3,31 @@ package ch.epfl.rigel.gui;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
-//part of the MODEL of the MVC pattern
+import java.time.temporal.ChronoUnit;
 
-/**
- * @author Alp Ozen (314542)
- * @author Jacopo Ferro (299301)
- */
+//part of the MODEL of the MVC pattern
 @FunctionalInterface
 public interface TimeAccelerator {
-    /**
-     *
-     * @param initialTime
-     * @param actualTimeSinceStart in nanoseconds
-     * @return simulated time T in ZoneDateTime form
-     */
      ZonedDateTime adjust(ZonedDateTime initialTime, long actualTimeSinceStart);
 
     /**
      *
-     * @param accelerationFactor
+     * @param acceleration
      * @return the continuousAccelerator implementation of the functional interface
      */
-     static TimeAccelerator continuous(int accelerationFactor){
+     static TimeAccelerator continuous(int acceleration){
          return (initialTime, actualTimeSinceStart)->
-                 initialTime.plusNanos((long)accelerationFactor*actualTimeSinceStart);
+             initialTime.plus(acceleration*actualTimeSinceStart, ChronoUnit.NANOS);
      }
 
     /**
      *
      * @param step
-     * @param frequency in nanoseconds
+     * @param frequency
      * @return the discreteAccelerator implementation of the functional interface
      */
      static TimeAccelerator discrete(Duration step, long frequency){
             return (initialTime, actualTimeSinceStart) ->
-                    initialTime.plusNanos((long)(step.toNanos()*Math.floor(frequency*actualTimeSinceStart)));
+                initialTime.plus(step.multipliedBy(frequency*actualTimeSinceStart/ 1_000_000_000L));
      }
 }
