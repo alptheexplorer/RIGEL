@@ -37,17 +37,15 @@ public class SkyCanvasManager {
     //initial value of fieldOfView is 100 degrees
     private ClosedInterval fieldOfViewRange = ClosedInterval.of(30,150);
 
-    //below are all observable and binded objects
     private ObservableObjectValue<Transform> planeToCanvas;
     private ObservableObjectValue<SkyCanvasPainter> painter;
     private ObservableObjectValue<ObservedSky> sky;
     private ObservableObjectValue<StereographicProjection> projection;
     private ObservableObjectValue<HorizontalCoordinates> mouseHorizontalCoordinates;
-
-    //three properties below are made public through getters
     private ObservableObjectValue<CelestialObject> objectUnderMouse;
     private ObservableDoubleValue mouseAltDeg;
     private ObservableDoubleValue mouseAzDeg;
+    private ObservableDoubleValue transformedMaxObjectClosestDistance;
 
     // the sole function of the constructor is to define bindings and add listeners
     public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters){
@@ -60,7 +58,7 @@ public class SkyCanvasManager {
                     viewingParameters.projectionCenterProperty());
 
             this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
-                    when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection);
+                    when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.get().heightProperty(),this.canvas.get().widthProperty());
 
             this.planeToCanvas = Bindings.createObjectBinding(() -> {
                 double dilation = (canvas.get().getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
@@ -68,6 +66,10 @@ public class SkyCanvasManager {
                     },
                     canvas,viewParam.fieldOfViewProperty()
             );
+
+            this.transformedMaxObjectClosestDistance = Bindings.createDoubleBinding(()->
+                this.planeToCanvas.get().inverseTransform(10,0).getX(), planeToCanvas);
+
 
             this.objectUnderMouse = Bindings.createObjectBinding(()->
                     this.sky.get().objectClosestTo(CartesianCoordinates.of(planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getX(), planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getY()),this.maxObjectClosestDistance),mousePosition,planeToCanvas);
@@ -92,7 +94,7 @@ public class SkyCanvasManager {
             canvas.get().setOnKeyPressed(e -> this.setProjectionCenter(e));
 
             //main listener here
-            painter.addListener((observable)->this.paintSky());
+            sky.addListener((observable) -> this.paintSky());
     };
 
     // this method will be called whenever mouse moves to set a new mouse position

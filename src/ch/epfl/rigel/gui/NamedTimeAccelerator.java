@@ -1,14 +1,16 @@
 package ch.epfl.rigel.gui;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 //part of the MODEL of the MVC pattern
 public enum NamedTimeAccelerator {
     TIMES_1(TimeAccelerator.continuous(1), "1x"),
     TIMES_30(TimeAccelerator.continuous(30), "30x"),
     TIMES_300(TimeAccelerator.continuous(300), "300x"),
     TIMES_3000(TimeAccelerator.continuous(3000), "3000x"),
-    DAY(TimeAccelerator.discrete(Duration.ofHours(24), (long)(60*Math.pow(10,9))), "jour"),
-    SIDEREAL_DAY(TimeAccelerator.discrete(Duration.parse("PT23H56M4.0S"),(long)(60*Math.pow(10,9))), "jour sidéral");
+    DAY(TimeAccelerator.discrete(Duration.of(24, ChronoUnit.HOURS), 60L), "jour"),
+    SIDEREAL_DAY(TimeAccelerator.discrete(Duration.of(86164, ChronoUnit.SECONDS),60L), "jour sidéral");
 
     TimeAccelerator accelerator;
     String name;

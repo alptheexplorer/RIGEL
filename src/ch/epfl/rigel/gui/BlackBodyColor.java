@@ -14,6 +14,11 @@ public class BlackBodyColor {
     private static Map<Integer,String> BBRVALUES = readFromBbr();
     private BlackBodyColor(){ }
 
+    private InputStream resourceStream (String resourceName)  {
+        return getClass (). getResourceAsStream (resourceName);
+    }
+
+
     //used to read data from bbr_color.txt and store it in a hashmap for later use
     private static Map<Integer,String> readFromBbr(){
 

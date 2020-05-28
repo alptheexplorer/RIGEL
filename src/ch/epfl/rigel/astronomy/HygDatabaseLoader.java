@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public enum HygDatabaseLoader implements StarCatalogue.Loader {
     INSTANCE;
@@ -16,7 +17,7 @@ public enum HygDatabaseLoader implements StarCatalogue.Loader {
 
         // everything happens inside try with resource block
 
-        try (InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
+        try (InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream, StandardCharsets.US_ASCII);
              BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
 
             // all temporary values declared here
