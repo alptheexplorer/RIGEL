@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SunModelTestOurs {
 
-    @Test
+ /**   @Test
     void atWorks(){
         EclipticCoordinates expectedCoord = EclipticCoordinates.of(3,0);
         ZonedDateTime timeObj = ZonedDateTime.of(
@@ -24,5 +24,5 @@ class SunModelTestOurs {
         EquatorialCoordinates expectedEqCoord = convObj.apply(expectedCoord);
         assertEquals(new Sun(expectedCoord,expectedEqCoord,(float)0.524930842,(float)-2.784355831).eclipticPos().lon(), SUN.at(J2010.daysUntil(timeObj), convObj).eclipticPos().lon());
 
-    }
+    }**/
 }

@@ -1,5 +1,9 @@
 package ch.epfl.rigel.math;
 
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public abstract class Interval {
     private final double lowerExtrema, higherExtrema;
 
@@ -9,7 +13,6 @@ public abstract class Interval {
     }
 
     /**
-     *
      * @return lowerbound of interval
      */
     public double low(){
@@ -17,8 +20,6 @@ public abstract class Interval {
     }
 
     /**
-     *
-     *
      * @return upperbound of interval
      */
     public double high(){
@@ -26,15 +27,17 @@ public abstract class Interval {
     }
 
     /**
-     *
-     *
      * @return size of interval
      */
-
     public double size(){
         return higherExtrema - lowerExtrema;
     }
 
+    /**
+     *
+     * @param v
+     * @return true if v is contained in the interval
+     */
     abstract public  boolean contains(double v);
 
     @Override

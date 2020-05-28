@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HorizontalCoordinatesTestOurs {
-    @Test
+   /** @Test
     void ofWorksOnInvalidAzimut(){
         assertThrows(IllegalArgumentException.class, () -> {
             HorizontalCoordinates.ofDeg(720,5);
@@ -43,5 +43,5 @@ public class HorizontalCoordinatesTestOurs {
         HorizontalCoordinates thiss = HorizontalCoordinates.ofDeg(45, 90);
         assertEquals("(az=45,0000°, alt=90,0000°)", thiss.toString());
     }
-
+**/
 }

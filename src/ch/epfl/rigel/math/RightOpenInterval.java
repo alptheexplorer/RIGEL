@@ -1,9 +1,13 @@
 package ch.epfl.rigel.math;
 
+import ch.epfl.rigel.Preconditions;
+
 import java.util.Locale;
 
 /**
- * @author Alp Ozen
+ * Right Open Interval [low, high[
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class RightOpenInterval extends Interval {
 
@@ -14,66 +18,46 @@ public final class RightOpenInterval extends Interval {
 
 
     /**
-     *
      * @param low
      * @param high
      * @return a new interval
+     * @throws IllegalArgumentException if high <= low
      */
     public static RightOpenInterval of(double low, double high){
-        if(high > low){
-            return new RightOpenInterval(low, high);
-        }
-        else{
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(high > low );
+        return new RightOpenInterval(low, high);
     }
 
     /**
-     *
      * @param size
-     * @return a new symmetric interval centered in 0.
+     * @return a new symmetric interval centered in 0
+     * @throws IllegalArgumentException if size <= 0
      */
     public static RightOpenInterval symmetric(double size){
-        if(size > 0){
-            return new RightOpenInterval(-size/2,size/2);
-        }
-        else{
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(size > 0);
+        return new RightOpenInterval(-size/2,size/2);
     }
 
     /**
-     *
      * @param v
      * @return true if inside right open interval
      */
-
     @Override
     public boolean contains(double v) {
-        return (v >= this.low() && v < this.high());
+        return (this.low()<=v && v<this.high());
     }
 
     /**
      *
      * @param v
-     * @return reduced form
-     *
+     * @return value reduced to interval
      */
     public double reduce(double v){
-        /**double low = this.low();
-        double high = this.high();
-        return v + ((v - low) - (high - low)*Math.floor((v - low)/(high-low)));**/
         return this.low() + florMod(v-this.low(), this.high() - this.low());
 
     }
 
-    /**TODO fix reduce
-     *
-     */
-
-
     /**
-     *
      * @return string representation of the interval
      */
     public String toString(){

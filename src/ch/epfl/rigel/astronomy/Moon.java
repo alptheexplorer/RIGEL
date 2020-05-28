@@ -1,45 +1,45 @@
 package ch.epfl.rigel.astronomy;
 
+import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.coordinates.*;
+import ch.epfl.rigel.math.*;
 
 import java.util.Locale;
 
 /**
- * represents the Moon at a given instant
+ * Moon at a given instant
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class Moon extends CelestialObject {
 
     private final float phase;
+    private static final ClosedInterval phaseInterval = ClosedInterval.of(0, 1);
 
     /**
-     *
      * name is "Lune"
-     * @throws IllegalArgumentException if not in specified phase
+     *
      * @param equatorialPos
      * @param angularSize
      * @param magnitude
-     * @param phase must be in [0,1]
+     * @param phase         must be in [0,1]
      */
-    public Moon(EquatorialCoordinates equatorialPos, float angularSize, float magnitude, float phase){
-        super("Lune",equatorialPos,angularSize,magnitude);
-        if(phase>=0 && phase<=1) {
-            this.phase=phase;}
-        else
-        {
-            throw new IllegalArgumentException();
-        }
-        }
+    public Moon(EquatorialCoordinates equatorialPos, float angularSize, float magnitude, float phase) {
+        super("Lune", equatorialPos, angularSize, magnitude);
+        this.phase = (float) Preconditions.checkInInterval(phaseInterval, phase);
+    }
 
 
-    //TODO: check this one: if phase = 0.3752, print " Lune (37.5%) "
-    //TODO: ask if we need to simply cut it or to approximate it:
-    // what if it was 0.3757 ? 37.5% or 37.6% ?
-    @Override
+
     /**
      * gives phase in percentage to the to one decimal place
      */
-    public  String info(){
-        double percentage = phase*100;
-        return String.format(Locale.ROOT,"Lune (%.1f", percentage) + "%)";
+    @Override
+    public String info() {
+        String name = super.info();
+        double percentage = phase * 100;
+        return String.format(Locale.ROOT, name + " (%.1f", percentage) + "%)";
     }
+
 }
+

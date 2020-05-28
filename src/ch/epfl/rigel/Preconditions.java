@@ -5,18 +5,20 @@ import ch.epfl.rigel.math.Interval;
 
 
 /**
- * @author Alp Ozen
+ * Useful class to check conditions and throwing exceptions
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class Preconditions {
     private Preconditions(){};
 
     /**
-     *
+     * Checks boolean, if false throws IAException
      * @param isTrue
-     *
+     * @throws IllegalArgumentException
      */
     public static void checkArgument(boolean isTrue){
-        if(isTrue == false) {
+        if(!isTrue) {
             throw new IllegalArgumentException();
         }
     }
@@ -28,9 +30,8 @@ public final class Preconditions {
      * @return value if in range else exception
      * @throws IllegalArgumentException
      */
-
     public static double checkInInterval(Interval interval, double value){
-        if(value <= interval.high() && value >= interval.low()){
+        if(interval.contains(value)){
             return value;
         }
         else{

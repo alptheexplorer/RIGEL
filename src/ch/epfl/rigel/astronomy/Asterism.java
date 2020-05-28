@@ -10,20 +10,21 @@ import java.util.Objects;
  * it's not strictly correct.
  * They are a group of particularly bright stars and are helpful to visualize better
  * the sky
- *
+ * <p>
  * Public, final and immutable class, represents an Asterism, which in this
- * project is just a list of stars, so this class is very basic and just has
- * a constructor
+ * project is just a list of stars, so this class is very basic
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
  */
 public final class Asterism {
 
-    private final  List<Star> asterism;
+    private final List<Star> asterism;
 
     /**
      * Construct the asterism ( a list of stars), throws exception if null or empty
      * @param stars
      */
-    public Asterism(List<Star> stars){
+    public Asterism(List<Star> stars) {
 
         Objects.requireNonNull(stars);
         Preconditions.checkArgument(!stars.isEmpty());
@@ -32,11 +33,9 @@ public final class Asterism {
     }
 
     /**
-     *
      * @return list of stars of the asterism
      */
-    public List<Star> stars(){
-
+    public List<Star> stars() {
         return asterism;
     }
 }

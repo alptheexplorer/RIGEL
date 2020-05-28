@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.*;
 
 class EquatorialToHorizontalConversionTestOurs {
-    ZonedDateTime date1 = ZonedDateTime.of(LocalDateTime.of(LocalDate.of(2000,Month.AUGUST,26), LocalTime.of(0,5,18,(int) 2.35e7)), ZoneOffset.UTC);
+  /**  ZonedDateTime date1 = ZonedDateTime.of(LocalDateTime.of(LocalDate.of(2000,Month.AUGUST,26), LocalTime.of(0,5,18,(int) 2.35e7)), ZoneOffset.UTC);
     //EquatorialCoordinates equa1 = EquatorialCoordinates.of(Angle.ofDeg(1),Angle.ofDMS(23,13,10));
     EquatorialToHorizontalConversion equRoHor1 = new EquatorialToHorizontalConversion(date1 ,GeographicCoordinates.ofDeg(1,52));
     EquatorialCoordinates equa2 = EquatorialCoordinates.ofDeg(1,23.219444);
@@ -23,5 +23,5 @@ class EquatorialToHorizontalConversionTestOurs {
 
     @Test
     void testEquals() {
-    }
+    } **/
 }

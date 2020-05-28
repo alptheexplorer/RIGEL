@@ -8,12 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SunTestOurs {
 
-    EclipticCoordinates e = null;
+   /** EclipticCoordinates e = null;
     EquatorialCoordinates ef = null;
     @Test
     void constructorThrowsError(){
         assertThrows(NullPointerException.class, () -> {
             Sun sun = new Sun(e,ef,(float)1,(float)2);
         });
-    }
+    }**/
 }

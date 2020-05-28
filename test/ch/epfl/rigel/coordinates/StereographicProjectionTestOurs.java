@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StereographicProjectionTestOurs {
 
-
+/**
 
     @Test
     void circleCenterWorks(){
@@ -37,5 +37,5 @@ class StereographicProjectionTestOurs {
         double x = transformer.inverseApply(toTransformObject).lon();
         System.out.println(transformer.toString());
     }
-
+**/
 }
