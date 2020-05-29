@@ -1,36 +1,39 @@
 package ch.epfl.rigel.gui;
 
-import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.math.ClosedInterval;
 import javafx.scene.paint.Color;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Reads from bbr_color database to obtain color corresponding to blackbody, access to color provided by colorForTemperature method
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
  */
+
 public class BlackBodyColor {
 
     //using a static method to read the txt file, we only read once to improve performance
     private static Map<Integer,String> BBRVALUES = readFromBbr();
+    // non-instaniable
     private BlackBodyColor(){ }
 
-    private InputStream resourceStream (String resourceName)  {
-        return getClass (). getResourceAsStream (resourceName);
+    private static InputStream resourceStream (String resourceName)  {
+        return BlackBodyColor.class.getResourceAsStream(resourceName);
     }
 
 
     //used to read data from bbr_color.txt and store it in a hashmap for later use
     private static Map<Integer,String> readFromBbr(){
 
-        Map<Integer,String> bbrValues = new HashMap<>();
+        Map<Integer,String> BBRVALUES = new HashMap<>();
 
-        try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("bbr_color.txt");
-             InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+
+
+        try (InputStream hs = resourceStream ( "/bbr_color.txt" );
+                InputStreamReader asciiDecodedStream = new InputStreamReader(hs);
              BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
 
             String line;
@@ -42,30 +45,30 @@ public class BlackBodyColor {
                     // returns integer at [1,6] cutting off space at beginning if there is any
                      currentInteger = Integer.parseInt(line.substring(1,6).trim());
                      currentRGB = line.substring(80,87);
-                     bbrValues.put(currentInteger,currentRGB);
+                     BBRVALUES.put(currentInteger,currentRGB);
                 }
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return bbrValues;
+        return BBRVALUES;
     }
 
+    //returns a Color instance for the given temperature of blackbody in Kelvin
+    public static Color colorForTemperature(double Kelvin) throws IllegalArgumentException {
 
-
-    /**
-     * @param kelvin
-     * @return a Color instance for the given temperature of blackbody in kelvin
-     * @throws IllegalArgumentException if the temperature is not in the range [1000,40000]
-     */
-    public static Color colorForTemperature(double kelvin) throws IllegalArgumentException {
+        // we check that argument is valid
         ClosedInterval tempInterval = ClosedInterval.of(1000,40000);
-
-        int filteredKelvin = (int) Math.round(
-                Preconditions.checkInInterval(tempInterval,kelvin)/100.0
-        ) * 100;
-        String colArg = BBRVALUES.get(filteredKelvin);
-        return Color.web(colArg);
+        if(!tempInterval.contains(Kelvin)){
+            // IA exception if argument not in range
+            throw new IllegalArgumentException();
+        }
+        else{
+            // we then round kelvin to the nearest 100th
+            int filteredKelvin = (int)(Math.round( Kelvin / 100.0) * 100);
+            String colArg = BBRVALUES.get(filteredKelvin);
+            return Color.web(colArg);
+        }
 
     }
 

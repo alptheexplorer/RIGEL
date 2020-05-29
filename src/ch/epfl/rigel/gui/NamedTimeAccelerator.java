@@ -3,7 +3,13 @@ package ch.epfl.rigel.gui;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-//part of the MODEL of the MVC pattern
+
+/**
+ *
+ * Contains Accelerator objects, enum strings are self-explanatory of the type of acceleration provided
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ */
 public enum NamedTimeAccelerator {
     TIMES_1(TimeAccelerator.continuous(1), "1x"),
     TIMES_30(TimeAccelerator.continuous(30), "30x"),

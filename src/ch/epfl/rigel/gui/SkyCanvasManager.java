@@ -8,6 +8,7 @@ import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
 import ch.epfl.rigel.math.Angle;
 import ch.epfl.rigel.math.ClosedInterval;
+import ch.epfl.rigel.math.EuclidianDistance;
 import ch.epfl.rigel.math.RightOpenInterval;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -24,6 +25,7 @@ import javafx.scene.transform.Transform;
 /**
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
+ * responsible of drawing the sky
  */
 public class SkyCanvasManager {
 
@@ -50,7 +52,7 @@ public class SkyCanvasManager {
     private ObservableDoubleValue mouseAzDeg;
     private ObservableDoubleValue transformedMaxObjectClosestDistance;
 
-    // the sole function of the constructor is to define bindings and add listeners
+    //constructor defines bindings and adds listener to draw sky
     public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters){
             this.viewParam = viewingParameters;
             this.viewParam.setFieldOfViewDeg(90);
@@ -60,9 +62,6 @@ public class SkyCanvasManager {
                     ()-> new StereographicProjection(viewingParameters.getProjectionCenter()),
                     viewingParameters.projectionCenterProperty());
 
-            this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
-                    when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.get().heightProperty(),this.canvas.get().widthProperty());
-
             this.planeToCanvas = Bindings.createObjectBinding(() -> {
                 double dilation = (canvas.get().getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
                 return Transform.affine(dilation,0,0,-1*dilation,canvas.get().getWidth()/2.0,canvas.get().getHeight()/2);
@@ -70,12 +69,19 @@ public class SkyCanvasManager {
                     canvas,viewParam.fieldOfViewProperty()
             );
 
-            this.transformedMaxObjectClosestDistance = Bindings.createDoubleBinding(()->
-                this.planeToCanvas.get().inverseTransform(10,0).getX(), planeToCanvas);
+        this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
+                when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.get().heightProperty(),this.canvas.get().widthProperty(),this.planeToCanvas);
 
+
+        // transforming the arg to be passed to objectclosesto
+        this.transformedMaxObjectClosestDistance = Bindings.createDoubleBinding(()->{
+                    Point2D inverseVector = this.planeToCanvas.get().inverseTransform(10,0);
+                    return EuclidianDistance.norm(inverseVector.getX(),inverseVector.getY());
+        }
+                , planeToCanvas);
 
             this.objectUnderMouse = Bindings.createObjectBinding(()->
-                    this.sky.get().objectClosestTo(CartesianCoordinates.of(planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getX(), planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getY()),this.maxObjectClosestDistance),mousePosition,planeToCanvas);
+                    this.sky.get().objectClosestTo(CartesianCoordinates.of(planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getX(), planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getY()),this.transformedMaxObjectClosestDistance.get()),mousePosition,planeToCanvas,transformedMaxObjectClosestDistance);
 
             this.mouseHorizontalCoordinates = Bindings.createObjectBinding(()->{
                 CartesianCoordinates inverseTransform = CartesianCoordinates.of(this.planeToCanvas.get().inverseTransform(getMouseX(),getMouseY()).getX(),this.planeToCanvas.get().inverseTransform(getMouseX(),getMouseY()).getY());

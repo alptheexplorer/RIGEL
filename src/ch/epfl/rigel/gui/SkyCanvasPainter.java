@@ -1,3 +1,4 @@
+
 package ch.epfl.rigel.gui;
 
 import ch.epfl.rigel.astronomy.*;
@@ -16,17 +17,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Transform;
 
-import java.util.List;
-
 /**
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
+ * paints onto a given canvas
  */
 public class SkyCanvasPainter {
 
     private Canvas canvas;
     private GraphicsContext ctx;
 
+    /**
+     *
+     * @param canvas
+     */
     public SkyCanvasPainter(Canvas canvas){
         this.canvas = canvas;
         this.ctx = canvas.getGraphicsContext2D();
@@ -69,7 +73,7 @@ public class SkyCanvasPainter {
         ctx.fillRect ( 0 , 0 , canvas.getWidth (), canvas.getHeight());
     }
 
-   /**
+    /**
      * draws stars and asterisms
      * @param sky
      * @param projection
@@ -95,7 +99,7 @@ public class SkyCanvasPainter {
                 ctx.moveTo(currentPos.getX(),currentPos.getY());
                 //draw line if at least one between the current and the previous star is inside the canvas bounds
                 if(canvasBound.contains(currentPos.getX(),currentPos.getY()) || canvasBound.contains(nextPos.getX(), nextPos.getY())){
-                       ctx.lineTo(nextPos.getX(), nextPos.getY());
+                    ctx.lineTo(nextPos.getX(), nextPos.getY());
                 }
                 ++i;
                 ++j;
@@ -147,21 +151,21 @@ public class SkyCanvasPainter {
      */
     public void drawSun(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
 
-            double discDiameter = this.transformedDiscDiameter(sky.sun(),projection,planeToAffine);
-            Point2D transformedCoordinates = this.transformCoordinates(sky.sunPosition().x(),sky.sunPosition().y(),planeToAffine);
-            // drawing smallest disc
-            ctx.setFill(Color.WHITE);
-            ctx.fillOval(transformedCoordinates.getX() - (discDiameter/2),
-                    transformedCoordinates.getY() - (discDiameter/2),discDiameter,discDiameter);
-            //drawing middle size disc
-            ctx.setFill(Color.YELLOW);
-            ctx.fillOval(transformedCoordinates.getX() - (discDiameter+2)/2,
-                    transformedCoordinates.getY() - (discDiameter+2)/2,(discDiameter+2),(discDiameter+2));
-            //drawing largest disc: the halo
-            ctx.setFill(Color.YELLOW.deriveColor(0,1,1,0.25));
-            ctx.fillOval(transformedCoordinates.getX() - (discDiameter*2.2)/2,
-                    transformedCoordinates.getY() - (discDiameter*2.2)/2,(discDiameter*2.2),(discDiameter*2.2));
-        }
+        double discDiameter = this.transformedDiscDiameter(sky.sun(),projection,planeToAffine);
+        Point2D transformedCoordinates = this.transformCoordinates(sky.sunPosition().x(),sky.sunPosition().y(),planeToAffine);
+        // drawing smallest disc
+        ctx.setFill(Color.WHITE);
+        ctx.fillOval(transformedCoordinates.getX() - (discDiameter/2),
+                transformedCoordinates.getY() - (discDiameter/2),discDiameter,discDiameter);
+        //drawing middle size disc
+        ctx.setFill(Color.YELLOW);
+        ctx.fillOval(transformedCoordinates.getX() - (discDiameter+2)/2,
+                transformedCoordinates.getY() - (discDiameter+2)/2,(discDiameter+2),(discDiameter+2));
+        //drawing largest disc: the halo
+        ctx.setFill(Color.YELLOW.deriveColor(0,1,1,0.25));
+        ctx.fillOval(transformedCoordinates.getX() - (discDiameter*2.2)/2,
+                transformedCoordinates.getY() - (discDiameter*2.2)/2,(discDiameter*2.2),(discDiameter*2.2));
+    }
 
     /**
      * draws moon to canvas
@@ -205,16 +209,11 @@ public class SkyCanvasPainter {
             HorizontalCoordinates horizCoord = HorizontalCoordinates.ofDeg(azDeg,-0.5);
             CartesianCoordinates cartesianCoord = projection.apply(horizCoord);
             Point2D canvasCoordinates = transformCoordinates(cartesianCoord.x(),cartesianCoord.y(),planeToAffine);
-            ctx.fillText(horizCoord.azOctantName("N","E","S","W"), canvasCoordinates.getX(),canvasCoordinates.getY());
+            ctx.fillText(horizCoord.azOctantName("N","E","S","O"), canvasCoordinates.getX(),canvasCoordinates.getY());
         }
 
     }
 }
-
-
-
-
-
 
 
 
