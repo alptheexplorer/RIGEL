@@ -229,7 +229,7 @@ public class Main extends Application {
         timeAnimator.acceleratorProperty().bind(Bindings.select(acceleratorChoice.valueProperty(), "accelerator"));
 
         // creating Buttons
-        InputStream fontStream = getClass().getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");
+        InputStream fontStream = resourceStream("/Font Awesome 5 Free-Solid-900.otf");
             Font fontAwesome = Font.loadFont(fontStream, 15);
             fontStream.close();
             Button resetButton = new Button("\uf0e2");

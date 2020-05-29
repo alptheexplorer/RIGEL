@@ -57,9 +57,6 @@ public class SkyCanvasManager {
                     ()-> new StereographicProjection(viewingParameters.getProjectionCenter()),
                     viewingParameters.projectionCenterProperty());
 
-            this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
-                    when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.get().heightProperty(),this.canvas.get().widthProperty());
-
             this.planeToCanvas = Bindings.createObjectBinding(() -> {
                 double dilation = (canvas.get().getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
                 return Transform.affine(dilation,0,0,-1*dilation,canvas.get().getWidth()/2.0,canvas.get().getHeight()/2);
@@ -67,7 +64,11 @@ public class SkyCanvasManager {
                     canvas,viewParam.fieldOfViewProperty()
             );
 
-            this.transformedMaxObjectClosestDistance = Bindings.createDoubleBinding(()->
+        this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
+                when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.get().heightProperty(),this.canvas.get().widthProperty(),this.planeToCanvas);
+
+
+        this.transformedMaxObjectClosestDistance = Bindings.createDoubleBinding(()->
                 this.planeToCanvas.get().inverseTransform(10,0).getX(), planeToCanvas);
 
 

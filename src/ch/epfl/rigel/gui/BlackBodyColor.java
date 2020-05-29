@@ -12,10 +12,11 @@ public class BlackBodyColor {
 
     //using a static method to read the txt file, we only read once to improve performance
     private static Map<Integer,String> BBRVALUES = readFromBbr();
+    // non-instaniable
     private BlackBodyColor(){ }
 
-    private InputStream resourceStream (String resourceName)  {
-        return getClass (). getResourceAsStream (resourceName);
+    private static InputStream resourceStream (String resourceName)  {
+        return BlackBodyColor.class.getResourceAsStream(resourceName);
     }
 
 
@@ -23,11 +24,11 @@ public class BlackBodyColor {
     private static Map<Integer,String> readFromBbr(){
 
         Map<Integer,String> BBRVALUES = new HashMap<>();
-        File file = new File("C:\\Users\\alpoz\\Desktop\\projectBA2\\resources\\bbr_color.txt");
 
 
-        try (InputStream inputStream = new FileInputStream(file);
-                InputStreamReader asciiDecodedStream = new InputStreamReader(inputStream);
+
+        try (InputStream hs = resourceStream ( "/bbr_color.txt" );
+                InputStreamReader asciiDecodedStream = new InputStreamReader(hs);
              BufferedReader buffer = new BufferedReader(asciiDecodedStream)) {
 
             String line;
