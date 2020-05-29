@@ -45,6 +45,7 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
     private InputStream resourceStream (String resourceName)  {
         return getClass (). getResourceAsStream (resourceName);
     }
