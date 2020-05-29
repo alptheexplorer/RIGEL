@@ -3,7 +3,7 @@ package ch.epfl.rigel.coordinates;
 import static ch.epfl.rigel.math.Angle.toDeg;
 
 /**
- *  Mother class for spherical coordinates
+ * Mother class for spherical coordinates
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
  */

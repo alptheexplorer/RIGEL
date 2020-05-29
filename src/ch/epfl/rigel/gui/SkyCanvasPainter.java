@@ -18,9 +18,9 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Transform;
 
 /**
+ * Paints onto a given canvas
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * paints onto a given canvas
  */
 public class SkyCanvasPainter {
 

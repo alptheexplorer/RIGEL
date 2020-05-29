@@ -15,8 +15,8 @@ import java.util.Locale;
  */
 public final class GeographicCoordinates extends SphericalCoordinates {
 
-    private final static RightOpenInterval LONG_INTERVAL = RightOpenInterval.of(-180.0, 180.0);
-    private final static ClosedInterval LAT_INTERVAL = ClosedInterval.of(-90.0, 90.0);
+    private final static RightOpenInterval LONG_INTERVAL = RightOpenInterval.symmetric(360);
+    private final static ClosedInterval LAT_INTERVAL = ClosedInterval.symmetric(180);
 
     private GeographicCoordinates(double l, double la) {
         super(l, la);
@@ -26,7 +26,7 @@ public final class GeographicCoordinates extends SphericalCoordinates {
      * @param lonDeg longitude in degrees
      * @param latDeg latitude in degrees
      * @return geographicCoordinates object with longitude and latitude in radians
-     * @throws IllegalArgumentException if arguments not in right intervals
+     * @throws IllegalArgumentException if arguments not in right intervals ( through preconditions)
      */
     public static GeographicCoordinates ofDeg(double lonDeg, double latDeg) {
         Preconditions.checkInInterval(LONG_INTERVAL,lonDeg);

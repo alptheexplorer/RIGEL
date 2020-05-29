@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 
 
 /**
- *
  * Contains Accelerator objects, enum strings are self-explanatory of the type of acceleration provided
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)

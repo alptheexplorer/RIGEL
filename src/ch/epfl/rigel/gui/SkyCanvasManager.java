@@ -23,9 +23,9 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.transform.Transform;
 
 /**
+ * Responsible of drawing the sky
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * responsible of drawing the sky
  */
 public class SkyCanvasManager {
 
@@ -155,11 +155,11 @@ public class SkyCanvasManager {
     }
 
     private void paintSky(){
-        painter.get().drawHorizon(sky.get(),projection.get(), planeToCanvas.get());
         painter.get().drawStars(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawPlanets(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawSun(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawMoon(sky.get(), projection.get(), planeToCanvas.get());
+        painter.get().drawHorizon(sky.get(),projection.get(), planeToCanvas.get());
     }
 
     /**

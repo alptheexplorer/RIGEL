@@ -9,9 +9,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.time.ZonedDateTime;
 
 /**
+ * Responsible of running the animation, most important method is handle which passes in an exponential evolving deltatime to adjust
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * responsible of running the animation, most important method is handle which passes in an exponential evolving deltatime to adjust
  */
 
 public final class TimeAnimator extends AnimationTimer {

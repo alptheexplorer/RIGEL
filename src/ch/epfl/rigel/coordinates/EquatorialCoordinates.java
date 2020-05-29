@@ -15,8 +15,8 @@ import java.util.Locale;
  */
 public final class EquatorialCoordinates extends SphericalCoordinates {
 
-    private static RightOpenInterval azimutRad = RightOpenInterval.of(0, Angle.TAU);
-    private static ClosedInterval heightRad = ClosedInterval.symmetric(Math.PI);
+    private static final  RightOpenInterval AZIMUT_RAD = RightOpenInterval.of(0, Angle.TAU);
+    private static final ClosedInterval HEIGHT_RAD = ClosedInterval.symmetric(Math.PI);
 
     private EquatorialCoordinates(double l, double la) {
         super(l, la);
@@ -28,10 +28,10 @@ public final class EquatorialCoordinates extends SphericalCoordinates {
      * @param ra right ascension
      * @param dec declination
      * @return EquatorialCoordinate object
-     * @throws IllegalArgumentException if arguments not in range
+     * @throws IllegalArgumentException if arguments not in range ( through preconditions)
      */
     public static EquatorialCoordinates of(double ra, double dec) {
-        return new EquatorialCoordinates(Preconditions.checkInInterval(azimutRad, ra), Preconditions.checkInInterval(heightRad, dec));
+        return new EquatorialCoordinates(Preconditions.checkInInterval(AZIMUT_RAD, ra), Preconditions.checkInInterval(HEIGHT_RAD, dec));
     }
 
 

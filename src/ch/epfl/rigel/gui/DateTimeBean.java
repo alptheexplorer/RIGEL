@@ -10,9 +10,9 @@ import java.time.ZonedDateTime;
 
 
 /**
+ * This class is a JavaFX bean, it represents a mutable version of the ZonedDateTime class
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * this class is a JavaFX bean, it represents a mutable version of the ZonedDateTime class
  */
 public final class DateTimeBean {
 

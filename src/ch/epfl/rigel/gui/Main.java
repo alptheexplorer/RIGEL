@@ -36,9 +36,9 @@ import java.util.function.UnaryOperator;
 import static javafx.beans.binding.Bindings.when;
 
 /**
+ * Main class, contains view elements such as control panes, in charge of running main program
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * Main class, contains view elements such as control panes, in charge of running main program
  */
 public class Main extends Application {
 
