@@ -5,7 +5,11 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-//part of the MODEL of the MVC pattern
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ * functional interface providing the method that outputs a new time based on acceleration factor and acceleration type
+ */
 @FunctionalInterface
 public interface TimeAccelerator {
      ZonedDateTime adjust(ZonedDateTime initialTime, long actualTimeSinceStart);

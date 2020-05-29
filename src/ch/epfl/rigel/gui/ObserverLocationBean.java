@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableObjectValue;
 
 /**
+ * Mutable version of the time, this bean is modified by control panes and is observable in the skycanvasmanager
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
  */

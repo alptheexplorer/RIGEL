@@ -35,6 +35,11 @@ import java.util.function.UnaryOperator;
 
 import static javafx.beans.binding.Bindings.when;
 
+/**
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ * Main class, contains view elements such as control panes, in charge of running main program
+ */
 public class Main extends Application {
 
     public static void main(String[] args) {
@@ -80,7 +85,7 @@ public class Main extends Application {
                     viewingParametersBean);
 
             Canvas sky = canvasManager.canvas();
-            sky.setOnMouseClicked(e -> requestFocus(e,sky));
+            sky.setOnMouseClicked(e -> sky.requestFocus());
             Pane skyPane = new Pane();
             BorderPane root = new BorderPane ();
             sky.widthProperty().bind(root.widthProperty());
@@ -100,9 +105,7 @@ public class Main extends Application {
         }
     }
 
-    private void requestFocus(Event e, Canvas sky){
-        sky.requestFocus();
-    }
+
 
 
     // root method which constructs upper hboxes
@@ -229,7 +232,7 @@ public class Main extends Application {
         timeAnimator.acceleratorProperty().bind(Bindings.select(acceleratorChoice.valueProperty(), "accelerator"));
 
         // creating Buttons
-        InputStream fontStream = getClass().getResourceAsStream("/Font Awesome 5 Free-Solid-900.otf");
+        InputStream fontStream = resourceStream("/Font Awesome 5 Free-Solid-900.otf");
             Font fontAwesome = Font.loadFont(fontStream, 15);
             fontStream.close();
             Button resetButton = new Button("\uf0e2");

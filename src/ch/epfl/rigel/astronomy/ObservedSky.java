@@ -6,6 +6,14 @@ import ch.epfl.rigel.math.EuclidianDistance;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+/**
+ *
+ * @author Alp Ozen (314542)
+ * @author Jacopo Ferro (299301)
+ *
+ * this class is used as an observable inside skycanvasmanager, it contains the observed sky at a given time
+ */
+
 public class ObservedSky {
 
     private final StarCatalogue currentCatalogue;

@@ -1,10 +1,10 @@
 package ch.epfl.rigel.math;
 
-// this class offers static methods useful with vectors or points on a plane
 
 /**
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
+ * this class is extra, it offers a method to obtain the Euclidian norm, and a method that provides the distance between two vectors
  */
 public class EuclidianDistance {
 
@@ -27,10 +27,9 @@ public class EuclidianDistance {
      * @return finds distance between two CartesianCoordinates
      */
     public static double distance(double subjectOneX, double subjectOneY, double subjectTwoX, double subjectTwoY){
-        return Math.sqrt(
-                (subjectOneX - subjectTwoX)*(subjectOneX - subjectTwoX)
-                + (subjectOneY - subjectTwoY)*(subjectOneY - subjectTwoY)
-        );
+        return
+                norm((subjectOneX - subjectTwoX), (subjectOneY - subjectTwoY));
+
     }
 
 }
