@@ -50,6 +50,11 @@ public class Main extends Application {
         return getClass (). getResourceAsStream (resourceName);
     }
 
+    /**
+     * All works from here, start
+     * @param primaryStage
+     * @throws IOException
+     */
     @Override
     public void start (Stage primaryStage) throws IOException {
         try (InputStream hs = resourceStream ( "/hygdata_v3.csv" );

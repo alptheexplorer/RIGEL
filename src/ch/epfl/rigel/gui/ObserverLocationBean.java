@@ -19,13 +19,6 @@ public class ObserverLocationBean {
     private ObservableObjectValue<GeographicCoordinates> coordinates = Bindings.createObjectBinding(()-> GeographicCoordinates.ofDeg(lonDeg.get(),latDeg.get()),lonDeg,latDeg);
     public ObserverLocationBean(){ }
 
-    /**
-     *
-     * @return content of lonDeg
-     */
-    public double getLonDeg() {
-        return lonDeg.get();
-    }
 
     /**
      *
@@ -43,13 +36,6 @@ public class ObserverLocationBean {
         this.lonDeg.set(lonDeg);
     }
 
-    /**
-     *
-     * @return content of latDeg
-     */
-    public double getLatDeg() {
-        return latDeg.get();
-    }
 
     /**
      *
@@ -75,14 +61,11 @@ public class ObserverLocationBean {
         return new SimpleObjectProperty<>(coordinates.get());
     }
 
+
     /**
      *
-     * @return geographicCoordinates property
+     * @param coord geographic coordinates
      */
-    public ObservableObjectValue<GeographicCoordinates> coordinatesProperty() {
-        return coordinates;
-    }
-
     public void setCoordinates(GeographicCoordinates coord){
         this.setLatDeg(coord.latDeg());
         this.setLonDeg(coord.lonDeg());

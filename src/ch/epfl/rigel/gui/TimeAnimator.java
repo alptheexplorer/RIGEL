@@ -22,11 +22,19 @@ public final class TimeAnimator extends AnimationTimer {
     private ZonedDateTime currentTime;
     private long initialTime;
 
+    /**
+     *
+     * @param dateTimeBean
+     */
     public TimeAnimator(DateTimeBean dateTimeBean) {
         this.dateTimeBean = dateTimeBean;
         running.set(false);
     }
 
+    /**
+     *
+     * @param now
+     */
     @Override
     public void handle(long now) {
         if(currentTime != null) {
@@ -41,6 +49,9 @@ public final class TimeAnimator extends AnimationTimer {
         }
     }
 
+    /**
+     * start
+     */
     @Override
     public void start() {
         initialTime = 0;
@@ -48,23 +59,37 @@ public final class TimeAnimator extends AnimationTimer {
         running.set(true);
         super.start();
     }
+
+    /**
+     * stop
+     */
     @Override
     public void stop() {
         super.stop();
         running.set(false);
     }
 
+    /**
+     *
+     * @return true if it's runnig
+     */
     public ReadOnlyBooleanProperty isRunning() {
         return running;
     }
+
+    /**
+     * set accelerator
+     * @param accelerator
+     */
     public void setAccelerator(TimeAccelerator accelerator) {
         this.accelerator.set(accelerator);
     }
 
-    public TimeAccelerator getAccelerator() {
-        return accelerator.getValue();
-    }
 
+    /**
+     *
+     * @return time accelerator
+     */
     public ObjectProperty<TimeAccelerator> acceleratorProperty() {
         return accelerator;
     }

@@ -1,5 +1,6 @@
 package ch.epfl.rigel.gui;
 
+import ch.epfl.rigel.Preconditions;
 import ch.epfl.rigel.math.ClosedInterval;
 import javafx.scene.paint.Color;
 
@@ -54,21 +55,20 @@ public class BlackBodyColor {
         return BBRVALUES;
     }
 
-    //returns a Color instance for the given temperature of blackbody in Kelvin
-    public static Color colorForTemperature(double Kelvin) throws IllegalArgumentException {
 
-        // we check that argument is valid
+    /**
+     *returns a Color instance for the given temperature of blackbody in Kelvin
+     * @param Kelvin
+     * @return
+     * @throws  IllegalArgumentException if temp is not in [1000, 40000]
+     */
+    public static Color colorForTemperature(double Kelvin)  {
+
         ClosedInterval tempInterval = ClosedInterval.of(1000,40000);
-        if(!tempInterval.contains(Kelvin)){
-            // IA exception if argument not in range
-            throw new IllegalArgumentException();
-        }
-        else{
-            // we then round kelvin to the nearest 100th
-            int filteredKelvin = (int)(Math.round( Kelvin / 100.0) * 100);
-            String colArg = BBRVALUES.get(filteredKelvin);
-            return Color.web(colArg);
-        }
+        Preconditions.checkInInterval(tempInterval,Kelvin);
+        int filteredKelvin = (int)(Math.round( Kelvin / 100.0) * 100);
+        String colArg = BBRVALUES.get(filteredKelvin);
+        return Color.web(colArg);
 
     }
 

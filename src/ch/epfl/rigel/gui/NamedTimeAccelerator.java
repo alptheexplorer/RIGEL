@@ -25,14 +25,26 @@ public enum NamedTimeAccelerator {
         this.name = name;
     }
 
+    /**
+     *
+     * @return name
+     */
     public String getName(){
         return this.name;
     }
 
+    /**
+     *
+     * @return  time accelerator
+     */
     public TimeAccelerator getAccelerator(){
         return this.accelerator;
     }
 
+    /**
+     *
+     * @return name
+     */
     @Override
     public String toString(){
         return this.name;
