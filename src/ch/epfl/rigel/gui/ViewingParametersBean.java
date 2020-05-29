@@ -5,9 +5,9 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
+ * Mutable instance of viewing parameters, modified by mouse scroll
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * mutable instance of viewing parameters, modified by mouse scroll
  */
 public class ViewingParametersBean {
 

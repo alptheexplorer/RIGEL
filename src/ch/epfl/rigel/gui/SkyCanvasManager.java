@@ -54,21 +54,21 @@ public class SkyCanvasManager {
 
     //constructor defines bindings and adds listener to draw sky
     public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters){
-            this.viewParam = viewingParameters;
-            this.viewParam.setFieldOfViewDeg(90);
-            canvas.requestFocus();
+        this.viewParam = viewingParameters;
+        this.viewParam.setFieldOfViewDeg(90);
+        canvas.requestFocus();
 
-            // we define all of our bindings here
-            this.projection = Bindings.createObjectBinding(
-                    ()-> new StereographicProjection(viewingParameters.getProjectionCenter()),
-                    viewingParameters.projectionCenterProperty());
+        // we define all of our bindings here
+        this.projection = Bindings.createObjectBinding(
+                ()-> new StereographicProjection(viewingParameters.getProjectionCenter()),
+                viewingParameters.projectionCenterProperty());
 
-            this.planeToCanvas = Bindings.createObjectBinding(() -> {
-                double dilation = (canvas.getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
-                return Transform.affine(dilation,0,0,-1*dilation,canvas.getWidth()/2.0,canvas.getHeight()/2);
-                    },
-                    canvas.getProperties(),viewParam.fieldOfViewProperty()
-            );
+        this.planeToCanvas = Bindings.createObjectBinding(() -> {
+                    double dilation = (canvas.getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
+                    return Transform.affine(dilation,0,0,-1*dilation,canvas.getWidth()/2.0,canvas.getHeight()/2);
+                },
+                canvas.getProperties(),viewParam.fieldOfViewProperty()
+        );
 
         this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
                 when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.heightProperty(),this.canvas.widthProperty(),this.planeToCanvas);
@@ -78,34 +78,34 @@ public class SkyCanvasManager {
         this.transformedMaxObjectClosestDistance = Bindings.createDoubleBinding(()->{
                     Point2D inverseVector = this.planeToCanvas.get().inverseTransform(MAX_OBJECT_CLOSEST_DISTANCE,0);
                     return EuclidianDistance.norm(inverseVector.getX(),inverseVector.getY());
-        }
+                }
                 , planeToCanvas);
 
-            this.objectUnderMouse = Bindings.createObjectBinding(()->
-                    this.sky.get().objectClosestTo(CartesianCoordinates.of(planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getX(), planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getY()),this.transformedMaxObjectClosestDistance.get()),mousePosition,planeToCanvas,transformedMaxObjectClosestDistance);
+        this.objectUnderMouse = Bindings.createObjectBinding(()->
+                this.sky.get().objectClosestTo(CartesianCoordinates.of(planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getX(), planeToCanvas.get().inverseTransform(this.getMouseX(),this.getMouseY()).getY()),this.transformedMaxObjectClosestDistance.get()),mousePosition,planeToCanvas,transformedMaxObjectClosestDistance);
 
-            this.mouseHorizontalCoordinates = Bindings.createObjectBinding(()->{
-                CartesianCoordinates inverseTransform = CartesianCoordinates.of(this.planeToCanvas.get().inverseTransform(getMouseX(),getMouseY()).getX(),this.planeToCanvas.get().inverseTransform(getMouseX(),getMouseY()).getY());
-                return this.projection.get().inverseApply(inverseTransform);
-            },planeToCanvas,projection,mousePosition);
+        this.mouseHorizontalCoordinates = Bindings.createObjectBinding(()->{
+            CartesianCoordinates inverseTransform = CartesianCoordinates.of(this.planeToCanvas.get().inverseTransform(getMouseX(),getMouseY()).getX(),this.planeToCanvas.get().inverseTransform(getMouseX(),getMouseY()).getY());
+            return this.projection.get().inverseApply(inverseTransform);
+        },planeToCanvas,projection,mousePosition);
 
-            this.painter =  Bindings.createObjectBinding(()-> new SkyCanvasPainter(this.canvas),
-                    this.canvas.heightProperty(),this.canvas.widthProperty(),this.sky,this.planeToCanvas,this.projection);
+        this.painter =  Bindings.createObjectBinding(()-> new SkyCanvasPainter(this.canvas),
+                this.canvas.heightProperty(),this.canvas.widthProperty(),this.sky,this.planeToCanvas,this.projection);
 
-            this.mouseAltDeg = Bindings.createDoubleBinding(()->(mouseHorizontalCoordinates.get().altDeg()),mouseHorizontalCoordinates);
-            this.mouseAzDeg = Bindings.createDoubleBinding(()->(mouseHorizontalCoordinates.get().azDeg()),mouseHorizontalCoordinates);
+        this.mouseAltDeg = Bindings.createDoubleBinding(()->(mouseHorizontalCoordinates.get().altDeg()),mouseHorizontalCoordinates);
+        this.mouseAzDeg = Bindings.createDoubleBinding(()->(mouseHorizontalCoordinates.get().azDeg()),mouseHorizontalCoordinates);
 
 
-            // adding mouse related event listeners
-            canvas.setOnMouseMoved(e -> this.setMousePosition(e));
-            canvas.setOnScroll(e -> this.setFieldOfView(e));
+        // adding mouse related event listeners
+        canvas.setOnMouseMoved(e -> this.setMousePosition(e));
+        canvas.setOnScroll(e -> this.setFieldOfView(e));
 
-            //adding keyboard related event listeners
-            canvas.setOnMousePressed(e -> this.setFocus(e,canvas)); // ENSURES THAT ONLY RIGHT CLICK GRANTS FOCUS
-            canvas.setOnKeyPressed(e -> this.setProjectionCenter(e));
+        //adding keyboard related event listeners
+        canvas.setOnMousePressed(e -> this.setFocus(e,canvas)); // ENSURES THAT ONLY RIGHT CLICK GRANTS FOCUS
+        canvas.setOnKeyPressed(e -> this.setProjectionCenter(e));
 
-            //main listener here
-            sky.addListener((observable) -> this.paintSky());
+        //main listener here
+        sky.addListener((observable) -> this.paintSky());
     };
 
     private void setFocus(MouseEvent e, Canvas canvas){

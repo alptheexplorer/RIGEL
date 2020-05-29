@@ -6,9 +6,9 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
+ * Functional interface providing the method that outputs a new time based on acceleration factor and acceleration type
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * functional interface providing the method that outputs a new time based on acceleration factor and acceleration type
  */
 @FunctionalInterface
 public interface TimeAccelerator {

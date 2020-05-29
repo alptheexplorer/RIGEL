@@ -36,9 +36,9 @@ import java.util.function.UnaryOperator;
 import static javafx.beans.binding.Bindings.when;
 
 /**
+ * Main class, contains view elements such as control panes, in charge of running main program
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
- * Main class, contains view elements such as control panes, in charge of running main program
  */
 public class Main extends Application {
 
@@ -50,6 +50,11 @@ public class Main extends Application {
         return getClass (). getResourceAsStream (resourceName);
     }
 
+    /**
+     * All works from here, start
+     * @param primaryStage
+     * @throws IOException
+     */
     @Override
     public void start (Stage primaryStage) throws IOException {
         try (InputStream hs = resourceStream ( "/hygdata_v3.csv" );
