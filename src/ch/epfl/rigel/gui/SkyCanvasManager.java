@@ -29,13 +29,13 @@ import javafx.scene.transform.Transform;
  */
 public class SkyCanvasManager {
 
-    //constants defined here
-    private final double maxObjectClosestDistance = 10;
-    private final RightOpenInterval azInterval = RightOpenInterval.of(0,360);
-    private final ClosedInterval altInterval = ClosedInterval.of(5,90);
+    //constants and simple objects defined here
+    private static final double MAX_OBJECT_CLOSEST_DISTANCE = 10;
+    private static final RightOpenInterval AZ_INTERVAL = RightOpenInterval.of(0,360);
+    private static final ClosedInterval ALT_INTERVAL = ClosedInterval.of(5,90);
+    private final Canvas canvas = new Canvas ( 800, 600 );
 
-    // all properties defined here --> these are values that do not need to be observable 
-    private ObjectProperty<Canvas> canvas = new SimpleObjectProperty<>(new Canvas ( 800, 600 ));
+    // all properties defined here --> these are values that do not need to be observable
     private ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>(new Point2D(100,120));
     private ViewingParametersBean viewParam;
 
@@ -56,6 +56,7 @@ public class SkyCanvasManager {
     public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters){
             this.viewParam = viewingParameters;
             this.viewParam.setFieldOfViewDeg(90);
+            canvas.requestFocus();
 
             // we define all of our bindings here
             this.projection = Bindings.createObjectBinding(
@@ -63,19 +64,19 @@ public class SkyCanvasManager {
                     viewingParameters.projectionCenterProperty());
 
             this.planeToCanvas = Bindings.createObjectBinding(() -> {
-                double dilation = (canvas.get().getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
-                return Transform.affine(dilation,0,0,-1*dilation,canvas.get().getWidth()/2.0,canvas.get().getHeight()/2);
+                double dilation = (canvas.getWidth())/(this.projection.get().applyToAngle(Angle.ofDeg(this.viewParam.getFieldOfView())));
+                return Transform.affine(dilation,0,0,-1*dilation,canvas.getWidth()/2.0,canvas.getHeight()/2);
                     },
-                    canvas,viewParam.fieldOfViewProperty()
+                    canvas.getProperties(),viewParam.fieldOfViewProperty()
             );
 
         this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
-                when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.get().heightProperty(),this.canvas.get().widthProperty(),this.planeToCanvas);
+                when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.heightProperty(),this.canvas.widthProperty(),this.planeToCanvas);
 
 
         // transforming the arg to be passed to objectclosesto
         this.transformedMaxObjectClosestDistance = Bindings.createDoubleBinding(()->{
-                    Point2D inverseVector = this.planeToCanvas.get().inverseTransform(10,0);
+                    Point2D inverseVector = this.planeToCanvas.get().inverseTransform(MAX_OBJECT_CLOSEST_DISTANCE,0);
                     return EuclidianDistance.norm(inverseVector.getX(),inverseVector.getY());
         }
                 , planeToCanvas);
@@ -88,23 +89,31 @@ public class SkyCanvasManager {
                 return this.projection.get().inverseApply(inverseTransform);
             },planeToCanvas,projection,mousePosition);
 
-            this.painter =  Bindings.createObjectBinding(()-> new SkyCanvasPainter(this.canvas.get()),
-                    this.canvas.get().heightProperty(),this.canvas.get().widthProperty(),this.sky,this.planeToCanvas,this.projection);
+            this.painter =  Bindings.createObjectBinding(()-> new SkyCanvasPainter(this.canvas),
+                    this.canvas.heightProperty(),this.canvas.widthProperty(),this.sky,this.planeToCanvas,this.projection);
 
             this.mouseAltDeg = Bindings.createDoubleBinding(()->(mouseHorizontalCoordinates.get().altDeg()),mouseHorizontalCoordinates);
             this.mouseAzDeg = Bindings.createDoubleBinding(()->(mouseHorizontalCoordinates.get().azDeg()),mouseHorizontalCoordinates);
 
 
             // adding mouse related event listeners
-            canvas.get().setOnMouseMoved(e -> this.setMousePosition(e));
-            canvas.get().setOnScroll(e -> this.setFieldOfView(e));
+            canvas.setOnMouseMoved(e -> this.setMousePosition(e));
+            canvas.setOnScroll(e -> this.setFieldOfView(e));
 
             //adding keyboard related event listeners
-            canvas.get().setOnKeyPressed(e -> this.setProjectionCenter(e));
+            canvas.setOnMousePressed(e -> this.setFocus(e,canvas)); // ENSURES THAT ONLY RIGHT CLICK GRANTS FOCUS
+            canvas.setOnKeyPressed(e -> this.setProjectionCenter(e));
 
             //main listener here
             sky.addListener((observable) -> this.paintSky());
     };
+
+    private void setFocus(MouseEvent e, Canvas canvas){
+        e.consume();
+        if(e.isPrimaryButtonDown()){
+            canvas.requestFocus();
+        }
+    }
 
     // this method will be called whenever mouse moves to set a new mouse position
     private void setMousePosition(MouseEvent e){
@@ -134,41 +143,35 @@ public class SkyCanvasManager {
         // consume event to avoid self interpretation
         e.consume();
         // call to focus
-        canvas.get().requestFocus();
+        canvas.requestFocus();
         double currentX = Angle.toDeg(viewParam.getProjectionCenter().az());
         double currentY = Angle.toDeg(viewParam.getProjectionCenter().alt());
         switch (e.getCode()){
             case LEFT:
-                viewParam.setCenter(HorizontalCoordinates.ofDeg(azInterval.reduce(currentX-10),currentY));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(AZ_INTERVAL.reduce(currentX-10),currentY));
                 break;
             case RIGHT:
-                viewParam.setCenter(HorizontalCoordinates.ofDeg(azInterval.reduce(currentX+10),currentY));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(AZ_INTERVAL.reduce(currentX+10),currentY));
                 break;
             case DOWN:
-                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX,altInterval.reduce(currentY-5)));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX, ALT_INTERVAL.clip(currentY-5)));
                 break;
             case UP:
-                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX,altInterval.reduce(currentY+5)));
+                viewParam.setCenter(HorizontalCoordinates.ofDeg(currentX, ALT_INTERVAL.clip(currentY+5)));
                 break;
         }
 
     }
 
+
     private void paintSky(){
-        painter.get().drawHorizon(sky.get(),projection.get(), planeToCanvas.get());
         painter.get().drawStars(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawPlanets(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawSun(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawMoon(sky.get(), projection.get(), planeToCanvas.get());
+        painter.get().drawHorizon(sky.get(),projection.get(), planeToCanvas.get());
     }
 
-    /**
-     *
-     * @return canvas property
-     */
-    public ObjectProperty<Canvas> canvasProperty() {
-        return canvas;
-    }
 
     private double getMouseX(){
         return this.mousePosition.get().getX();
@@ -188,22 +191,23 @@ public class SkyCanvasManager {
      * @return content of Canvas property
      */
     public Canvas canvas(){
-        return this.canvas.get();
+        return this.canvas;
     }
 
 
-    public Number getMouseAzDeg() {
-        return mouseAzDeg.get();
-    }
-
+    /**
+     *
+     * @return mouseAzDegProperty
+     */
     public ObservableDoubleValue mouseAzDegProperty() {
         return mouseAzDeg;
     }
 
-    public Number getMouseAltDeg() {
-        return mouseAltDeg.get();
-    }
 
+    /**
+     *
+     * @return mouseAltDegProperty
+     */
     public ObservableDoubleValue mouseAltDegProperty() {
         return mouseAltDeg;
     }

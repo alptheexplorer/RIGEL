@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableObjectValue;
  * Mutable version of the time, this bean is modified by control panes and is observable in the skycanvasmanager
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
+ * ! certain getters were excluded because they were not used
  */
 public class ObserverLocationBean {
 
@@ -19,13 +20,6 @@ public class ObserverLocationBean {
     private ObservableObjectValue<GeographicCoordinates> coordinates = Bindings.createObjectBinding(()-> GeographicCoordinates.ofDeg(lonDeg.get(),latDeg.get()),lonDeg,latDeg);
     public ObserverLocationBean(){ }
 
-    /**
-     *
-     * @return content of lonDeg
-     */
-    public double getLonDeg() {
-        return lonDeg.get();
-    }
 
     /**
      *
@@ -43,13 +37,6 @@ public class ObserverLocationBean {
         this.lonDeg.set(lonDeg);
     }
 
-    /**
-     *
-     * @return content of latDeg
-     */
-    public double getLatDeg() {
-        return latDeg.get();
-    }
 
     /**
      *
@@ -75,13 +62,6 @@ public class ObserverLocationBean {
         return new SimpleObjectProperty<>(coordinates.get());
     }
 
-    /**
-     *
-     * @return geographicCoordinates property
-     */
-    public ObservableObjectValue<GeographicCoordinates> coordinatesProperty() {
-        return coordinates;
-    }
 
     public void setCoordinates(GeographicCoordinates coord){
         this.setLatDeg(coord.latDeg());

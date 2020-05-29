@@ -86,7 +86,7 @@ public class Main extends Application {
                     viewingParametersBean);
 
             Canvas sky = canvasManager.canvas();
-            sky.setOnMouseClicked(e -> sky.requestFocus());
+            //sky.setOnMouseClicked(e -> sky.requestFocus());
             Pane skyPane = new Pane();
             BorderPane root = new BorderPane ();
             sky.widthProperty().bind(root.widthProperty());
