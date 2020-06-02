@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableObjectValue;
  * Mutable version of the time, this bean is modified by control panes and is observable in the skycanvasmanager
  * @author Alp Ozen (314542)
  * @author Jacopo Ferro (299301)
+ * ! certain getters were excluded because they were not used
  */
 public class ObserverLocationBean {
 
@@ -62,10 +63,6 @@ public class ObserverLocationBean {
     }
 
 
-    /**
-     *
-     * @param coord geographic coordinates
-     */
     public void setCoordinates(GeographicCoordinates coord){
         this.setLatDeg(coord.latDeg());
         this.setLonDeg(coord.lonDeg());
