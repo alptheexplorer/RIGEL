@@ -2,6 +2,7 @@ package ch.epfl.rigel.gui;
 
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
@@ -13,8 +14,26 @@ public class ViewingParametersBean {
 
     private SimpleDoubleProperty fieldOfView = new SimpleDoubleProperty();
     private SimpleObjectProperty<HorizontalCoordinates> projectionCenter = new SimpleObjectProperty<>();
+    private SimpleFloatProperty maxMagnitude = new SimpleFloatProperty();
 
     public ViewingParametersBean(){ };
+
+
+    /**
+     *
+     * @param maxMagnitude
+     */
+    public void setMaxMagnitude(float maxMagnitude) {
+        this.maxMagnitude.set(maxMagnitude);
+    }
+
+    /**
+     *
+     * @return content of maxmagnitude property
+     */
+    public float getMaxMagnitude() {
+        return maxMagnitude.get();
+    }
 
     /**
      *

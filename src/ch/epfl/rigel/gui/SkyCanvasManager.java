@@ -55,7 +55,8 @@ public class SkyCanvasManager {
     //constructor defines bindings and adds listener to draw sky
     public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters){
         this.viewParam = viewingParameters;
-        this.viewParam.setFieldOfViewDeg(90);
+        this.viewParam.setFieldOfViewDeg(viewingParameters.getFieldOfView());
+        this.viewParam.setMaxMagnitude(viewingParameters.getMaxMagnitude());
         canvas.requestFocus();
 
         // we define all of our bindings here
@@ -165,7 +166,7 @@ public class SkyCanvasManager {
 
 
     private void paintSky(){
-        painter.get().drawStars(sky.get(), projection.get(), planeToCanvas.get());
+        painter.get().drawStars(sky.get(), projection.get(), planeToCanvas.get(), viewParam.getMaxMagnitude());
         painter.get().drawPlanets(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawSun(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawMoon(sky.get(), projection.get(), planeToCanvas.get());
