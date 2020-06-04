@@ -60,6 +60,7 @@ public class SkyCanvasManager {
         this.viewParam = viewingParameters;
         canvas.requestFocus();
         magnitude.setMagnitude(MAGNITUDE_CURVE.at(viewingParameters.getFieldOfView()));
+        backgroundRgb.setBackgroundColor(Color.rgb(0,(int)Math.floor(RGBRANGE.clip(RGBGREEN_CURVE.at(viewParam.getFieldOfView()))),(int)Math.floor(RGBRANGE.clip(RGBBLUE_CURVE.at(viewParam.getFieldOfView()/1.5)))));
 
 
         // we define all of our bindings here
@@ -133,11 +134,9 @@ public class SkyCanvasManager {
         e.consume();
         magnitude.setMagnitude(MAGNITUDE_CURVE.at(viewParam.getFieldOfView()));
         int green = (int)Math.floor(RGBRANGE.clip(RGBGREEN_CURVE.at(viewParam.getFieldOfView())));
-        int blue = (int)Math.floor(RGBRANGE.clip(RGBBLUE_CURVE.at(viewParam.getFieldOfView())-100));
+        int blue = (int)Math.floor(RGBRANGE.clip(RGBBLUE_CURVE.at(viewParam.getFieldOfView()/1.5)));
         int red = 0;
-        System.out.println(blue);
         backgroundRgb.setBackgroundColor(Color.rgb(red,green,blue));
-
     }
 
 
@@ -145,13 +144,13 @@ public class SkyCanvasManager {
     private void setFieldOfView(ScrollEvent e){
         e.consume();
         if(Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())){
-            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaX();
+            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaX()/25.0;
             if(this.fieldOfViewRange.contains(newFieldOfView)){
                 this.viewParam.setFieldOfViewDeg(newFieldOfView);
             }
         }
         else{
-            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaY();
+            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaY()/25.0;
             if(this.fieldOfViewRange.contains(newFieldOfView)){
                 this.viewParam.setFieldOfViewDeg(newFieldOfView);
             }
