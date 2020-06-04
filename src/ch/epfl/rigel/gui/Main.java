@@ -84,11 +84,19 @@ public class Main extends Application {
                     HorizontalCoordinates.ofDeg ( 180.000000000001 , 15 ));
             viewingParametersBean.setFieldOfViewDeg ( 100 );
 
+            SkyModeBean skyMode = new SkyModeBean();
+            skyMode.setMode("normal");
+            MagnitudeBean magnitude = new MagnitudeBean();
+            BackgroundRgbBean backgroundRgb = new BackgroundRgbBean();
+
             SkyCanvasManager canvasManager = new SkyCanvasManager (
                     catalog,
                     dateTimeBean,
                     observeLocationBean,
-                    viewingParametersBean);
+                    viewingParametersBean,
+                    skyMode,
+                    magnitude,
+                    backgroundRgb);
 
             Canvas sky = canvasManager.canvas();
             Pane skyPane = new Pane();
@@ -97,7 +105,7 @@ public class Main extends Application {
             sky.heightProperty().bind(root.heightProperty());
 
             skyPane.getChildren().add(sky);
-            root.setTop(setController(observeLocationBean, dateTimeBean, timeAnimator));
+            root.setTop(setController(observeLocationBean, dateTimeBean, timeAnimator, skyMode));
             root.setCenter(skyPane);
             root.setBottom(setInformationPane(viewingParametersBean, canvasManager));
 
@@ -105,6 +113,22 @@ public class Main extends Application {
             primaryStage.setMinHeight ( 600 );
             primaryStage.setScene (new Scene(root));
             primaryStage.show ();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.initOwner(primaryStage);
+            alert.setTitle("Release Beta 0.2");
+            alert.setHeaderText("What's new? ");
+            String newLine = System.getProperty("line.separator");
+            alert.setContentText( new StringBuilder()
+                    .append("--> Choose what elements to draw in the Sky")
+                    .append(newLine)
+                    .append("--> Dynamic star opacity")
+                    .append(newLine)
+                    .append("--> Dynamic zoom mode")
+                    .append(newLine)
+                    .toString());
+
+            alert.showAndWait();
+
 
             sky.requestFocus();
         }
@@ -114,11 +138,11 @@ public class Main extends Application {
 
 
     // root method which constructs upper hboxes
-    private HBox setController(ObserverLocationBean observerBean, DateTimeBean dateTimeBean, TimeAnimator timeAnimator) throws IOException {
+    private HBox setController(ObserverLocationBean observerBean, DateTimeBean dateTimeBean, TimeAnimator timeAnimator, SkyModeBean skyMode) throws IOException {
         HBox controlBar = new HBox();
         controlBar.setStyle ( "-fx-spacing: 4; -fx-padding: 4;" );
         setLeftBar(controlBar,observerBean);
-        setMiddleBar(controlBar,dateTimeBean,timeAnimator);
+        setMiddleBar(controlBar,dateTimeBean,timeAnimator, skyMode);
         setRightBar(controlBar,timeAnimator,dateTimeBean);
         return controlBar;
     }
@@ -187,7 +211,7 @@ public class Main extends Application {
         return filter;
     }
 
-    private void setMiddleBar(HBox observationControl, DateTimeBean dateTime, TimeAnimator timeAnimator){
+    private void setMiddleBar(HBox observationControl, DateTimeBean dateTime, TimeAnimator timeAnimator, SkyModeBean skyMode){
         HBox controlBar = new HBox();
         controlBar.setStyle("-fx-spacing: inherit; -fx-alignment: baseline-left;");
 
@@ -215,11 +239,17 @@ public class Main extends Application {
         timeZone.setStyle("-fx-pref-width: 180;");
         timeZone.valueProperty().bindBidirectional(dateTime.zoneProperty());
 
+        // choosing the sky mode aka. whether to exclude asterisms, planets or the horizon from drawing
+        ObservableList<String> skyDrawingOptions = FXCollections.observableArrayList("asterism-excluded", "horizon-excluded", "planet-excluded", "normal");
+        ChoiceBox<String> skyStructure = new ChoiceBox<>(skyDrawingOptions);
+        skyStructure.setValue("normal");
+        skyStructure.valueProperty().bindBidirectional(skyMode.modeProperty());
 
-        controlBar.getChildren().addAll(dateLabel,datePick,hourLabel,hourEntry,timeZone);
+        controlBar.getChildren().addAll(dateLabel,datePick,hourLabel,hourEntry,timeZone,skyStructure);
         controlBar.disableProperty().bind(timeAnimator.isRunning());
         Separator separator = new Separator(Orientation.VERTICAL);
         observationControl.getChildren().addAll(controlBar,separator);
+
     }
 
     private void setRightBar(HBox observationControl, TimeAnimator timeAnimator, DateTimeBean dateTime) throws IOException{

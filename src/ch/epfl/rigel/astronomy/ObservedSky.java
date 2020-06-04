@@ -28,6 +28,7 @@ public class ObservedSky {
 
 
 
+
     /**
      * Instantiate ObservedSky object containing each object in sky as hashmap
      * with key being name as string and value being projected cartesian coordinates

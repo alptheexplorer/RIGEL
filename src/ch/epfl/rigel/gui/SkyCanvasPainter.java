@@ -27,6 +27,7 @@ public class SkyCanvasPainter {
     private Canvas canvas;
     private GraphicsContext ctx;
 
+
     /**
      *
      * @param canvas
@@ -35,7 +36,6 @@ public class SkyCanvasPainter {
         this.canvas = canvas;
         this.ctx = canvas.getGraphicsContext2D();
         //setting black background
-        this.clear();
     }
 
 
@@ -67,9 +67,9 @@ public class SkyCanvasPainter {
      * clears canvas and set black background
      * @return void
      */
-    public void clear(){
+    public void clear(BackgroundRgbBean color){
         ctx.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        ctx.setFill (Color.BLACK);
+        ctx.setFill (color.getBackgroundColor());
         ctx.fillRect ( 0 , 0 , canvas.getWidth (), canvas.getHeight());
     }
 
@@ -80,9 +80,30 @@ public class SkyCanvasPainter {
      * @param planeToAffine
      * @return void
      */
-    public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
+    public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine, Double magnitude){
+
+
+
+        //draw stars
+        int i=0;
+        for(Star s:sky.stars()){
+            double discDiameter = transformedDiscDiameter(s,projection,planeToAffine);
+            Point2D transformedCoordinates = transformCoordinates(sky.starPositions()[i],
+                    sky.starPositions()[i+1],planeToAffine);
+            // stars are drawn only if their magnitude is less than the current magnitude
+            if(s.magnitude() <= magnitude){
+                ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
+                ctx.fillOval(transformedCoordinates.getX() - (discDiameter/2),
+                        transformedCoordinates.getY() - (discDiameter/2), discDiameter, discDiameter);
+                i += 2;
+            }
+        }
+    }
+
+    public void drawAsterisms(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
         //draw Asterisms
         Bounds canvasBound = canvas.getBoundsInLocal();
+
         for(Asterism a: sky.asterisms()){
             ctx.beginPath();
             ctx.setLineWidth(1);
@@ -107,18 +128,6 @@ public class SkyCanvasPainter {
             ctx.closePath();
             ctx.setStroke(Color.BLUE);
             ctx.stroke();
-        }
-        //draw stars
-        int i=0;
-        for(Star s:sky.stars()){
-
-            double discDiameter = transformedDiscDiameter(s,projection,planeToAffine);
-            Point2D transformedCoordinates = transformCoordinates(sky.starPositions()[i],
-                    sky.starPositions()[i+1],planeToAffine);
-            ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
-            ctx.fillOval(transformedCoordinates.getX() - (discDiameter/2),
-                    transformedCoordinates.getY() - (discDiameter/2), discDiameter, discDiameter);
-            i += 2;
         }
     }
 
@@ -189,85 +198,31 @@ public class SkyCanvasPainter {
      * @param projection
      * @param planeToAffine
      */
-    public void drawHorizon(ObservedSky sky, StereographicProjection projection, Transform planeToAffine) {
+    public void drawHorizon(ObservedSky sky, StereographicProjection projection, Transform planeToAffine){
         HorizontalCoordinates horizonCoord = HorizontalCoordinates.ofDeg(0, 0);
         double discRadius = projection.circleRadiusForParallel(horizonCoord);
         CartesianCoordinates circleCenter = projection.circleCenterForParallel(horizonCoord);
-        double transformedRadius = planeToAffine.deltaTransform(new Point2D(discRadius, 0)).getX();
-        Point2D transformedCoordinates = this.transformCoordinates(circleCenter.x(), circleCenter.y(), planeToAffine);
+        double transformedRadius = planeToAffine.deltaTransform(new Point2D(discRadius,0)).getX();
+        Point2D transformedCoordinates = this.transformCoordinates(circleCenter.x(),circleCenter.y(),planeToAffine);
         double horizonX = transformedCoordinates.getX() - transformedRadius;
         double horizonY = transformedCoordinates.getY() - transformedRadius;
         ctx.setStroke(Color.RED);
         ctx.setLineWidth(2);
-        ctx.strokeOval(horizonX, horizonY, transformedRadius * 2, transformedRadius * 2);
+        ctx.strokeOval(horizonX,horizonY, transformedRadius*2, transformedRadius*2);
 
         //adding horizon annotations
         ctx.setFill(Color.RED);
         ctx.setTextAlign(TextAlignment.CENTER);
         ctx.setTextBaseline(VPos.TOP);
 
-        for (double azDeg = 0; azDeg < 360; azDeg += 45) {
-            HorizontalCoordinates horizCoord = HorizontalCoordinates.ofDeg(azDeg, -0.5);
+        for(double azDeg = 0; azDeg <360; azDeg+=45){
+            HorizontalCoordinates horizCoord = HorizontalCoordinates.ofDeg(azDeg,-0.5);
             CartesianCoordinates cartesianCoord = projection.apply(horizCoord);
-            Point2D canvasCoordinates = transformCoordinates(cartesianCoord.x(), cartesianCoord.y(), planeToAffine);
-            ctx.fillText(horizCoord.azOctantName("N", "E", "S", "O"), canvasCoordinates.getX(), canvasCoordinates.getY());
+            Point2D canvasCoordinates = transformCoordinates(cartesianCoord.x(),cartesianCoord.y(),planeToAffine);
+            ctx.fillText(horizCoord.azOctantName("N","E","S","O"), canvasCoordinates.getX(),canvasCoordinates.getY());
         }
 
     }
-        /**
-         * draws stars and asterisms that are brighter than a given magnitude
-         * @param sky
-         * @param projection
-         * @param planeToAffine
-         * @param maxMagnitude max magnitude to paint
-         * @return void
-         */
-        public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine, float maxMagnitude){
-            //draw Asterisms
-            Bounds canvasBound = canvas.getBoundsInLocal();
-            for(Asterism a: sky.asterisms()){
-                ctx.beginPath();
-                ctx.setLineWidth(1);
-                int i = 0;
-                int j = 1;
-                while(j < sky.starIndices(a).size()){
-                    //current and previous index
-                    int currentIndex = sky.starIndices(a).get(i);
-                    int nextIndex = sky.starIndices(a).get(j);
-                    //transformed coordinates of the current and previous star
-                    Point2D currentPos = transformCoordinates(sky.starPositions()[2*currentIndex], sky.starPositions()[2*currentIndex+1], planeToAffine);
-                    Point2D nextPos = transformCoordinates(sky.starPositions()[2*nextIndex], sky.starPositions()[2*nextIndex+1], planeToAffine);
-                    //move head
-                    ctx.moveTo(currentPos.getX(),currentPos.getY());
-                    //draw line if at least one between the current and the previous star is inside the canvas bounds
-                    if(canvasBound.contains(currentPos.getX(),currentPos.getY()) || canvasBound.contains(nextPos.getX(), nextPos.getY())){
-                        ctx.lineTo(nextPos.getX(), nextPos.getY());
-                    }
-                    ++i;
-                    ++j;
-                }
-                ctx.closePath();
-                ctx.setStroke(Color.BLUE);
-                ctx.stroke();
-            }
-            //draw stars
-            int i=0;
-            for(Star s:sky.stars()){
-
-                    double discDiameter = transformedDiscDiameter(s, projection, planeToAffine);
-                    Point2D transformedCoordinates = transformCoordinates(sky.starPositions()[i],
-                            sky.starPositions()[i + 1], planeToAffine);
-                    if(s.magnitude() <= maxMagnitude) {
-                    ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
-                    ctx.fillOval(transformedCoordinates.getX() - (discDiameter / 2),
-                            transformedCoordinates.getY() - (discDiameter / 2), discDiameter, discDiameter);
-                    }
-                    i += 2;
-            }
-
-        }
-
-
 }
 
 

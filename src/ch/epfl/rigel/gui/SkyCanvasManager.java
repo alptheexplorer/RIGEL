@@ -6,10 +6,7 @@ import ch.epfl.rigel.astronomy.StarCatalogue;
 import ch.epfl.rigel.coordinates.CartesianCoordinates;
 import ch.epfl.rigel.coordinates.HorizontalCoordinates;
 import ch.epfl.rigel.coordinates.StereographicProjection;
-import ch.epfl.rigel.math.Angle;
-import ch.epfl.rigel.math.ClosedInterval;
-import ch.epfl.rigel.math.EuclidianDistance;
-import ch.epfl.rigel.math.RightOpenInterval;
+import ch.epfl.rigel.math.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -20,6 +17,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 
 /**
@@ -34,6 +32,11 @@ public class SkyCanvasManager {
     private static final RightOpenInterval AZ_INTERVAL = RightOpenInterval.of(0,360);
     private static final ClosedInterval ALT_INTERVAL = ClosedInterval.of(5,90);
     private final Canvas canvas = new Canvas ( 800, 600 );
+
+    private static final Polynomial MAGNITUDE_CURVE = Polynomial.of(0.000005707,-0.00125, -0.02349, 16);
+    private static final Polynomial RGBBLUE_CURVE = Polynomial.of(-0.00023,0.0647, -3.06,40 );
+    private static final Polynomial RGBGREEN_CURVE = Polynomial.of(-0.000008384,0.00227894, -0.09159, 4.438179);
+    private static final ClosedInterval RGBRANGE = ClosedInterval.of(0,255);
 
     // all properties defined here --> these are values that do not need to be observable
     private ObjectProperty<Point2D> mousePosition = new SimpleObjectProperty<>(new Point2D(100,120));
@@ -53,11 +56,11 @@ public class SkyCanvasManager {
     private ObservableDoubleValue transformedMaxObjectClosestDistance;
 
     //constructor defines bindings and adds listener to draw sky
-    public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters){
+    public SkyCanvasManager(StarCatalogue catalogue, DateTimeBean when, ObserverLocationBean observerLocation, ViewingParametersBean viewingParameters, SkyModeBean skyMode, MagnitudeBean magnitude, BackgroundRgbBean backgroundRgb){
         this.viewParam = viewingParameters;
-        this.viewParam.setFieldOfViewDeg(viewingParameters.getFieldOfView());
-        this.viewParam.setMaxMagnitude(viewingParameters.getMaxMagnitude());
         canvas.requestFocus();
+        magnitude.setMagnitude(MAGNITUDE_CURVE.at(viewingParameters.getFieldOfView()));
+
 
         // we define all of our bindings here
         this.projection = Bindings.createObjectBinding(
@@ -72,7 +75,7 @@ public class SkyCanvasManager {
         );
 
         this.sky = Bindings.createObjectBinding(()-> new ObservedSky(when.getZonedDateTime().get(),observerLocation.getCoordinates().get(), this.projection.get(), catalogue),
-                when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.heightProperty(),this.canvas.widthProperty(),this.planeToCanvas);
+                when.dateProperty(),when.zoneProperty(),when.timeProperty(),observerLocation.lonDegProperty(),observerLocation.latDegProperty(),this.projection,this.canvas.heightProperty(),this.canvas.widthProperty(),this.planeToCanvas, skyMode.modeProperty(), backgroundRgb.backgroundColorProperty(), magnitude.magnitudeProperty());
 
 
         // transforming the arg to be passed to objectclosesto
@@ -99,14 +102,17 @@ public class SkyCanvasManager {
 
         // adding mouse related event listeners
         canvas.setOnMouseMoved(e -> this.setMousePosition(e));
-        canvas.setOnScroll(e -> this.setFieldOfView(e));
+        canvas.setOnScroll(e -> {
+            this.setFieldOfView(e);
+            this.setStarMagAndRgb(e, magnitude, backgroundRgb);
+        });
 
         //adding keyboard related event listeners
         canvas.setOnMousePressed(e -> this.setFocus(e,canvas)); // ENSURES THAT ONLY RIGHT CLICK GRANTS FOCUS
         canvas.setOnKeyPressed(e -> this.setProjectionCenter(e));
 
         //main listener here
-        sky.addListener((observable) -> this.paintSky());
+        sky.addListener((observable) -> this.paintSky(skyMode, magnitude, backgroundRgb));
     };
 
     private void setFocus(MouseEvent e, Canvas canvas){
@@ -121,6 +127,19 @@ public class SkyCanvasManager {
         e.consume();
         mousePosition.setValue(new Point2D(e.getX(),e.getY()));
     }
+
+    //sets a new background RGB and a new maximum stat magnitude upon user scroll
+    private void setStarMagAndRgb(ScrollEvent e, MagnitudeBean magnitude, BackgroundRgbBean backgroundRgb){
+        e.consume();
+        magnitude.setMagnitude(MAGNITUDE_CURVE.at(viewParam.getFieldOfView()));
+        int green = (int)Math.floor(RGBRANGE.clip(RGBGREEN_CURVE.at(viewParam.getFieldOfView())));
+        int blue = (int)Math.floor(RGBRANGE.clip(RGBBLUE_CURVE.at(viewParam.getFieldOfView())-100));
+        int red = 0;
+        System.out.println(blue);
+        backgroundRgb.setBackgroundColor(Color.rgb(red,green,blue));
+
+    }
+
 
     // this method sets the field of view to a number within the given range and based on the mouse scroll
     private void setFieldOfView(ScrollEvent e){
@@ -165,12 +184,24 @@ public class SkyCanvasManager {
     }
 
 
-    private void paintSky(){
-        painter.get().drawStars(sky.get(), projection.get(), planeToCanvas.get(), viewParam.getMaxMagnitude());
-        painter.get().drawPlanets(sky.get(), projection.get(), planeToCanvas.get());
+    private void paintSky(SkyModeBean skyMode, MagnitudeBean magnitude, BackgroundRgbBean color){
+
+        painter.get().clear(color);
+        if(!skyMode.isIsNonAsterism()){
+            painter.get().drawAsterisms(sky.get(), projection.get(), planeToCanvas.get());
+        }
+        painter.get().drawStars(sky.get(), projection.get(), planeToCanvas.get(), magnitude.getMagnitude());
+        if(!skyMode.isIsNonPlanet()){
+            painter.get().drawPlanets(sky.get(), projection.get(), planeToCanvas.get());
+        }
         painter.get().drawSun(sky.get(), projection.get(), planeToCanvas.get());
         painter.get().drawMoon(sky.get(), projection.get(), planeToCanvas.get());
-        painter.get().drawHorizon(sky.get(),projection.get(), planeToCanvas.get());
+        if(!skyMode.isIsNonHorizon()){
+            painter.get().drawHorizon(sky.get(),projection.get(), planeToCanvas.get());
+        }
+
+
+
     }
 
 
