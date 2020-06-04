@@ -27,6 +27,7 @@ public class SkyCanvasPainter {
     private Canvas canvas;
     private GraphicsContext ctx;
 
+
     /**
      *
      * @param canvas
@@ -35,7 +36,6 @@ public class SkyCanvasPainter {
         this.canvas = canvas;
         this.ctx = canvas.getGraphicsContext2D();
         //setting black background
-        this.clear();
     }
 
 
@@ -67,9 +67,9 @@ public class SkyCanvasPainter {
      * clears canvas and set black background
      * @return void
      */
-    public void clear(){
+    public void clear(BackgroundRgbBean color){
         ctx.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        ctx.setFill (Color.BLACK);
+        ctx.setFill (color.getBackgroundColor());
         ctx.fillRect ( 0 , 0 , canvas.getWidth (), canvas.getHeight());
     }
 
@@ -80,9 +80,30 @@ public class SkyCanvasPainter {
      * @param planeToAffine
      * @return void
      */
-    public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
+    public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine, Double magnitude){
+
+
+
+        //draw stars
+        int i=0;
+        for(Star s:sky.stars()){
+            double discDiameter = transformedDiscDiameter(s,projection,planeToAffine);
+            Point2D transformedCoordinates = transformCoordinates(sky.starPositions()[i],
+                    sky.starPositions()[i+1],planeToAffine);
+            // stars are drawn only if their magnitude is less than the current magnitude
+            if(s.magnitude() <= magnitude){
+                ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
+                ctx.fillOval(transformedCoordinates.getX() - (discDiameter/2),
+                        transformedCoordinates.getY() - (discDiameter/2), discDiameter, discDiameter);
+                i += 2;
+            }
+        }
+    }
+
+    public void drawAsterisms(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
         //draw Asterisms
         Bounds canvasBound = canvas.getBoundsInLocal();
+
         for(Asterism a: sky.asterisms()){
             ctx.beginPath();
             ctx.setLineWidth(1);
@@ -107,17 +128,6 @@ public class SkyCanvasPainter {
             ctx.closePath();
             ctx.setStroke(Color.BLUE);
             ctx.stroke();
-        }
-        //draw stars
-        int i=0;
-        for(Star s:sky.stars()){
-            double discDiameter = transformedDiscDiameter(s,projection,planeToAffine);
-            Point2D transformedCoordinates = transformCoordinates(sky.starPositions()[i],
-                    sky.starPositions()[i+1],planeToAffine);
-            ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
-            ctx.fillOval(transformedCoordinates.getX() - (discDiameter/2),
-                    transformedCoordinates.getY() - (discDiameter/2), discDiameter, discDiameter);
-            i += 2;
         }
     }
 
