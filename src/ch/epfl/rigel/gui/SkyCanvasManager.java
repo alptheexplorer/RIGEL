@@ -43,7 +43,7 @@ public class SkyCanvasManager {
     private ViewingParametersBean viewParam;
 
     //initial value of fieldOfView is 100 degrees
-    private ClosedInterval fieldOfViewRange = ClosedInterval.of(30,150);
+    private ClosedInterval fieldOfViewRange = ClosedInterval.of(25,150);
 
     private ObservableObjectValue<Transform> planeToCanvas;
     private ObservableObjectValue<SkyCanvasPainter> painter;
@@ -133,7 +133,7 @@ public class SkyCanvasManager {
         e.consume();
         magnitude.setMagnitude(MAGNITUDE_CURVE.at(viewParam.getFieldOfView()));
         int green = (int)Math.floor(RGBRANGE.clip(RGBGREEN_CURVE.at(viewParam.getFieldOfView())));
-        int blue = (int)Math.floor(RGBRANGE.clip(RGBBLUE_CURVE.at(viewParam.getFieldOfView())-100));
+        int blue = (int)Math.floor(RGBRANGE.clip(viewParam.getFieldOfView()/1.5));
         int red = 0;
         System.out.println(blue);
         backgroundRgb.setBackgroundColor(Color.rgb(red,green,blue));
@@ -145,13 +145,13 @@ public class SkyCanvasManager {
     private void setFieldOfView(ScrollEvent e){
         e.consume();
         if(Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())){
-            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaX();
+            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaX()/10.0;
             if(this.fieldOfViewRange.contains(newFieldOfView)){
                 this.viewParam.setFieldOfViewDeg(newFieldOfView);
             }
         }
         else{
-            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaY();
+            double newFieldOfView = viewParam.getFieldOfView() + e.getDeltaY()/10.0;
             if(this.fieldOfViewRange.contains(newFieldOfView)){
                 this.viewParam.setFieldOfViewDeg(newFieldOfView);
             }

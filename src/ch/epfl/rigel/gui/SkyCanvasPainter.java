@@ -95,8 +95,9 @@ public class SkyCanvasPainter {
                 ctx.setFill(BlackBodyColor.colorForTemperature(s.colorTemperature()));
                 ctx.fillOval(transformedCoordinates.getX() - (discDiameter/2),
                         transformedCoordinates.getY() - (discDiameter/2), discDiameter, discDiameter);
-                i += 2;
+
             }
+            i += 2;
         }
     }
 

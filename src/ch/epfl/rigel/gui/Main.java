@@ -84,6 +84,7 @@ public class Main extends Application {
                     HorizontalCoordinates.ofDeg ( 180.000000000001 , 15 ));
             viewingParametersBean.setFieldOfViewDeg ( 100 );
 
+
             SkyModeBean skyMode = new SkyModeBean();
             skyMode.setMode("normal");
             MagnitudeBean magnitude = new MagnitudeBean();
