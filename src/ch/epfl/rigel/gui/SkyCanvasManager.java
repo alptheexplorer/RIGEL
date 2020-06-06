@@ -102,11 +102,15 @@ public class SkyCanvasManager {
 
 
         // adding mouse related event listeners
-        canvas.setOnMouseMoved(e -> this.setMousePosition(e));
+        canvas.setOnMouseMoved(e -> {
+            this.setMousePosition(e);
+        }
+        );
         canvas.setOnScroll(e -> {
             this.setFieldOfView(e);
             this.setStarMagAndRgb(e, magnitude, backgroundRgb);
         });
+
 
         //adding keyboard related event listeners
         canvas.setOnMousePressed(e -> this.setFocus(e,canvas)); // ENSURES THAT ONLY RIGHT CLICK GRANTS FOCUS
@@ -120,6 +124,7 @@ public class SkyCanvasManager {
         e.consume();
         if(e.isPrimaryButtonDown()){
             canvas.requestFocus();
+            viewParam.setCenter(HorizontalCoordinates.ofDeg(AZ_INTERVAL.reduce(mouseHorizontalCoordinates.get().azDeg()), ALT_INTERVAL.clip(mouseHorizontalCoordinates.get().altDeg())));
         }
     }
 

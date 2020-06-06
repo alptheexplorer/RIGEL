@@ -119,11 +119,11 @@ public class Main extends Application {
             alert.setHeaderText("What's new? ");
             String newLine = System.getProperty("line.separator");
             alert.setContentText( new StringBuilder()
-                    .append("--> Choose what elements to draw in the Sky")
+                    .append("--> SKY MODE: choose the elements you want drawn in the sky \n")
                     .append(newLine)
-                    .append("--> Dynamic star opacity")
+                    .append("--> DEPTH EFFECT: dynamic sky color and star magnitude, exactly as if it were a telescope \n")
                     .append(newLine)
-                    .append("--> Dynamic zoom mode")
+                    .append("--> NAVIGATE: navigate through the sky using your cursor \n")
                     .append(newLine)
                     .toString());
 
@@ -332,6 +332,7 @@ public class Main extends Application {
         containerRight.getChildren().addAll(height, heightValue);
 
         infoPane.setRight(containerRight);
+
 
 
         return infoPane;

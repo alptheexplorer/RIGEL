@@ -82,8 +82,6 @@ public class SkyCanvasPainter {
      */
     public void drawStars(ObservedSky sky,StereographicProjection projection, Transform planeToAffine, Double magnitude){
 
-
-
         //draw stars
         int i=0;
         for(Star s:sky.stars()){
@@ -99,6 +97,7 @@ public class SkyCanvasPainter {
             i += 2;
         }
     }
+
 
     public void drawAsterisms(ObservedSky sky,StereographicProjection projection, Transform planeToAffine){
         //draw Asterisms
